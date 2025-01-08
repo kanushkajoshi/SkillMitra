@@ -5,12 +5,12 @@ body {
     padding: 0;
     box-sizing: border-box;
     color: #333;
-    background-color: #f9f9f9;
+    background-color: 	#c7b198;
 }
 
 /* Header Styles */
 header {
-    background-color: #e7804d; /* Vibrant orange tone */
+    background-color: #016e85 /* Vibrant orange tone */
     color: #fff;
     padding: 20px 40px;
     display: flex;
