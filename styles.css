@@ -85,7 +85,7 @@ header nav a:hover {
     margin: 0 10px;
     padding: 15px 25px;
     border: none;
-    background-color: #917864;
+    background-color:#917864;;
     color: white;
     font-size: 1rem;
     cursor: pointer;
@@ -171,3 +171,25 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+/* Button Styling */
+.feature-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #917864;; /* Blue color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.feature-btn:hover {
+    background-color: #755e4b; /* Darker blue on hover */
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.feature-btn:active {
+    transform: scale(0.95); /* Slight shrink on click */
+}
+
