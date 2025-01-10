@@ -192,3 +192,32 @@ footer a:hover {
 .feature-btn:active {
     transform: scale(0.95); /* Slight shrink on click */
 }
+/* FAQ Section */
+#faq {
+    text-align: left; /* Keep the section itself centered */
+    padding: 40px 20px;
+}
+
+#faq h2 {
+    text-align: left; /* Keep FAQ title centered */
+    margin-bottom: 30px;
+}
+
+.faq-container {
+    max-width: 800px; /* Optional: limit the width for better readability */
+    margin: 0 auto; /* Center the container */
+}
+
+.faq-container h3 {
+    text-align: left; /* Left-align only the questions */
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.faq-container p {
+    text-align: left; /* Keep the answers centered */
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
