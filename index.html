@@ -226,6 +226,26 @@
             currentIndex = (currentIndex + 1) % images.length;
             images[currentIndex].classList.add('active');
         }, 3000);
+        // Open the Worker Signup Form
+        function openWorkerForm() {
+            document.getElementById("workerForm").style.display = "block";
+        }
+
+        // Close the Worker Signup Form
+        function closeWorkerForm() {
+                document.getElementById("workerForm").style.display = "none";
+        }
+
+        // Open the Talent Hiring Form
+        function openTalentForm() {
+            document.getElementById("talentForm").style.display = "block";
+        }
+
+       // Close the Talent Hiring Form
+        function closeTalentForm() {
+             document.getElementById("talentForm").style.display = "none";
+        }
+
     </script>
 </body>
 </html>
