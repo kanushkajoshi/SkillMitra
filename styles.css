@@ -10,7 +10,7 @@ body {
 
 /* Header Styles */
 header {
-    background-color: #917864 /* Vibrant orange tone */
+    background-color: #917864; /* Vibrant orange tone */
     color: #fff;
     padding: 20px 40px;
     display: flex;
