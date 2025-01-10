@@ -6,6 +6,8 @@
     <title>SkillMitra - Empowering People, One Skill at a Time</title>
     <link rel="icon" href="skillmitralogo.png" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
+
+
 </head>
 <body>
     <header>
@@ -22,31 +24,44 @@
         </nav>
     </header>
 
-    <div class="hero">
-        <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
-        <p>Bridging the gap between talent and opportunities in underserved communities.</p>
-        <div class="cta-buttons">
-            <button class="cta-btn">Sign Up as a Worker</button>
-            <button class="cta-btn">Hire Verified Talent</button>
-        </div>
+      
+<div class="hero">
+    <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
+    <p>Bridging the gap between talent and opportunities in underserved communities.</p>
+    <div class="cta-buttons">
+        <button onclick="openWorkerForm()">Sign Up as a Worker</button>
+        <button onclick="openTalentForm()">Hire Verified Talent</button>
     </div>
+</div>
+
+
+    <!-- <section id="about">
+        <h2>Why SkillMitra?</h2>
+
+        <p>Millions of skilled women face barriers in finding fair and local job opportunities. SkillMantra is here to change that.</p>
+    </section> -->
 
     <section id="about">
         <div class="why-slideshow">
             <div class="why-content">
                 <h2>Why SkillMitra?</h2>
                 <div class="text-box">
-                <p>Ready to bridge the gap between talent and opportunity? We're here to make it effortless for skilled professionals to shine and for recruiters to find the perfect match. No more hassle—just seamless connections that work!</p>
-                </div>
+                <p style="font-family: Arial, sans-serif;">Ready to bridge the gap between talent and opportunity? We're here to make it effortless for skilled professionals to shine and for recruiters to find the perfect match. No more hassle—just seamless connections that work!</p>
+
+            </div>
             </div>
             <div class="slideshow">
                 <img src="tailor.jpeg" alt="Image 1" class="active" height="300" width="500">
+        <p>Millions of skilled women face barriers in finding fair and local job opportunities. SkillMitra is here to change that.</p>
+
                 <img src="potter.jpeg"  height="300" width="500" alt="Image 2">
                 <img src="embro.webp"  height="300" width="500"alt="Image 3">
                 <img src="jacket.jpeg" height="300" width="500" alt="Image 4">
             </div>
         </div>
+
     </section>
+
 
     <section id="features">
         <h2>What We Offer</h2>
@@ -109,6 +124,99 @@
         <p>&copy; 2025 SkillMitra. All Rights Reserved.</p>
         <p><a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
     </footer>
+
+    <!-- Worker Signup Form -->
+    <div id="workerForm" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeWorkerForm()">&times;</span>
+            <h2>Sign Up as a Worker</h2>
+            <form action="/submit-worker" method="POST">
+                <label for="worker-name">Name:</label>
+                <input type="text" id="worker-name" name="worker-name" required>
+
+                <label for="worker-skills">Skills:</label>
+                <select id="worker-skills" name="worker-skills" onchange="showOtherSkillInput(this)">
+                    <option value="Tailor">Tailor</option>
+                    <option value="Embroiderer">Embroiderer</option>
+                    <option value="Plumber">Plumber</option>
+                    <option value="Electrician">Electrician</option>
+                    <option value="Construction Worker">Construction Worker</option>
+                    <option value="Painter">Painter</option>
+                    <option value="Carpenter">Carpenter</option>
+                    <option value="Mason">Mason</option>
+                    <option value="Mechanic">Mechanic</option>
+                    <option value="Sweeper">Sweeper</option>
+                    <option value="Gardener">Gardener</option>
+                    <option value="Welder">Welder</option>
+                    <option value="Housekeeper">Housekeeper</option>
+                    <option value="Security Guard">Security Guard</option>
+                    <option value="Delivery Worker">Delivery Worker</option>
+                    <option value="Driver">Driver</option>
+                    <option value="Cleaner">Cleaner</option>
+                    <option value="Packager">Packager</option>
+                    <option value="Laundry Worker">Laundry Worker</option>
+                    <option value="Warehouse Laborer">Warehouse Laborer</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div id="other-skill" style="display:none; margin-top: 10px;">
+                    <label for="other-skill-input">Please specify:</label>
+                    <input type="text" id="other-skill-input" name="other-skill-input">
+                </div>
+                <label for="worker-other-info">If Other, Then Specify:</label>
+                <textarea id="worker-other-info" name="worker-other-info" placeholder="Provide additional information (optional)"></textarea>
+                <label for="worker-dob">Date of Birth:</label>
+                <input type="date" id="worker-dob" name="worker-dob" required>
+
+                <label for="worker-contact">Contact Number:</label>
+                <input type="tel" id="worker-contact" name="worker-contact" required>
+
+                <label for="worker-email">Email:</label>
+                <input type="email" id="worker-email" name="worker-email" required>
+
+                <label for="worker-gender">Gender:</label>
+                <select id="worker-gender" name="worker-gender" onchange="showOtherGenderInput(this)" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div id="other-gender" style="display:none; margin-top: 10px;">
+                    <label for="other-gender-input">Please specify:</label>
+                    <input type="text" id="other-gender-input" name="other-gender-input">
+                </div>
+
+                <label for="worker-wage">Expected Wage:</label>
+                <input type="number" id="worker-wage" name="worker-wage" placeholder="Enter expected wage in INR" required>
+
+                
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+
+     <!-- Talent Hiring Form -->
+     <div id="talentForm" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeTalentForm()">&times;</span>
+            <h2>Hire Verified Talent</h2>
+            <form action="/submit-talent" method="POST">
+                <label for="recruiter-name">Name:</label>
+                <input type="text" id="recruiter-name" name="recruiter-name" required>
+
+                <label for="job-title">Job Title:</label>
+                <input type="text" id="job-title" name="job-title" required>
+
+                <label for="job-description">Job Description:</label>
+                <textarea id="job-description" name="job-description" required></textarea>
+
+                <label for="expected-wage">Expected Wage:</label>
+                <input type="number" id="expected-wage" name="expected-wage" placeholder="Enter wage in INR" required>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
     <script>
         const images = document.querySelectorAll('.slideshow img');
         let currentIndex = 0;
