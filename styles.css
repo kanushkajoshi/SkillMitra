@@ -194,30 +194,72 @@ footer a:hover {
 }
 /* FAQ Section */
 #faq {
-    text-align: left; /* Keep the section itself centered */
+    text-align: left; /* Aligns the section content */
     padding: 40px 20px;
 }
 
 #faq h2 {
-    text-align: left; /* Keep FAQ title centered */
+    text-align: left; /* Align FAQ title to the left */
     margin-bottom: 30px;
 }
 
 .faq-container {
     max-width: 800px; /* Optional: limit the width for better readability */
-    margin: 0 auto; /* Center the container */
+    margin: 0; /* Remove auto-centering */
 }
 
 .faq-container h3 {
-    text-align: left; /* Left-align only the questions */
+    text-align: left; /* Left-align the questions */
     font-size: 1.2rem;
     color: #333;
     margin-bottom: 10px;
 }
 
 .faq-container p {
-    text-align: left; /* Keep the answers centered */
+    text-align: left; /* Left-align the answers */
     font-size: 1rem;
     color: #666;
     margin-bottom: 20px;
+}
+.why-slideshow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+.why-content {
+width: 50%;
+text-align: relative;
+padding: 20px;
+}
+.slideshow {
+    width: 50%;
+    position: top;
+}
+.slideshow img {
+    width: 500;
+    height: 300;
+    border-radius: 10px;
+    display: none;
+    position: top;
+    top: 0; /* Aligns images to the top of their container */
+}
+.slideshow img.active {
+    display: block;
+}
+.text-box {
+    background-color: white; /* White background for the box */
+    padding: 20px; /* Add some space around the text */
+    border-radius: 10px; /* Rounded corners for the box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    max-width: 80%; /* Adjust width to fit text */
+    margin: 0 auto; /* Center the box */
+    text-align: center; /* Center the text inside the box */
+    font-size: 1.2rem; /* Adjust text size */
+    color: #333; /* Dark color for the text */
+}
+
+.text-box p {
+    margin: 0; /* Remove default margin */
+    line-height: 1.6; /* Line spacing for readability */
 }
