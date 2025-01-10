@@ -5,12 +5,12 @@ body {
     padding: 0;
     box-sizing: border-box;
     color: #333;
-    background-color: 	#c7b198
+    background-color:   #c7b198;
 }
 
 /* Header Styles */
 header {
-    background-color: #fefdfc /* Vibrant orange tone */
+    background-color: #917864; /* Vibrant orange tone */
     color: #fff;
     padding: 20px 40px;
     display: flex;
@@ -48,18 +48,18 @@ header nav a {
     text-decoration: none;
     font-size: 1rem;
     font-weight: 500;
-    transition: color 0.3s;
+    transition:  0.3s;
 }
 
 header nav a:hover {
-    color: 	#322f2c /* Light orange hover */
+    color:  #322f2c; /* Light orange hover */
 }
 
 /* Hero Section */
 .hero {
     text-align: center;
     padding: 100px 20px;
-    background: linear-gradient(to bottom, 	#dfd3c3, #ffffff); /* Soft gradient */
+    background: linear-gradient(to bottom,  #dfd3c3, #ffffff); /* Soft gradient */
 }
 
 .hero h1 {
@@ -85,7 +85,7 @@ header nav a:hover {
     margin: 0 10px;
     padding: 15px 25px;
     border: none;
-    background-color:#2162cb;;
+    background-color:#917864;
     color: white;
     font-size: 1rem;
     cursor: pointer;
@@ -192,4 +192,3 @@ footer a:hover {
 .feature-btn:active {
     transform: scale(0.95); /* Slight shrink on click */
 }
-
