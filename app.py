@@ -5,7 +5,6 @@ from flask_limiter.util import get_remote_address
 import bcrypt
 import sqlite3
 
-
 app = Flask(__name__)
 CORS(app)
 limiter = Limiter(get_remote_address, app=app)
@@ -47,7 +46,15 @@ def hash_password(password):
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode('utf-8'), salt)
 
-@app.route('/signup', methods=['POST'])
+# Route decorator placed directly above the function
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        # Handle form submission
+        pass
+    else:
+        # Render signup form
+        pass
 @limiter.limit("5 per minute")
 def signup():
     data = request.json
@@ -73,3 +80,25 @@ def signup():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+# Connect to SQLite (this creates the file if it doesn't exist)
+connection = sqlite3.connect('database.db')
+
+# Create a cursor object to execute SQL commands
+cursor = connection.cursor()
+
+# Create a table (example)
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL
+    )
+''')
+
+# Commit changes and close the connection
+connection.commit()
+connection.close()
+
+print("database.db file created successfully!")

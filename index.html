@@ -91,21 +91,125 @@
     <section id="stories">
         <h2>Our Impact</h2>
         <p>Explore success stories of women and businesses empowered by SkillMitra.</p>
+        <section id="impact">
+            <div class="impact-slideshow-container" onclick="handleSlideClick(event)">
+                <!-- Slideshow images with text content -->
+                <div class="impact-slideshow">
+                    <div class="impact-slide">
+                        <h3>Real Stories of Empowerment</h3>
+                        <p>"Thanks to SkillMitra, I found a steady job as a tailor and am now able to support my family."</p>
+                        <p>~Priya Kumari</p>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                        </div>
+                    </div>
+                    <div class="impact-slide">
+                        <h3>Transforming Communities</h3>
+                        <p>In the last year, SkillMitra helped create 3,000 local jobs and trained over 500 women in entrepreneurial skills.</p>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                        </div>
+                    </div>
+                    <div class="impact-slide">
+                        <h3>The Numbers Behind the Change</h3>
+                        <ul>
+                            <li>3,000 jobs created</li>
+                            <li>98% worker satisfaction rate</li>
+                            <li>500+ women entrepreneurs trained</li>
+                        </ul>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                        </div>
+                    </div>
+                    <div class="impact-slide">
+                        <h3>Partnerships & Collaborations</h3>
+                        <p>We’ve partnered with various local businesses, NGOs, and government organizations to ensure that more people have access to SkillMitra’s benefits.</p>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                            <span class="star">&#9733;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </section>
+    
 
     <section id="faq">
-        <h2>FAQs(Frequently Asked Questions)</h2>
+        <h2>FAQs (Frequently Asked Questions)</h2>
         <div class="faq-container">
-            <h3>What is SkillMitra?</h3>
-            <p>SkillMitra is a platform that connects skilled individuals with local job opportunities.</p>
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>What is SkillMitra?</h3>
+                <p class="faq-answer">SkillMitra is a platform that connects skilled individuals with local job opportunities.</p>
+            </div>
+    
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How does the platform ensure fair compensation?</h3>
+                <p class="faq-answer">We use transparent reviews and fair wage guidelines to ensure workers receive fair compensation.</p>
+            </div>
+    
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I sign up for training programs?</h3>
+                <p class="faq-answer">Yes, SkillMitra offers upskilling and certification programs to help boost your career.</p>
+            </div>
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>What types of courses does SkillMitra offer?</h3>
+                <p class="faq-answer">SkillMitra offers a wide range of courses including technical, soft skills, business development, and industry-specific certifications to help you advance in your career.</p>
+            </div>
             
-            <h3>How does the platform ensure fair compensation?</h3>
-            <p>We use transparent reviews and fair wage guidelines to ensure workers receive fair compensation.</p>
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How do I enroll in a course?</h3>
+                <p class="faq-answer">You can easily enroll in any of our courses by visiting the "Courses" section on our website and selecting the course you'd like to join. Just follow the registration steps to get started!</p>
+            </div>
             
-            <h3>Can I sign up for training programs?</h3>
-            <p>Yes, SkillMitra offers upskilling and certification programs to help boost your career.</p>
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Are the courses free?</h3>
+                <p class="faq-answer">While some introductory courses are free, most of our in-depth programs require a fee. You can check course details for pricing and any available discounts.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Will I receive a certification after completing a course?</h3>
+                <p class="faq-answer">Yes, upon successfully completing any of our courses, you will receive a certificate of completion that you can add to your resume or LinkedIn profile.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I take courses at my own pace?</h3>
+                <p class="faq-answer">Yes, many of our courses are self-paced, allowing you to learn at your convenience. However, some instructor-led courses may have fixed schedules.</p>
+            </div>
+            
+            <!-- <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Are there any prerequisites for the courses?</h3>
+                <p class="faq-answer">Prerequisites vary by course. Some may require prior knowledge in a specific area, while others are beginner-friendly. You can check the course details for any specific requirements.</p>
+            </div> -->
+            
+            <!-- <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I access course materials after completion?</h3>
+                <p class="faq-answer">Yes, you will have access to course materials even after completing the course, allowing you to review and revisit the content whenever you need.</p>
+            </div> -->
+            
+            <!-- <div class="faq-item">
+                <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How can I get assistance if I have questions during a course?</h3>
+                <p class="faq-answer">You can ask questions in the course discussion forums, or you may reach out to course instructors and support staff via email or chat for further assistance.</p>
+            </div> -->
+            
         </div>
     </section>
+    
     
     
 
@@ -120,6 +224,8 @@
             <span class="close" onclick="closeWorkerForm()">&times;</span>
             <h2>Sign Up as a Worker</h2>
             <form action="/submit-worker" method="POST">
+                    <!-- Form fields -->
+                
                 <label for="worker-name">Name:</label>
                 <input type="text" id="worker-name" name="worker-name" required>
 
