@@ -192,9 +192,6 @@ footer a:hover {
 .feature-btn:active {
     transform: scale(0.95); /* Slight shrink on click */
 }
-<<<<<<< HEAD
-
-=======
 /* FAQ Section */
 #faq {
     text-align: left; /* Aligns the section content */
@@ -266,4 +263,3 @@ padding: 20px;
     margin: 0; /* Remove default margin */
     line-height: 1.6; /* Line spacing for readability */
 }
->>>>>>> 09df8c4ad4fcf6b450c5e4ed5943c3f7155c5530
