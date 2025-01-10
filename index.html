@@ -6,7 +6,7 @@
     <title>SkillMitra - Empowering People, One Skill at a Time</title>
     <link rel="icon" href="skillmitralogo.png" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="chatstyle.css"> <!-- Link to external CSS file -->
 
 </head>
 <body>
@@ -118,6 +118,25 @@
         </div>
     </section>
     
+    <div id="open-chat" onclick="toggleChat()">💬 </div>
+    <div id="chat-container" style=> <!-- Hide initially -->
+        <div id="chat-header">
+            <span>Chatbot</span>
+            <span id="close-chat" onclick="toggleChat()">X</span>
+        </div>
+        <div id="chat-box">
+            <div id="chat-history"></div>
+        </div>
+        <input
+            type="text"
+            id="user-input"
+            placeholder="Type your message..."
+            onkeydown="if(event.key === 'Enter') sendMessage()"
+        />
+    </div>
+
+
+ 
     
 
     <footer>
@@ -217,7 +236,7 @@
             </form>
         </div>
     </div>
-    <script>
+    <script >
         const images = document.querySelectorAll('.slideshow img');
         let currentIndex = 0;
 
@@ -245,7 +264,7 @@
         function closeTalentForm() {
              document.getElementById("talentForm").style.display = "none";
         }
-
-    </script>
+        </script>
+        <script src="chat.js"></script> <!-- External JavaScript -->
 </body>
 </html>
