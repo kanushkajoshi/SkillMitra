@@ -39,8 +39,9 @@
             <div class="why-content">
                 <h2>Why SkillMitra?</h2>
                 <div class="text-box">
-                <p>Ready to bridge the gap between talent and opportunity? We're here to make it effortless for skilled professionals to shine and for recruiters to find the perfect match. No more hassle—just seamless connections that work!</p>
-                </div>
+                <p style="font-family: Arial, sans-serif;">Ready to bridge the gap between talent and opportunity? We're here to make it effortless for skilled professionals to shine and for recruiters to find the perfect match. No more hassle—just seamless connections that work!</p>
+
+            </div>
             </div>
             <div class="slideshow">
                 <img src="tailor.jpeg" alt="Image 1" class="active" height="300" width="500">
@@ -123,10 +124,9 @@
                 <input type="text" id="worker-name" name="worker-name" required>
 
                 <label for="worker-skills">Skills:</label>
-                <select id="worker-skills" name="worker-skills" multiple style="width: 100%; height: 150px;">
+                <select id="worker-skills" name="worker-skills" onchange="showOtherSkillInput(this)">
                     <option value="Tailor">Tailor</option>
                     <option value="Embroiderer">Embroiderer</option>
-                    <option value="Wage Labour">Wage Labour </option>
                     <option value="Plumber">Plumber</option>
                     <option value="Electrician">Electrician</option>
                     <option value="Construction Worker">Construction Worker</option>
@@ -147,7 +147,12 @@
                     <option value="Warehouse Laborer">Warehouse Laborer</option>
                     <option value="Other">Other</option>
                 </select>
-
+                <div id="other-skill" style="display:none; margin-top: 10px;">
+                    <label for="other-skill-input">Please specify:</label>
+                    <input type="text" id="other-skill-input" name="other-skill-input">
+                </div>
+                <label for="worker-other-info">If Other, Then Specify:</label>
+                <textarea id="worker-other-info" name="worker-other-info" placeholder="Provide additional information (optional)"></textarea>
                 <label for="worker-dob">Date of Birth:</label>
                 <input type="date" id="worker-dob" name="worker-dob" required>
 
@@ -158,14 +163,20 @@
                 <input type="email" id="worker-email" name="worker-email" required>
 
                 <label for="worker-gender">Gender:</label>
-                <select id="worker-gender" name="worker-gender" required>
+                <select id="worker-gender" name="worker-gender" onchange="showOtherGenderInput(this)" required>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                 </select>
+                <div id="other-gender" style="display:none; margin-top: 10px;">
+                    <label for="other-gender-input">Please specify:</label>
+                    <input type="text" id="other-gender-input" name="other-gender-input">
+                </div>
 
                 <label for="worker-wage">Expected Wage:</label>
                 <input type="number" id="worker-wage" name="worker-wage" placeholder="Enter expected wage in INR" required>
+
+                
 
                 <button type="submit">Submit</button>
             </form>
