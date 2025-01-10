@@ -327,3 +327,136 @@ form button {
 form button:hover {
     background-color: #45a049;
 }
+
+.why-slideshow {
+    display: flex;
+    justify-content: flex-end; /* Aligns the slideshow to the right */
+}
+
+/* .slideshow {
+    display: flex;
+    gap: 10px; /* Optional: Adds space between images */
+
+
+    .faq-answer {
+        display: none; /* Hide answers by default */
+        overflow: hidden;
+        max-height: 0; /* Initially set to 0 for a smooth transition */
+        padding: 0 0 10px 0; /* Padding to apply when expanded */
+        font-size: 1.1em;
+        color: #555;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Smooth transition */
+    }
+    
+    .faq-question {
+        cursor: pointer;
+        margin: 10px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    .faq-item {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    
+#impact {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.impact-slideshow-container {
+    position: relative;
+    max-width: 100%;
+    margin: auto;
+}
+
+.impact-slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.impact-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 30px;
+}
+
+.impact-slide h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.impact-slide p, .impact-slide ul {
+    font-size: 18px;
+    color: #555;
+}
+
+.impact-slide ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.impact-slide ul li {
+    margin-bottom: 10px;
+}
+
+.slideshow-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.prev, .next {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 16px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.impact-slideshow-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.impact-slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.impact-slide {
+    min-width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.rating {
+    margin-top: 10px;
+}
+
+.star {
+    color: gold;
+    font-size: 20px;
+}
+
+.impact-slideshow-container {
+    cursor: pointer;
+}
+
+/* Optional: To add some padding/margin for better layout */
+#impact {
+    margin-top: 30px;
+}
