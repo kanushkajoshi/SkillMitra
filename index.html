@@ -254,6 +254,7 @@
                 </div>
                 <div id="chat-box">
                     <div id="chat-history"></div>
+                    <div id="chat-suggestions"></div> <!-- Suggestions Container -->
                 </div>
                 <input
                     type="text"
@@ -279,12 +280,11 @@
                 <div class="modal-content">
                     <span class="close" onclick="closeWorkerForm()">&times;</span>
                     <h2>Sign Up as a Worker</h2>
-                    <form action="signup.php" method="POST">
-                            <!-- Form fields -->
-                        
+                    <form action="other-page.php" method="POST">
+                        <!-- Form fields -->
                         <label for="worker-name">Name:</label>
                         <input type="text" id="worker-name" name="worker-name" required>
-        
+                    
                         <label for="worker-skills">Skills:</label>
                         <select id="worker-skills" name="worker-skills" onchange="showOtherSkillInput(this)">
                             <option value="Tailor">Tailor</option>
@@ -313,17 +313,28 @@
                             <label for="other-skill-input">Please specify:</label>
                             <input type="text" id="other-skill-input" name="other-skill-input">
                         </div>
-                        <label for="worker-other-info">If Other, Then Specify:</label>
-                        <textarea id="worker-other-info" name="worker-other-info" placeholder="Provide additional information (optional)"></textarea>
+                    
                         <label for="worker-dob">Date of Birth:</label>
                         <input type="date" id="worker-dob" name="worker-dob" required>
-        
+                    
                         <label for="worker-contact">Contact Number:</label>
                         <input type="tel" id="worker-contact" name="worker-contact" required>
-        
+                    
                         <label for="worker-email">Email:</label>
-                        <input type="email" id="worker-email" name="worker-email" required>
-        
+                        <input type="email" id="worker-email" name="worker-email" onblur="checkEmailAvailability()" required>
+                        <span id="email-error" style="color: red; display: none;">Email already exists!</span>
+                    
+                        <label for="worker-password">Password:</label>
+                        <input type="password" id="worker-password" name="worker-password" minlength="6" required>
+                        <label for="worker-pincode">PIN Code:</label>
+    <input type="text" id="worker-pincode" name="worker-pincode" maxlength="6" onkeyup="fetchLocationDetails()" required>
+                    
+                        <label for="worker-city">City:</label>
+                        <input type="text" id="worker-city" name="worker-city" readonly>
+                    
+                        <label for="worker-state">State:</label>
+                        <input type="text" id="worker-state" name="worker-state" readonly>
+                    
                         <label for="worker-gender">Gender:</label>
                         <select id="worker-gender" name="worker-gender" onchange="showOtherGenderInput(this)" required>
                             <option value="Male">Male</option>
@@ -334,14 +345,61 @@
                             <label for="other-gender-input">Please specify:</label>
                             <input type="text" id="other-gender-input" name="other-gender-input">
                         </div>
-        
+                    
                         <label for="worker-wage">Expected Wage:</label>
                         <input type="number" id="worker-wage" name="worker-wage" placeholder="Enter expected wage in INR" required>
-        
-                        
-        
+                    
                         <button type="submit">Submit</button>
                     </form>
+                    
+                    <script>
+                        function showOtherSkillInput(selectElement) {
+                            const otherSkillDiv = document.getElementById('other-skill');
+                            if (selectElement.value === 'Other') {
+                                otherSkillDiv.style.display = 'block';
+                            } else {
+                                otherSkillDiv.style.display = 'none';
+                                document.getElementById('other-skill-input').value = ''; // Clear input when hidden
+                            }
+                        }
+                    
+                        function showOtherGenderInput(selectElement) {
+                            const otherGenderDiv = document.getElementById('other-gender');
+                            if (selectElement.value === 'Other') {
+                                otherGenderDiv.style.display = 'block';
+                            } else {
+                                otherGenderDiv.style.display = 'none';
+                                document.getElementById('other-gender-input').value = ''; // Clear input when hidden
+                            }
+                        }
+                    
+                        async function fetchLocationDetails() {
+                            const pincode = document.getElementById('worker-pincode').value;
+                            if (pincode.length === 6) { // Only make the API call when PIN code has 6 digits
+                                try {
+                                    const response = await fetch(`https://api.zippopotam.us/in/${pincode}`);
+                                    if (response.ok) {
+                                        const data = await response.json();
+                                        document.getElementById('worker-city').value = data.places[0]['place name'];
+                                        document.getElementById('worker-state').value = data.places[0]['state'];
+                                    } else {
+                                        document.getElementById('worker-city').value = '';
+                                        document.getElementById('worker-state').value = '';
+                                        console.error('Invalid PIN Code');
+                                    }
+                                } catch (error) {
+                                    console.error('Error fetching location data:', error);
+                                }
+                            } else {
+                                document.getElementById('worker-city').value = '';
+                                document.getElementById('worker-state').value = '';
+                            }
+                        }
+                    </script>
+                    
+                    
+                    
+                    
                 </div>
             </div>
         
