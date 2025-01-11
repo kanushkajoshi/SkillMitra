@@ -1,0 +1,528 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #333;
+    background-color:   #c7b198;
+}
+
+/* Header Styles */
+header {
+    background-color: #917864; /* Vibrant orange tone */
+    color: #fff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header .logo {
+    width: 50px; /* Logo width */
+    height: 50px; /* Logo height */
+    border-radius: 50%;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+header nav {
+    display: flex;
+    align-items: center;
+}
+
+header nav a {
+    color: #070707;
+    margin: 0 15px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition:  0.3s;
+}
+
+header nav a:hover {
+    color:  #322f2c; /* Light orange hover */
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+    background: linear-gradient(to bottom,  #dfd3c3, #ffffff); /* Soft gradient */
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.hero .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.hero .cta-buttons button {
+    margin: 0 10px;
+    padding: 15px 25px;
+    border: none;
+    background-color:#3d6fee;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 30px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.hero .cta-buttons button:hover {
+    background-color: #161717;
+    transform: translateY(-3px);
+}
+
+/* Section Styles */
+section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+section h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+section p {
+    font-size: 1rem;
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+/* Features Section */
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.feature {
+    margin: 20px;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 280px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.feature h3 {
+    font-size: 1.2rem;
+    color: #876346;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: #ff8a4281;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+/* Button Styling */
+.feature-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #917864; /* Blue color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.feature-btn:hover {
+    background-color: #755e4b; /* Darker blue on hover */
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.feature-btn:active {
+    transform: scale(0.95); /* Slight shrink on click */
+}
+/* FAQ Section */
+#faq {
+    text-align: left; /* Aligns the section content */
+    padding: 40px 20px;
+}
+
+#faq h2 {
+    text-align: left; /* Align FAQ title to the left */
+    margin-bottom: 30px;
+}
+
+.faq-container {
+    max-width: 800px; /* Optional: limit the width for better readability */
+    margin: 0; /* Remove auto-centering */
+}
+
+.faq-container h3 {
+    text-align: left; /* Left-align the questions */
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.faq-container p {
+    text-align: left; /* Left-align the answers */
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+.why-slideshow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+.why-content {
+width: 50%;
+text-align: relative;
+padding: 20px;
+}
+.slideshow {
+    width: 50%;
+    position: top;
+}
+.slideshow img {
+    width: 500;
+    height: 300;
+    border-radius: 10px;
+    display: none;
+    position: top;
+    top: 0; /* Aligns images to the top of their container */
+}
+.slideshow img.active {
+    display: block;
+}
+.text-box {
+    background-color: white; /* White background for the box */
+    padding: 20px; /* Add some space around the text */
+    border-radius: 10px; /* Rounded corners for the box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    max-width: 80%; /* Adjust width to fit text */
+    margin: 0 auto; /* Center the box */
+    text-align: center; /* Center the text inside the box */
+    font-size: 1.2rem; /* Adjust text size */
+    color: #333; /* Dark color for the text */
+}
+
+.text-box p {
+    margin: 0; /* Remove default margin */
+    line-height: 1.6; /* Line spacing for readability */
+}
+
+.modal {
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Input and Button Styling */
+form label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+form input, form textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #45a049;
+}
+
+.why-slideshow {
+    display: flex;
+    justify-content: flex-end; /* Aligns the slideshow to the right */
+}
+
+/* .slideshow {
+    display: flex;
+    gap: 10px; /* Optional: Adds space between images */
+
+
+    .faq-answer {
+        display: none; /* Hide answers by default */
+        overflow: hidden;
+        max-height: 0; /* Initially set to 0 for a smooth transition */
+        padding: 0 0 10px 0; /* Padding to apply when expanded */
+        font-size: 1.1em;
+        color: #555;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Smooth transition */
+    }
+    
+    .faq-question {
+        cursor: pointer;
+        margin: 10px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    .faq-item {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    
+#impact {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.impact-slideshow-container {
+    position: relative;
+    max-width: 100%;
+    margin: auto;
+}
+
+.impact-slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.impact-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 30px;
+}
+
+.impact-slide h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.impact-slide p, .impact-slide ul {
+    font-size: 18px;
+    color: #555;
+}
+
+.impact-slide ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.impact-slide ul li {
+    margin-bottom: 10px;
+}
+
+.slideshow-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.prev, .next {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 16px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.impact-slideshow-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.impact-slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.impact-slide {
+    min-width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.rating {
+    margin-top: 10px;
+}
+
+.star {
+    color: gold;
+    font-size: 20px;
+}
+
+.impact-slideshow-container {
+    cursor: pointer;
+}
+
+/* Optional: To add some padding/margin for better layout */
+#impact {
+    margin-top: 30px;
+}
+/* Chatbot Icon */
+#open-chat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 24px;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Chatbot Container */
+#chat-container {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    max-height: 400px;
+    display: none;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Chat Header */
+#chat-header {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Chat Box */
+#chat-box {
+    height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* User and Bot Message Styles */
+.user-message, .bot-message {
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: 15px;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    text-align: right;
+}
+
+.bot-message {
+    background-color: #e5e5e5;
+    color: #333;
+}
+
