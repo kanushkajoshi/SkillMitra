@@ -5,7 +5,382 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillMitra - Empowering People, One Skill at a Time</title>
         <link rel="icon" href="skillmitralogo.png" type="image/x-icon">
-    
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>SkillMitra - Empowering People, One Skill at a Time</title>
+            <link rel="icon" href="skillmitralogo.png" type="image/x-icon">
+            <link rel="stylesheet" href="styles.css">
+            <link rel="stylesheet" href="chatstyle.css"> <!-- Link to external CSS file -->
+        
+        </head>
+        <body>
+            <header>
+                <div class="logo-container">
+                    <img src="skillmitralogo.png" alt="SkillMitra Logo" class="logo">
+                    <h1>SkillMitra</h1>
+                </div>
+                <nav>
+                    <a href="#about">About Us</a>
+                    <a href="#features">Features</a>
+                    <a href="#stories">Success Stories</a>
+                    <a href="#faq">FAQs</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </header>
+        
+              
+        <div class="hero">
+            <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
+            <p>Bridging the gap between talent and opportunities in underserved communities.</p>
+            <div class="cta-buttons">
+                <button onclick="openWorkerForm()">Sign Up as a Worker</button>
+                <button onclick="openTalentForm()">Hire Verified Talent</button>
+            </div>
+        </div>
+        
+        
+            <!-- <section id="about">
+                <h2>Why SkillMitra?</h2>
+        
+                <p>Millions of skilled women face barriers in finding fair and local job opportunities. SkillMantra is here to change that.</p>
+            </section> -->
+        
+            <section id="about">
+                <div class="why-slideshow">
+                    <div class="why-content">
+                        <h2>Why SkillMitra?</h2>
+                        <div class="text-box">
+                        <p style="font-family: Arial, sans-serif;">Ready to bridge the gap between talent and opportunity? We're here to make it effortless for skilled professionals to shine and for recruiters to find the perfect match. No more hassle—just seamless connections that work!</p>
+        
+                    </div>
+                    </div>
+                    <div class="slideshow">
+                        <img src="tailor.jpeg" alt="Image 1" class="active" height="300" width="500">
+                <p>Millions of skilled women face barriers in finding fair and local job opportunities. SkillMitra is here to change that.</p>
+        
+                        <img src="potter.jpeg"  height="300" width="500" alt="Image 2">
+                        <img src="embro.webp"  height="300" width="500"alt="Image 3">
+                        <img src="jacket.jpeg" height="300" width="500" alt="Image 4">
+                    </div>
+                </div>
+        
+            </section>
+        
+        
+            <section id="features">
+                <h2>What We Offer</h2>
+                <div class="features">
+                    <div class="feature">
+                        <h3>Real-Time Availability</h3>
+                        <p>Update availability, access talent on demand.</p>
+                        <button class="feature-btn">Learn More</button>
+                    </div>
+                    <div class="feature">
+                        <h3>Upskilling & Growth</h3>
+                        <p>Training and certifications to boost careers.</p>
+                        <button class="feature-btn">Explore Training Programs</button>
+                    </div>
+                    <div class="feature">
+                        <h3>Smart Job Matching</h3>
+                        <p>AI matches workers with suitable jobs.</p>
+                        <button class="feature-btn">Discover Your Match</button>
+                    </div>
+                    <div class="feature">
+                        <h3>Trustworthy Ratings</h3>
+                        <p>Build trust with transparent reviews.</p>
+                        <button class="feature-btn">Explore Reviews</button>
+                    </div>
+                    <div class="feature">
+                        <h3>Fair Compensation</h3>
+                        <p>Ensure workers receive fair wages.</p>
+                        <button class="feature-btn">Learn More</button>
+                    </div>
+                    <div class="feature">
+                        <h3>Collaboration Opportunities</h3>
+                        <p>Facilitate partnerships and creative ventures.</p>
+                        <button class="feature-btn">Explore Collaboration</button>
+                    </div>
+                </div>
+            </section>
+        
+            <section id="stories">
+                <h2>Our Impact</h2>
+                <p>Explore success stories of women and businesses empowered by SkillMitra.</p>
+                <section id="impact">
+                    <div class="impact-slideshow-container" onclick="handleSlideClick(event)">
+                        <!-- Slideshow images with text content -->
+                        <div class="impact-slideshow">
+                            <div class="impact-slide">
+                                <h3>Real Stories of Empowerment</h3>
+                                <p>"Thanks to SkillMitra, I found a steady job as a tailor and am now able to support my family."</p>
+                                <p>~Priya Kumari</p>
+                                <div class="rating">
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                </div>
+                            </div>
+                            <div class="impact-slide">
+                                <h3>Transforming Communities</h3>
+                                <p>In the last year, SkillMitra helped create 3,000 local jobs and trained over 500 women in entrepreneurial skills.</p>
+                                <div class="rating">
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                </div>
+                            </div>
+                            <div class="impact-slide">
+                                <h3>The Numbers Behind the Change</h3>
+                                <ul>
+                                    <li>3,000 jobs created</li>
+                                    <li>98% worker satisfaction rate</li>
+                                    <li>500+ women entrepreneurs trained</li>
+                                </ul>
+                                <div class="rating">
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                </div>
+                            </div>
+                            <div class="impact-slide">
+                                <h3>Partnerships & Collaborations</h3>
+                                <p>We’ve partnered with various local businesses, NGOs, and government organizations to ensure that more people have access to SkillMitra’s benefits.</p>
+                                <div class="rating">
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                    <span class="star">&#9733;</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            
+        
+            <section id="faq">
+                <h2>FAQs (Frequently Asked Questions)</h2>
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>What is SkillMitra?</h3>
+                        <p class="faq-answer">SkillMitra is a platform that connects skilled individuals with local job opportunities.</p>
+                    </div>
+            
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How does the platform ensure fair compensation?</h3>
+                        <p class="faq-answer">We use transparent reviews and fair wage guidelines to ensure workers receive fair compensation.</p>
+                    </div>
+            
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I sign up for training programs?</h3>
+                        <p class="faq-answer">Yes, SkillMitra offers upskilling and certification programs to help boost your career.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>What types of courses does SkillMitra offer?</h3>
+                        <p class="faq-answer">SkillMitra offers a wide range of courses including technical, soft skills, business development, and industry-specific certifications to help you advance in your career.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How do I enroll in a course?</h3>
+                        <p class="faq-answer">You can easily enroll in any of our courses by visiting the "Courses" section on our website and selecting the course you'd like to join. Just follow the registration steps to get started!</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Are the courses free?</h3>
+                        <p class="faq-answer">While some introductory courses are free, most of our in-depth programs require a fee. You can check course details for pricing and any available discounts.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Will I receive a certification after completing a course?</h3>
+                        <p class="faq-answer">Yes, upon successfully completing any of our courses, you will receive a certificate of completion that you can add to your resume or LinkedIn profile.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I take courses at my own pace?</h3>
+                        <p class="faq-answer">Yes, many of our courses are self-paced, allowing you to learn at your convenience. However, some instructor-led courses may have fixed schedules.</p>
+                    </div>
+                    
+                    <!-- <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Are there any prerequisites for the courses?</h3>
+                        <p class="faq-answer">Prerequisites vary by course. Some may require prior knowledge in a specific area, while others are beginner-friendly. You can check the course details for any specific requirements.</p>
+                    </div> -->
+                    
+                    <!-- <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>Can I access course materials after completion?</h3>
+                        <p class="faq-answer">Yes, you will have access to course materials even after completing the course, allowing you to review and revisit the content whenever you need.</p>
+                    </div> -->
+                    
+                    <!-- <div class="faq-item">
+                        <h3 class="faq-question" onclick="toggleAnswer(this)"><span>&#8594;</span>How can I get assistance if I have questions during a course?</h3>
+                        <p class="faq-answer">You can ask questions in the course discussion forums, or you may reach out to course instructors and support staff via email or chat for further assistance.</p>
+                    </div> -->
+                    
+                </div>
+            </section>
+            
+            <div id="open-chat" onclick="toggleChat()">💬 </div>
+            <div id="chat-container" style=> <!-- Hide initially -->
+                <div id="chat-header">
+                    <span>Chatbot</span>
+                    <span id="close-chat" onclick="toggleChat()">X</span>
+                </div>
+                <div id="chat-box">
+                    <div id="chat-history"></div>
+                </div>
+                <input
+                    type="text"
+                    id="user-input"
+                    placeholder="Type your message..."
+                    onkeydown="if(event.key === 'Enter') sendMessage()"
+                />
+            </div>
+        
+        
+         
+            
+            
+        
+            <footer>
+                <p>&copy; 2025 SkillMitra. All Rights Reserved.</p>
+                <p><a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
+            </footer>
+        
+            <!-- Worker Signup Form -->
+            <div id="workerForm" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close" onclick="closeWorkerForm()">&times;</span>
+                    <h2>Sign Up as a Worker</h2>
+                    <form action="/submit-worker" method="POST">
+                            <!-- Form fields -->
+                        
+                        <label for="worker-name">Name:</label>
+                        <input type="text" id="worker-name" name="worker-name" required>
+        
+                        <label for="worker-skills">Skills:</label>
+                        <select id="worker-skills" name="worker-skills" onchange="showOtherSkillInput(this)">
+                            <option value="Tailor">Tailor</option>
+                            <option value="Embroiderer">Embroiderer</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Construction Worker">Construction Worker</option>
+                            <option value="Painter">Painter</option>
+                            <option value="Carpenter">Carpenter</option>
+                            <option value="Mason">Mason</option>
+                            <option value="Mechanic">Mechanic</option>
+                            <option value="Sweeper">Sweeper</option>
+                            <option value="Gardener">Gardener</option>
+                            <option value="Welder">Welder</option>
+                            <option value="Housekeeper">Housekeeper</option>
+                            <option value="Security Guard">Security Guard</option>
+                            <option value="Delivery Worker">Delivery Worker</option>
+                            <option value="Driver">Driver</option>
+                            <option value="Cleaner">Cleaner</option>
+                            <option value="Packager">Packager</option>
+                            <option value="Laundry Worker">Laundry Worker</option>
+                            <option value="Warehouse Laborer">Warehouse Laborer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="other-skill" style="display:none; margin-top: 10px;">
+                            <label for="other-skill-input">Please specify:</label>
+                            <input type="text" id="other-skill-input" name="other-skill-input">
+                        </div>
+                        <label for="worker-other-info">If Other, Then Specify:</label>
+                        <textarea id="worker-other-info" name="worker-other-info" placeholder="Provide additional information (optional)"></textarea>
+                        <label for="worker-dob">Date of Birth:</label>
+                        <input type="date" id="worker-dob" name="worker-dob" required>
+        
+                        <label for="worker-contact">Contact Number:</label>
+                        <input type="tel" id="worker-contact" name="worker-contact" required>
+        
+                        <label for="worker-email">Email:</label>
+                        <input type="email" id="worker-email" name="worker-email" required>
+        
+                        <label for="worker-gender">Gender:</label>
+                        <select id="worker-gender" name="worker-gender" onchange="showOtherGenderInput(this)" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="other-gender" style="display:none; margin-top: 10px;">
+                            <label for="other-gender-input">Please specify:</label>
+                            <input type="text" id="other-gender-input" name="other-gender-input">
+                        </div>
+        
+                        <label for="worker-wage">Expected Wage:</label>
+                        <input type="number" id="worker-wage" name="worker-wage" placeholder="Enter expected wage in INR" required>
+        
+                        
+        
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        
+        
+             <!-- Talent Hiring Form -->
+             <div id="talentForm" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close" onclick="closeTalentForm()">&times;</span>
+                    <h2>Hire Verified Talent</h2>
+                    <form action="/submit-talent" method="POST">
+                        <label for="recruiter-name">Name:</label>
+                        <input type="text" id="recruiter-name" name="recruiter-name" required>
+        
+                        <label for="job-title">Job Title:</label>
+                        <input type="text" id="job-title" name="job-title" required>
+        
+                        <label for="job-description">Job Description:</label>
+                        <textarea id="job-description" name="job-description" required></textarea>
+        
+                        <label for="expected-wage">Expected Wage:</label>
+                        <input type="number" id="expected-wage" name="expected-wage" placeholder="Enter wage in INR" required>
+        
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+            <script >
+                const images = document.querySelectorAll('.slideshow img');
+                let currentIndex = 0;
+        
+                setInterval(() => {
+                    images[currentIndex].classList.remove('active');
+                    currentIndex = (currentIndex + 1) % images.length;
+                    images[currentIndex].classList.add('active');
+                }, 3000);
+                // Open the Worker Signup Form
+                function openWorkerForm() {
+                    document.getElementById("workerForm").style.display = "block";
+                }
+        
+                // Close the Worker Signup Form
+                function closeWorkerForm() {
+                        document.getElementById("workerForm").style.display = "none";
+                }
+        
+                // Open the Talent Hiring Form
+                function openTalentForm() {
+                    document.getElementById("talentForm").style.display = "block";
+                }
+        
+               // Close the Talent Hiring Form
+                function closeTalentForm() {
+                     document.getElementById("talentForm").style.display = "none";
+                }
+                </script>
+                <script src="chat.js"></script> <!-- External JavaScript -->
+        </body>
+        </html>
     
     <link rel="stylesheet" href="styles.css">
 </head>
