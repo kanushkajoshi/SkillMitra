@@ -4,19 +4,19 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: #333;
-    background-color:   #c7b198;
+    color: #333333;
+    background-color:   #98b4c7;
 }
 
 /* Header Styles */
 header {
-    background-color: #917864; /* Vibrant orange tone */
+    background-color: #405f7e; /* Vibrant orange tone */
     color: #fff;
     padding: 20px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgb(255, 255, 255);
 }
 
 header .logo-container {
@@ -43,7 +43,7 @@ header nav {
 }
 
 header nav a {
-    color: #070707;
+    color: #ffffff;
     margin: 0 15px;
     text-decoration: none;
     font-size: 1rem;
@@ -52,14 +52,14 @@ header nav a {
 }
 
 header nav a:hover {
-    color:  #322f2c; /* Light orange hover */
+    color:  #2C3E50; /* Light orange hover */
 }
 
 /* Hero Section */
 .hero {
     text-align: center;
     padding: 100px 20px;
-    background: linear-gradient(to bottom,  #dfd3c3, #ffffff); /* Soft gradient */
+    background: linear-gradient(to bottom, #ECF0F1, #e1ebed); /* Soft gradient */
 }
 
 .hero h1 {
@@ -85,7 +85,7 @@ header nav a:hover {
     margin: 0 10px;
     padding: 15px 25px;
     border: none;
-    background-color:#3d6fee;
+    background-color:#2C3E50;
     color: white;
     font-size: 1rem;
     cursor: pointer;
@@ -145,7 +145,7 @@ section p {
 
 .feature h3 {
     font-size: 1.2rem;
-    color: #876346;
+    color: #466587;
     margin-bottom: 10px;
 }
 
@@ -164,7 +164,7 @@ footer {
 }
 
 footer a {
-    color: #ff8a4281;
+    color: #42b7ff81;
     text-decoration: none;
 }
 
@@ -177,7 +177,7 @@ footer a:hover {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
-    background-color: #917864; /* Blue color */
+    background-color: #647a91; /* Blue color */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -185,7 +185,7 @@ footer a:hover {
 }
 
 .feature-btn:hover {
-    background-color: #755e4b; /* Darker blue on hover */
+    background-color: #4b6175; /* Darker blue on hover */
     transform: scale(1.05); /* Slight zoom on hover */
 }
 
