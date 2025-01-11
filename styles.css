@@ -196,23 +196,48 @@ footer a:hover {
 #faq {
     text-align: left; /* Aligns the section content */
     padding: 40px 20px;
+    background-color: #ffffff; /* White box for the FAQ section */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+    margin: 40px auto; /* Add spacing and center the section */
+    max-width: 900px; /* Limit width to ensure content readability */
 }
 
 #faq h2 {
-    text-align: left; /* Align FAQ title to the left */
+    text-align: center; /* Center the FAQ title */
     margin-bottom: 30px;
+    font-size: 2rem;
+    color: #333;
 }
 
 .faq-container {
     max-width: 800px; /* Optional: limit the width for better readability */
-    margin: 0; /* Remove auto-centering */
+    margin: 0 auto; /* Center the FAQ container */
+}
+
+.faq-container .faq-item {
+    border-bottom: 1px solid #ddd; /* Optional separator between FAQ items */
+    padding: 10px 0;
 }
 
 .faq-container h3 {
     text-align: left; /* Left-align the questions */
     font-size: 1.2rem;
     color: #333;
+    cursor: pointer; /* Pointer cursor to indicate interactivity */
     margin-bottom: 10px;
+    display: flex; /* Flexbox to align icon and text */
+    align-items: center;
+}
+
+.faq-container h3 span {
+    margin-right: 10px; /* Add spacing between arrow and question text */
+    transform: rotate(0); /* Default arrow direction */
+    transition: transform 0.3s ease; /* Smooth transition for arrow rotation */
+}
+
+.faq-container h3.active span {
+    transform: rotate(90deg); /* Rotate arrow when active */
 }
 
 .faq-container p {
@@ -220,7 +245,9 @@ footer a:hover {
     font-size: 1rem;
     color: #666;
     margin-bottom: 20px;
+    display: none; /* Initially hide answers for collapsible effect */
 }
+
 .why-slideshow {
     display: flex;
     justify-content: center;
@@ -343,7 +370,7 @@ form button:hover {
         overflow: hidden;
         max-height: 0; /* Initially set to 0 for a smooth transition */
         padding: 0 0 10px 0; /* Padding to apply when expanded */
-        font-size: 1.1em;
+        font-size: 0.8em;
         color: #555;
         transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Smooth transition */
     }
@@ -351,7 +378,7 @@ form button:hover {
     .faq-question {
         cursor: pointer;
         margin: 10px 0;
-        font-size: 1.2em;
+        font-size: 1.0em;
         font-weight: bold;
     }
     
