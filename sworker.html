@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Data</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Worker Data</h1>
+    </header>
+
+    <main>
+        <table id="workerDataTable" border="1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Skills</th>
+                    <th>Date of Birth</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>PIN Code</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Gender</th>
+                    <th>Expected Wage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Worker data will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Fetch worker data from the backend
+        async function fetchWorkerData() {
+            try {
+                const response = await fetch('http://localhost:3000/getWorkerData'); // Adjust API endpoint accordingly
+                if (response.ok) {
+                    const data = await response.json();
+                    populateWorkerTable(data);
+                } else {
+                    console.error('Error fetching worker data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Populate the table with worker data
+        function populateWorkerTable(workerData) {
+            const tableBody = document.getElementById('workerDataTable').querySelector('tbody');
+            tableBody.innerHTML = ''; // Clear existing data
+
+            workerData.forEach(worker => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${worker.name}</td>
+                    <td>${worker.skills}</td>
+                    <td>${worker.dob}</td>
+                    <td>${worker.contact}</td>
+                    <td>${worker.email}</td>
+                    <td>${worker.pincode}</td>
+                    <td>${worker.city}</td>
+                    <td>${worker.state}</td>
+                    <td>${worker.gender}</td>
+                    <td>${worker.wage}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Call the function to fetch and display data on page load
+        document.addEventListener('DOMContentLoaded', fetchWorkerData);
+    </script>
+</body>
+</html>
