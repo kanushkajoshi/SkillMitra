@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Mitra Services</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Specific styles for E-Mitra page */
+        .emitra-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #ECF0F1;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .emitra-container h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #2c5c8b;
+        }
+
+        .emitra-container p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .emitra-container input, .emitra-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .emitra-container button {
+            background-color: #2c5c8b;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .emitra-container button:hover {
+            background-color: #161717;
+        }
+
+        .location-button {
+            background-color: #28a745;
+        }
+
+        .location-button:hover {
+            background-color: #1e7c34;
+        }
+    </style>
+</head>
+<body>
+    <div class="emitra-container">
+        <h1>E-Mitra Services</h1>
+        <p>Enable your location and provide your details to proceed.</p>
+        <button class="location-button" onclick="enableLocation()">Enable Location</button>
+        <p id="location-status"></p>
+        <form id="emitraForm" action="submit_emitra.php" method="POST">
+            <input type="text" name="name" placeholder="Enter Your Name" required>
+            <input type="tel" name="contact" placeholder="Enter Your Contact Number" required pattern="[0-9]{10}">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function enableLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('location-status').textContent = 
+                            `Location enabled: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
+                    },
+                    (error) => {
+                        document.getElementById('location-status').textContent = 
+                            "Error: Unable to fetch location. Please enable location services.";
+                    }
+                );
+            } else {
+                document.getElementById('location-status').textContent = 
+                    "Geolocation is not supported by your browser.";
+            }
+        }
+    </script>
+</body>
+</html>
