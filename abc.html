@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Search Page</title>
-  <link rel="stylesheet" href="abc.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Job</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .search-bar {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .job-list {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Find Your Job</h1>
-      <div class="search-container">
-        <input id="search-bar" type="text" placeholder="Search for skills...">
-        <button id="location-btn">Use My Location</button>
-      </div>
-    </header>
-    <section id="job-list">
-      <!-- Job cards will be dynamically added here -->
-    </section>
-  </div>
- <script src="script.js"></script>
+    <h1>Find Your Job</h1>
+    <form method="POST" action="search_jobs.php">
+        <input type="text" name="search" class="search-bar" placeholder="Search for skills..." required>
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="job-list">
+        <!-- Search Results Will Appear Here -->
+    </div>
 </body>
 </html>
