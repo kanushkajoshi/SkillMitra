@@ -62,18 +62,9 @@ header nav a:hover {
     background: linear-gradient(to bottom, #ECF0F1, #e1ebed); /* Soft gradient */
    
 }
-.cta-background {
-    background: url('GROUP\ OF\ PEOPLE.jpeg')  no-repeat center center;
-    background-size: cover;
-    height: 100vh; /* Adjust height as needed */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
 .hero h1 {
     font-size: 3rem;
-    font-weight: bold
+    font-weight: bold;
     margin-bottom: 20px;
     color: #333;
 }
@@ -83,7 +74,16 @@ header nav a:hover {
     margin-bottom: 30px;
     color: #666;
 }
-
+.hero .cta-background { 
+    position: relative; /* Required for positioning overlay and content */
+    background: url('GROUP\ OF\ PEOPLE.jpeg') no-repeat center center;
+    background-size: cover;
+    height: 100vh; /* Adjust height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Ensure overlay covers the section */
+}
 .hero .cta-buttons {
     display: flex;
     justify-content: center;
@@ -123,7 +123,7 @@ section h2 {
 
 section p {
     font-size: 1rem;
-    color: #666;
+    color: #454343d3;
     max-width: 700px;
     margin: 0 auto 40px;
 }
@@ -397,17 +397,41 @@ form button:hover {
         margin-bottom: 10px;
     }
     
+/* General section styles */
 #impact {
     text-align: center;
-    margin: 50px 0;
+    margin: 50px auto;
+    padding: 50px 0; /* Add padding to avoid text overlapping the background */
+    background-image: url('worldmapsatellite.jpg'); /* Replace with your image path */
+    background-size: cover; /* Make sure the image covers the entire section */
+    background-position: center; /* Center the background image */
+    background-attachment: fixed; /* Make the background image fixed for a parallax effect */
+    color: white; /* Ensure text is readable on the background */
+}
+#impact h2 {
+    font-size: 36px; /* Adjusted font size for prominence */
+    margin-bottom: 30px; /* Added spacing below the heading */
+    color: white; /* Ensures the heading text is visible */
+}
+#impact p{
+    font-size: 1rem;
+    color: #ffffffd3;
+    max-width: 700px;
+    margin: 0 auto 40px;
 }
 
+/* Slideshow container */
 .impact-slideshow-container {
     position: relative;
-    max-width: 100%;
+    max-width: 80%;
     margin: auto;
+    overflow: hidden;
+    border-radius: 10px;
+    padding: 0; /* No extra padding */
+    box-shadow: none; /* Remove shadow for a cleaner look */
 }
 
+/* Slideshow styles */
 .impact-slideshow {
     display: flex;
     transition: transform 0.5s ease-in-out;
@@ -417,17 +441,19 @@ form button:hover {
     min-width: 100%;
     box-sizing: border-box;
     padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
 }
 
 .impact-slide h3 {
     font-size: 24px;
     margin-bottom: 20px;
-    color: #333;
+    color: #ffffff;
 }
 
 .impact-slide p, .impact-slide ul {
     font-size: 18px;
-    color: #555;
+    color: #ffffff;
 }
 
 .impact-slide ul {
@@ -439,63 +465,41 @@ form button:hover {
     margin-bottom: 10px;
 }
 
-.slideshow-nav {
-    position: absolute;
-    top: 50%;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    transform: translateY(-50%);
+/* Rating stars */
+.rating .star {
+    color: gold;
+    font-size: 20px;
+    margin: 0 2px;
 }
 
+/* Navigation buttons */
 .prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     border: none;
-    padding: 16px;
+    padding: 10px 15px;
     cursor: pointer;
     font-size: 18px;
     border-radius: 50%;
+    z-index: 1;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
 }
 
 .prev:hover, .next:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-.impact-slideshow-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
 
-.impact-slideshow {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-}
-
-.impact-slide {
-    min-width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.rating {
-    margin-top: 10px;
-}
-
-.star {
-    color: gold;
-    font-size: 20px;
-}
-
-.impact-slideshow-container {
-    cursor: pointer;
-}
-
-/* Optional: To add some padding/margin for better layout */
-#impact {
-    margin-top: 30px;
-}
 /* Chatbot Icon */
 /* General Styles */
 body {
@@ -596,19 +600,55 @@ body {
     color: #333;
     align-self: flex-end;
 }
-
-<<<<<<< HEAD
-
-  
-=======
-/* Input Box */
-#user-input {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    outline: none;
-    border-top: 1px solid #ddd;
-    box-sizing: border-box;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
 }
->>>>>>> 8d807cefdffa0c83477a3cc31bd4d01677e8a928
+
+.confirmation-container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.confirmation-container h1 {
+    color: #4CAF50;
+}
+
+.job-recommendations {
+    margin: 20px 0;
+}
+
+.job-recommendations ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+}
+
+.job-recommendations li {
+    background: #f1f1f1;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #45a049;
+}

@@ -32,18 +32,35 @@
             </header>
         
               
-        <div class="hero">
-            <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
-            <p>Bridging the gap between talent and opportunities in underserved communities.</p>
-              <div class="cta-background">
-              <div class="cta-buttons">
-                <button onclick="openWorkerForm()">Sign Up as a Worker</button>
-                <button onclick="openTalentForm()">Hire Verified Talent</button>
+            <div class="hero">
+                <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
+                <p>Bridging the gap between talent and opportunities in underserved communities.</p>
+                <div class="background">
+                    <div class="cta-buttons">
+                        <button onclick="openWorkerForm()">Sign Up as a Worker</button>
+                        <button onclick="openTalentForm()">Hire Verified Talent</button>
+                        <button onclick="openEMitra()">E-Mitra Services</button>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
         
+            <script>
+                function openWorkerForm() {
+                    alert("Redirecting to Worker Sign-Up Form...");
+                }
         
+                function openTalentForm() {
+                    alert("Redirecting to Talent Hiring Form...");
+                }
+        
+                function openEMitra() {
+                    alert("Redirecting to E-Mitra Services...");
+                    function openEMitra() {
+            window.location.href = "e-mitra.html";
+        }
+                }
+            </script>
+      
             <!-- <section id="about">
                 <h2>Why SkillMitra?</h2>
         
@@ -107,13 +124,13 @@
             </section>
         
             <section id="stories">
-                <h2>Our Impact</h2>
-                <p>Explore success stories of women and businesses empowered by SkillMitra.</p>
                 <section id="impact">
-                    <div class="impact-slideshow-container" onclick="handleSlideClick(event)">
-                        <!-- Slideshow images with text content -->
-                        <div class="impact-slideshow">
-                            <div class="impact-slide">
+                    <div class="impact-content">
+                        <h2>Our Impact</h2>
+                        <p>Explore success stories of women and businesses empowered by SkillMitra.</p>
+                        <div class="impact-slideshow-container">
+                            <div class="impact-slideshow">
+                                <div class="impact-slide">
                                 <h3>Real Stories of Empowerment</h3>
                                 <p>"Thanks to SkillMitra, I found a steady job as a tailor and am now able to support my family."</p>
                                 <p>~Priya Kumari</p>
@@ -163,8 +180,12 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Navigation buttons -->
+                        <button class="prev">&lt;</button>
+                        <button class="next">&gt;</button>
                     </div>
-                </section>      
+                </section>
+                <script src="script.js"></script>
             </section>
             
         
@@ -245,9 +266,8 @@
                 </div>
             </section>
             
-            <div id="open-chat" onclick="toggleChat()">💬</div>
-
-            <div id="chat-container">
+            <div id="open-chat" onclick="toggleChat()">💬 </div>
+            <div id="chat-container" style=> <!-- Hide initially -->
                 <div id="chat-header">
                     <span>Chatbot</span>
                     <span id="close-chat" onclick="toggleChat()">X</span>
@@ -263,8 +283,7 @@
                     onkeydown="if(event.key === 'Enter') sendMessage()"
                 />
             </div>
-            
-         
+        
         
          
             
@@ -280,7 +299,11 @@
                 <div class="modal-content">
                     <span class="close" onclick="closeWorkerForm()">&times;</span>
                     <h2>Sign Up as a Worker</h2>
+<<<<<<< HEAD
                     <form action="insert.php" method="POST">
+=======
+                    <form action="work.html" method="GET">
+>>>>>>> c9c7da23de27b8b2e7e5597b5be249f4815b4190
                         <!-- Form fields -->
                         <label for="worker-name">Name:</label>
                         <input type="text" id="worker-name" name="worker-name" required>

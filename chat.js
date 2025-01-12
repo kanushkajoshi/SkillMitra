@@ -1,29 +1,74 @@
-const predefinedQuestions = [
-    "What is your name?",
-    "What skills do you have?",
-    "What type of work are you looking for?"
-];
+// Updated Chatbot Code with Options for User Selection
 
-// Predefined answers mapped to questions
-const predefinedAnswers = {
-    "What is your name?": "I am SkillMitra's assistant. What's your name?",
-    "What skills do you have?": "We can help with tailoring, embroidery, plumbing, and more!",
-    "What type of work are you looking for?": "We have many local opportunities. What are you interested in?"
+const predefinedFlows = {
+    signup: [
+        "What is your name?",
+        "What skills do you have?",
+        "What type of work are you looking for?",
+        "Do you need help logging in or signing up?"
+    ],
+    hiring: [
+        "What type of worker are you looking for?",
+        "Do you have specific requirements (e.g., skills, experience)?",
+        "What is the location of the job?",
+        "Do you need assistance verifying worker details?"
+    ]
 };
 
-let currentQuestionIndex = 0; // Tracks the current question
+const predefinedAnswers = {
+    "What is your name?": "I am SkillMitra's assistant.",
+    "What skills do you have?": "We can help with tailoring, embroidery, plumbing, and more!",
+    "What type of work are you looking for?": "We have many local opportunities. What are you interested in?",
+    "Do you need help logging in or signing up?": "If you are a worker, go to the 'Sign Up as a Worker' section and create an account using your details. If you are a hirer, select the 'Hire Verified' option and fill out your company or personal details to register.",
+    "What type of worker are you looking for?": "We can provide skilled workers in tailoring, plumbing, and more.",
+    "Do you have specific requirements (e.g., skills, experience)?": "Yes, we can match workers based on your requirements.",
+    "What is the location of the job?": "Please provide the location so we can find nearby workers.",
+    "Do you need assistance verifying worker details?": "We offer worker verification services for your safety and peace of mind."
+};
+
+let currentFlow = [];
+let currentQuestionIndex = 0;
 
 // Function to initialize the chat
 function startChat() {
     const chatHistory = document.getElementById("chat-history");
-    chatHistory.innerHTML = "<p><strong>Chatbot:</strong> Welcome! I'm here to assist you. Let's start.</p>";
+    chatHistory.innerHTML = "<p><strong>Chatbot:</strong> Hi, I am your chatbot. How can I assist you today?</p>";
+    showOptions(["Assist for Sign Up", "Assist in Hiring"]);
+}
+
+// Function to show options to the user
+function showOptions(options) {
+    const chatSuggestions = document.getElementById("chat-suggestions");
+    chatSuggestions.innerHTML = "";
+
+    options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.onclick = () => handleOptionSelection(option);
+        chatSuggestions.appendChild(button);
+    });
+}
+
+// Function to handle user selection of an option
+function handleOptionSelection(option) {
+    const chatHistory = document.getElementById("chat-history");
+    chatHistory.innerHTML += `<p><strong>You:</strong> ${option}</p>`;
+
+    if (option === "Assist for Sign Up") {
+        currentFlow = predefinedFlows.signup;
+    } else if (option === "Assist in Hiring") {
+        currentFlow = predefinedFlows.hiring;
+    }
+
+    currentQuestionIndex = 0;
+    document.getElementById("chat-suggestions").innerHTML = "";
     askQuestion(currentQuestionIndex);
 }
 
 // Function to ask a question
 function askQuestion(index) {
     const chatHistory = document.getElementById("chat-history");
-    const question = predefinedQuestions[index];
+    const question = currentFlow[index];
 
     if (question) {
         chatHistory.innerHTML += `<p><strong>Chatbot:</strong> ${question}</p>`;
@@ -43,14 +88,14 @@ function sendMessage() {
 
         // Simulate chatbot response based on the predefined answers
         setTimeout(() => {
-            const currentQuestion = predefinedQuestions[currentQuestionIndex];
+            const currentQuestion = currentFlow[currentQuestionIndex];
             if (predefinedAnswers[currentQuestion]) {
                 chatHistory.innerHTML += `<p><strong>Chatbot:</strong> ${predefinedAnswers[currentQuestion]}</p>`;
             }
 
             // Move to the next question
             currentQuestionIndex++;
-            if (currentQuestionIndex < predefinedQuestions.length) {
+            if (currentQuestionIndex < currentFlow.length) {
                 setTimeout(() => askQuestion(currentQuestionIndex), 1500); // Delay before the next question
             } else {
                 // End of conversation
@@ -79,10 +124,3 @@ function scrollToBottom() {
     const chatBox = document.getElementById("chat-box");
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-// Event listener to send message when 'Enter' key is pressed
-document.getElementById("user-input").addEventListener("keydown", function (event) {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-});
