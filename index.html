@@ -32,18 +32,35 @@
             </header>
         
               
-        <div class="hero">
-            <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
-            <p>Bridging the gap between talent and opportunities in underserved communities.</p>
-            <div class="background">
-              <div class="cta-buttons">
-                <button onclick="openWorkerForm()">Sign Up as a Worker</button>
-                <button onclick="openTalentForm()">Hire Verified Talent</button>
+            <div class="hero">
+                <h1>Connecting Skilled People to Safe and Local Job Opportunities</h1>
+                <p>Bridging the gap between talent and opportunities in underserved communities.</p>
+                <div class="background">
+                    <div class="cta-buttons">
+                        <button onclick="openWorkerForm()">Sign Up as a Worker</button>
+                        <button onclick="openTalentForm()">Hire Verified Talent</button>
+                        <button onclick="openEMitra()">E-Mitra Services</button>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
         
+            <script>
+                function openWorkerForm() {
+                    alert("Redirecting to Worker Sign-Up Form...");
+                }
         
+                function openTalentForm() {
+                    alert("Redirecting to Talent Hiring Form...");
+                }
+        
+                function openEMitra() {
+                    alert("Redirecting to E-Mitra Services...");
+                    function openEMitra() {
+            window.location.href = "e-mitra.html";
+        }
+                }
+            </script>
+      
             <!-- <section id="about">
                 <h2>Why SkillMitra?</h2>
         
@@ -282,7 +299,7 @@
                 <div class="modal-content">
                     <span class="close" onclick="closeWorkerForm()">&times;</span>
                     <h2>Sign Up as a Worker</h2>
-                    <form action="other-page.php" method="POST">
+                    <form action="" method="POST">
                         <!-- Form fields -->
                         <label for="worker-name">Name:</label>
                         <input type="text" id="worker-name" name="worker-name" required>
