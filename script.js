@@ -34,7 +34,6 @@ window.addEventListener("resize", () => showSlide(currentSlide));
 
 // script.js
 
-<script>
 // Function to fetch user location using Geolocation API
 function getLocationAndSearchJobs() {
   if (navigator.geolocation) {
@@ -89,8 +88,3 @@ function displayJobs(jobs) {
     });
   }
 }
-
-// Add event listener to the "Use My Location" button
-document.getElementById("location-btn").addEventListener("click", getLocationAndSearchJobs);
-</script>
-  
