@@ -74,7 +74,16 @@ header nav a:hover {
     margin-bottom: 30px;
     color: #666;
 }
-
+.hero .cta-background { 
+    position: relative; /* Required for positioning overlay and content */
+    background: url('GROUP\ OF\ PEOPLE.jpeg') no-repeat center center;
+    background-size: cover;
+    height: 100vh; /* Adjust height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Ensure overlay covers the section */
+}
 .hero .cta-buttons {
     display: flex;
     justify-content: center;
