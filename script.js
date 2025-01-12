@@ -34,7 +34,6 @@ window.addEventListener("resize", () => showSlide(currentSlide));
 
 // script.js
 
-<script>
 // Function to fetch user location using Geolocation API
 function getLocationAndSearchJobs() {
   if (navigator.geolocation) {
