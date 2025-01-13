@@ -5,7 +5,7 @@ body {
     padding: 0;
     box-sizing: border-box;
     color: #333333;
-    background-color:   #98b4c7;
+    background-color:    #405f7e;
 }
 
 /* Header Styles */
@@ -56,23 +56,29 @@ header nav a:hover {
 }
 
 /* Hero Section */
-.hero {
-    text-align: center;
-    padding: 100px 20px;
-    background: linear-gradient(to bottom, #ECF0F1, #e1ebed); /* Soft gradient */
+.hero{
+text-align: center;
+padding: 160px 20px;
+background: 
+    /* linear-gradient(to bottom, #ECF0F1, #e1ebed),  */
+ url('Untitled\ Project.jpg');
+background-size: cover;
+background-repeat: no-repeat;
+background-position: center;
+color: #355372; /* Soft gradient */
    
 }
 .hero h1 {
     font-size: 3rem;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #333;
+    color: #223951;
 }
 
 .hero p {
     font-size: 1.2rem;
     margin-bottom: 30px;
-    color: #666;
+    color: #072357;
 }
 .hero .cta-background { 
     position: relative; /* Required for positioning overlay and content */
@@ -113,6 +119,7 @@ header nav a:hover {
 section {
     padding: 60px 20px;
     text-align: center;
+    background-color: #98b4c7a1;
 }
 
 section h2 {
@@ -210,6 +217,7 @@ footer a:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
     margin: 40px auto; /* Add spacing and center the section */
     max-width: 900px; /* Limit width to ensure content readability */
+    background-color: #98b4c7a1;
 }
 
 #faq h2 {
@@ -237,6 +245,7 @@ footer a:hover {
     margin-bottom: 10px;
     display: flex; /* Flexbox to align icon and text */
     align-items: center;
+    background-color: #98b4c7a1;
 }
 
 .faq-container h3 span {
@@ -247,7 +256,7 @@ footer a:hover {
 
 .faq-container h3.active span {
     transform: rotate(90deg); /* Rotate arrow when active */
-}
+}1
 
 .faq-container p {
     text-align: left; /* Left-align the answers */

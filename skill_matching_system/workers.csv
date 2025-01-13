@@ -1,0 +1,27 @@
+import pandas as pd
+
+# Define the data structure for workers
+workers_data = {
+    "worker_name": [],
+    "worker_skills": [],
+    "other_skill": [],
+    "worker_dob": [],
+    "worker_contact": [],
+    "worker_email": [],
+    "worker_password": [],
+    "worker_pincode": [],
+    "worker_city": [],
+    "worker_state": [],
+    "worker_gender": [],
+    "other_gender": [],
+    "worker_wage": []
+}
+
+# Create an empty DataFrame
+workers_df = pd.DataFrame(workers_data)
+
+# Save the DataFrame to a CSV file
+workers_df.to_csv("workers.csv", index=False)
+
+print("Empty workers.csv file created successfully!")
+
