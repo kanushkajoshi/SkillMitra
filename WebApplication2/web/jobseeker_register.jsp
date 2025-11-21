@@ -9,10 +9,11 @@
 <body>
     <header class="header">
         <div class="logo">
-            <img src="skillmitralogo.png" alt="SkillMitra Logo">
+            <img src="skillmitralogo.jpg" alt="SkillMitra Logo">
             SkillMitra
         </div>
-        <button class="back-btn">? Back to Home</button>
+       <button class="back-btn" onclick="window.location.href='home.jsp'">? Back to Home</button>
+
     </header>
 
     <div class="container">

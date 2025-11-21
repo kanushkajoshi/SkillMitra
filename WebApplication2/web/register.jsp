@@ -16,7 +16,7 @@
             <img src="skillmitralogo.jpg" alt="SkillMitra Logo">
             SkillMitra
         </div>
-        <button class="back-btn" onclick="window.location.href='index.jsp'">← Back to Home</button>
+        <button class="back-btn" onclick="window.location.href='home.jsp'">← Back to Home</button>
     </header>
 
     <!-- MAIN CARD -->
