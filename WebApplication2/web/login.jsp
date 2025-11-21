@@ -40,7 +40,7 @@
             <button type="submit" id="loginBtn" class="loginBtn">Login</button>
 
             <p class="signup">
-                Don’t have an account? <a href="#">Sign Up</a>
+                Don’t have an account? <a href="register.jsp">Sign Up</a>
             </p>
         </form>
     </div>

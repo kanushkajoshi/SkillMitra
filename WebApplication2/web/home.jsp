@@ -39,8 +39,9 @@
         <p>Bridging the gap between talent and opportunities in underserved communities.</p>
 
         <div class="cta-buttons">
-            <a href="#" class="cta-btn">Login</a>
-            <a href="#" class="cta-btn">Register</a>
+            <a href="login.jsp
+               " class="cta-btn">Login</a>
+            <a href="register.jsp" class="cta-btn">Register</a>
         </div>
     </section>
 
