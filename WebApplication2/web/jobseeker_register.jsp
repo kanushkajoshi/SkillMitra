@@ -17,7 +17,8 @@
     </header>
 
     <div class="container">
-    <form class="register-form" action="JobSeekerRegisterServlet" method="post">
+    <form class="register-form" action="JobSeekerRegisterServelet" method="post">
+        
     <h1>Register as JobSeeker</h1>
 
     <div class="form-grid">
@@ -67,7 +68,7 @@
         </div>
 
         <div class="form-group">
-            <label for="zipcode">Zipcode *</label>
+            <label for="zipcode">Zip *</label>
             <input type="text" id="zipcode" name="zipcode" required>
         </div>
     </div>
@@ -75,18 +76,10 @@
     <div class="form-grid">
         <div class="form-group">
             <label for="date_of_birth">Date of Birth</label>
-            <input type="date" id="date_of_birth" name="date_of_birth">
+            <input type="date" id="date_of_birth" name="date_of_birth" required>
         </div>
 
-        <div class="form-group">
-            <label for="languages_spoken">Languages Spoken</label>
-            <input type="text" id="languages_spoken" name="languages_spoken">
-        </div>
-
-        <div class="form-group">
-            <label for="qualifications">Education/Qualifications</label>
-            <input type="text" id="qualifications" name="qualifications">
-        </div>
+     
     </div>
 
     <button type="submit" class="register-btn">Create Account</button>
