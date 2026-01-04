@@ -53,7 +53,7 @@
             <div class="form-footer">
                 <a href="#forgot">Forgot Password?</a>
                 <div class="divider">or</div>
-                <a href="#register">Don't have an account? Sign Up</a>
+                <a href="emp_dash.jsp">Don't have an account? Sign Up</a>
             </div>
         </div>
     </main>

@@ -13,10 +13,12 @@ public class EmployerLoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("Servlet hit");
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
+System.out.println("Email: " + email);
+System.out.println("Password: " + password);
         try {
             // Load JDBC driver
             Class.forName("com.mysql.jdbc.Driver");
@@ -36,14 +38,17 @@ public class EmployerLoginServlet extends HttpServlet {
 
             if (rs.next()) {
                 // Login success
+                System.out.println("LOGIN SUCCESS");
                 HttpSession session = request.getSession();
                 session.setAttribute("employerId", rs.getInt("eid"));
                 session.setAttribute("employerName", rs.getString("efirstname"));
-                session.setAttribute("employerEmail", email);
-
+//                session.setAttribute("employerEmail", email);
+            
                 response.sendRedirect("emp_dash.jsp");
+               
             } else {
                 // Login failed
+                System.out.println("LOGIN FAILED");
                 response.sendRedirect("login.jsp?error=invalid&role=employer");
             }
 
