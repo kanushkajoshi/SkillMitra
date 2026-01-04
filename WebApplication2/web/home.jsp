@@ -68,6 +68,60 @@
         </div>
       </div>
     </section>
+<!-- Features Section -->
+<section id="features">
+    <div class="container">
+        <h2>Our Features</h2>
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <h3>Job Posting</h3>
+                <p>Easily post jobs and reach skilled workers instantly.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Direct Proposal System</h3>
+                <p>Send and receive proposals directly without hassle.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Bidding System</h3>
+                <p>Workers can bid on jobs to ensure fair pricing.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Search by Skill & Location</h3>
+                <p>Find the right worker or job based on skill and location.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Secure Chat Communication</h3>
+                <p>Communicate safely and privately with your connections.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Ratings & Feedback</h3>
+                <p>Leave and view feedback to build trust in the community.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact">
+    <div class="container">
+        <h2>Contact Us</h2>
+        <p class="contact-email">support@skillmitra.com</p>
+
+        <form class="contact-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Your Email" required>
+            <textarea placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</section>
 
 <section id="faqs" class="faq-section">
     <h2>Frequently Asked Questions</h2>
