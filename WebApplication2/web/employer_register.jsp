@@ -26,6 +26,14 @@
         </div>
         <button class="back-btn" onclick="window.location.href='home.jsp'">← Back to Home</button>
     </header>
+<%
+String error = request.getParameter("error");
+if ("phone_exists".equals(error)) {
+%>
+    <p style="color:red;">Phone number already registered.</p>
+<%
+}
+%>
 
     <div class="container">
 <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet">
@@ -112,7 +120,7 @@
 
         <div class="form-footer">
             or<br><br>
-            Already have an account? <a href="#login">Sign In</a>
+            Already have an account? <a href="login.jsp">Sign In</a>
         </div>
 
     </form>

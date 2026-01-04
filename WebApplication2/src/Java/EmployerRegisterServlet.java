@@ -1,18 +1,11 @@
-
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import java.sql.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import javax.servlet.http.HttpServlet;
 
 @WebServlet("/EmployerRegisterServlet")
 public class EmployerRegisterServlet extends HttpServlet {
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -32,24 +25,39 @@ public class EmployerRegisterServlet extends HttpServlet {
         String zipcode = request.getParameter("zipcode");
 
         try {
-            // 2. Get DB connection
-             Class.forName("com.mysql.jdbc.Driver");
+            // 2. Load Driver
+            Class.forName("com.mysql.jdbc.Driver");
 
-            // Database connection
+            // 3. DB Connection
             Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/skillmitra",
                 "root",
-                ""   // change password
+                ""
             );
+// 🔍 CHECK IF PHONE ALREADY EXISTS
+String checkSql = "SELECT ephone FROM employer WHERE ephone = ?";
+PreparedStatement checkPs = con.prepareStatement(checkSql);
+checkPs.setString(1, phone);
 
-            
+ResultSet rs = checkPs.executeQuery();
 
-            // 3. SQL Insert Query
+if (rs.next()) {
+    // Phone already registered
+    response.sendRedirect("employer_register.jsp?error=phone_exists");
+    con.close();
+    return; // ⛔ STOP execution here
+}
+
+            // 4. INSERT QUERY (RETURN GENERATED ID)
             String sql = "INSERT INTO employer "
-                    + "(efirstname, elastname, ephone, eemail, epwd,  ecompanyname, ecompanywebsite, ecountry, estate, ecity, ezip) "
+                    + "(efirstname, elastname, ephone, eemail, epwd, "
+                    + "ecompanyname, ecompanywebsite, ecountry, estate, ecity, ezip) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(
+                sql
+                    
+            );
 
             ps.setString(1, firstName);
             ps.setString(2, lastName);
@@ -63,19 +71,28 @@ public class EmployerRegisterServlet extends HttpServlet {
             ps.setString(10, city);
             ps.setString(11, zipcode);
 
-            // 4. Execute
+            // 5. Execute insert
             ps.executeUpdate();
+
+            // 6. GET GENERATED EMPLOYER ID
+         
+
+            // 7. CREATE SESSION & STORE DATA
+           
 
             con.close();
 
-            // 5. Redirect after success
+            // 8. REDIRECT TO DASHBOARD
             response.sendRedirect("emp_dash.jsp");
 
-        } catch (Exception e) {
-            
-            e.printStackTrace();
-            response.sendRedirect("error.jsp");
-                
-        }
+        } catch (SQLIntegrityConstraintViolationException e) {
+    // Duplicate email or phone
+    response.sendRedirect("emp_dash.jsp?error=duplicate");
+}
+catch (Exception e) {
+    e.printStackTrace();
+    response.sendRedirect("error.jsp");
+}
+
     }
 }
