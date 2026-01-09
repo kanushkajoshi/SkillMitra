@@ -6,17 +6,44 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
+<%@ page import="java.sql.*" %>
+
+
 <%
+    // Session check
 //    if (session.getAttribute("eemail") == null) {
 //        response.sendRedirect("login.jsp");
 //        return;
 //    }
-//    if (session.getAttribute("employerEmail") == null) {
-//        response.sendRedirect("login.jsp");
-//        return;
-//    }
 
+    // If name not already in session, fetch from DB
+    if (session.getAttribute("efirstname") == null) {
 
+        String email = (String) session.getAttribute("eemail");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
+
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                session.setAttribute("efirstname", rs.getString("efirstname"));
+                session.setAttribute("elastname", rs.getString("elastname"));
+                session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
+            }
+
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 %>
 
 <!DOCTYPE html>
@@ -147,9 +174,11 @@
     </div>
 
     <div class="profile-menu" id="profileMenu">
-        <a href="EditEmployerProfileServlet">Edit Profile</a>
-        <a href="LogoutServlet">Logout</a>
-    </div>
+    <a href="employer_profile.jsp">View Profile</a>
+    <a href="EditEmployerProfileServlet">Edit Profile</a>
+    <a href="LogoutServlet">Logout</a>
+</div>
+
 </aside>
 
 
