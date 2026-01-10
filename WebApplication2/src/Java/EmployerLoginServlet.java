@@ -29,7 +29,7 @@ System.out.println("Password: " + password);
                 ""
             );
 
-            String sql = "SELECT eid, efirstname FROM employer WHERE eemail=? AND epwd=?";
+            String sql = "SELECT eid,ecompanyname, efirstname FROM employer WHERE eemail=? AND epwd=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, email);
             ps.setString(2, password);
@@ -42,7 +42,11 @@ System.out.println("Password: " + password);
                 HttpSession session = request.getSession();
                 session.setAttribute("employerId", rs.getInt("eid"));
                 session.setAttribute("employerName", rs.getString("efirstname"));
-//                session.setAttribute("employerEmail", email);
+                session.setAttribute("efirstname", rs.getString("efirstname"));
+                session.setAttribute("elastname", "");   // placeholder for now
+session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
+
+                session.setAttribute("eemail", email);
             
                 response.sendRedirect("emp_dash.jsp");
                

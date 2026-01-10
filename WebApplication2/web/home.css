@@ -1,9 +1,10 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom right, #dce7ff, #f0f5ff);
+    background: linear-gradient(to bottom right, #e6f0ff, #ffffff);
     min-height: 100vh;
 }
+
 
 /* Header Section */
 /*header {
@@ -15,6 +16,7 @@ body {
 }*/
 header {
     background-color: #637b96;
+   
 }
 .header-flex {
     display: flex;
@@ -69,18 +71,31 @@ nav a:hover {
 .hero {
     text-align: center;
     padding: 80px 20px;
+    background-image:
+        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+        url("images/workers.jpeg");
+    background-size: cover;      /* image full cover ho jaye */
+    background-position: center; /* center me ho */
+    background-repeat: no-repeat;
+    min-height: 70vh;        /* 👈 KEY LINE */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    margin-bottom: 80px;  
+    
 }
 
 .hero h1 {
     font-size: 32px;
     margin-bottom: 10px;
-    color: #333;
+    color: whitesmoke;
 }
 
 .hero p {
     font-size: 18px;
     margin-bottom: 30px;
-    color: #555;
+    color: white;
 }
 
 /* CTA Buttons */
@@ -104,4 +119,240 @@ nav a:hover {
 .cta-btn:hover {
     background: #1f4fae;
     transform: scale(1.07);
+}
+/* About Us Section */
+.about-section {
+    background: #e6f0ff; /* light blue background */
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.about-section h2 {
+    font-size: 32px;
+    color: #1a3d7c; /* dark blue */
+    margin-bottom: 15px;
+}
+
+.about-section p {
+    font-size: 18px;
+    color: #334d80; /* medium blue */
+    margin-bottom: 40px;
+}
+
+/* Cards container */
+.about-cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* Individual Card */
+.card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 30px 20px;
+    width: 250px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.card-icon {
+    width: 50px;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    font-size: 20px;
+    color: #1a3d7c;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 15px;
+    color: #4d6b99;
+}
+/* FAQ Section */
+.faq-section {
+    background: #e6f0ff; /* light blue background */
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.faq-section h2 {
+    font-size: 32px;
+    color: #1a3d7c; /* dark blue */
+    margin-bottom: 10px;
+}
+
+.faq-section p {
+    font-size: 18px;
+    color: #334d80; /* medium blue */
+    margin-bottom: 40px;
+}
+
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 18px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a3d7c;
+    background: window;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.3s ease;
+}
+
+.faq-question:hover {
+    background: #fff5e6;
+}
+
+.faq-answer {
+    padding: 0 20px 15px 20px;
+    display: none;
+    font-size: 15px;
+    color: #334d80;
+}
+/* Features Section */
+#features {
+    background-color: #e6f0ff; /* Same as FAQ section background */
+    padding: 60px 20px;
+    font-family: Arial, sans-serif;
+}
+
+#features .container {
+    max-width: 1200px;
+    margin: auto;
+    text-align: center;
+}
+
+#features h2 {
+    color: #004aad; /* Blue accent like FAQ heading */
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.features-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card h3 {
+    color: #004aad;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.feature-card p {
+    font-size: 16px;
+    color: #333333;
+}
+
+/* Hover Effect */
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+    .features-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+/* Contact Section */
+#contact {
+    background-color: #e6f0ff; /* FAQ/Features blue background */
+    padding: 60px 20px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#contact h2 {
+    color: #004aad; /* Blue heading like FAQ */
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.contact-email {
+    font-size: 18px;
+    color: #004aad;
+    margin-bottom: 40px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+    margin: auto; /* center align form */
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contact-form button {
+    background-color: #004aad;
+    color: #ffffff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.contact-form button:hover {
+    background-color: #003080;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contact-form {
+        width: 100%;
+    }
 }
