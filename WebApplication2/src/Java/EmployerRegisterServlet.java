@@ -11,7 +11,6 @@ public class EmployerRegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Read data from JSP form
         String firstName = request.getParameter("first_name");
         String lastName = request.getParameter("last_name");
         String phone = request.getParameter("phone");
@@ -24,39 +23,51 @@ public class EmployerRegisterServlet extends HttpServlet {
         String city = request.getParameter("city");
         String zipcode = request.getParameter("zipcode");
 
+        // 🔐 PASSWORD VALIDATION
+        if (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{6,}$")) {
+            request.setAttribute("passwordError",
+                "Password must contain letters and numbers (min 6 characters)");
+            request.getRequestDispatcher("employer_register.jsp")
+                   .forward(request, response);
+            return;
+        }
+
         try {
-            // 2. Load Driver
             Class.forName("com.mysql.jdbc.Driver");
-
-            // 3. DB Connection
             Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/skillmitra",
-                "root",
-                ""
+                "jdbc:mysql://localhost:3306/skillmitra", "root", ""
             );
-// 🔍 CHECK IF PHONE ALREADY EXISTS
-String checkSql = "SELECT ephone FROM employer WHERE ephone = ?";
-PreparedStatement checkPs = con.prepareStatement(checkSql);
-checkPs.setString(1, phone);
 
-ResultSet rs = checkPs.executeQuery();
+            // ✅ CHECK EMAIL
+            PreparedStatement emailPs = con.prepareStatement(
+                "SELECT 1 FROM employer WHERE eemail = ?");
+            emailPs.setString(1, email);
+            if (emailPs.executeQuery().next()) {
+                request.setAttribute("emailError", "Email already registered");
+                request.getRequestDispatcher("employer_register.jsp")
+                       .forward(request, response);
+                con.close();
+                return;
+            }
 
-if (rs.next()) {
-    // Phone already registered
-    response.sendRedirect("employer_register.jsp?error=phone_exists");
-    con.close();
-    return; // ⛔ STOP execution here
-}
+            // ✅ CHECK PHONE
+            PreparedStatement phonePs = con.prepareStatement(
+                "SELECT 1 FROM employer WHERE ephone = ?");
+            phonePs.setString(1, phone);
+            if (phonePs.executeQuery().next()) {
+                request.setAttribute("phoneError", "Phone number already registered");
+                request.getRequestDispatcher("employer_register.jsp")
+                       .forward(request, response);
+                con.close();
+                return;
+            }
 
-            // 4. INSERT QUERY (RETURN GENERATED ID)
-            String sql = "INSERT INTO employer "
-                    + "(efirstname, elastname, ephone, eemail, epwd, "
-                    + "ecompanyname, ecompanywebsite, ecountry, estate, ecity, ezip) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+            // ✅ INSERT
             PreparedStatement ps = con.prepareStatement(
-                sql
-                    
+                "INSERT INTO employer " +
+                "(efirstname, elastname, ephone, eemail, epwd, " +
+                "ecompanyname, ecompanywebsite, ecountry, estate, ecity, ezip) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
 
             ps.setString(1, firstName);
@@ -71,28 +82,24 @@ if (rs.next()) {
             ps.setString(10, city);
             ps.setString(11, zipcode);
 
-            // 5. Execute insert
             ps.executeUpdate();
 
-            // 6. GET GENERATED EMPLOYER ID
-         
-
-            // 7. CREATE SESSION & STORE DATA
-           
+            // ✅ CREATE SESSION (FROM FORM DATA)
+            HttpSession session = request.getSession();
+            session.setAttribute("eemail", email);
+            session.setAttribute("efirstname", firstName);
+            session.setAttribute("elastname", lastName);
+            session.setAttribute("ecompanyname", companyName);
+            session.setAttribute("ephoto", null);
 
             con.close();
 
-            // 8. REDIRECT TO DASHBOARD
+            // ✅ REDIRECT ON SUCCESS
             response.sendRedirect("emp_dash.jsp");
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-    // Duplicate email or phone
-    response.sendRedirect("emp_dash.jsp?error=duplicate");
-}
-catch (Exception e) {
-    e.printStackTrace();
-    response.sendRedirect("error.jsp");
-}
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("error.jsp");
+        }
     }
 }

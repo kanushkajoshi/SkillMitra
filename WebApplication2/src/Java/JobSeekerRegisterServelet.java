@@ -24,17 +24,25 @@ public class JobSeekerRegisterServelet extends HttpServlet {
         String state     = request.getParameter("state");
         String city      = request.getParameter("city");
         String dob       = request.getParameter("date_of_birth");
+        java.sql.Date sqlDob = java.sql.Date.valueOf(dob);
+
 
         // 2. Basic validation (Java-side)
-        if (!phone.matches("^[6-9][0-9]{9}$")) {
-            response.sendRedirect("jobseeker_register.jsp?error=phone");
-            return;
-        }
+      if (!phone.matches("^[6-9][0-9]{9}$")) {
+    request.setAttribute("phoneError", "Enter a valid 10-digit Indian mobile number");
+    request.getRequestDispatcher("jobseeker_register.jsp")
+           .forward(request, response);
+    return;
+}
 
-        if (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{6,}$")) {
-            response.sendRedirect("jobseeker_register.jsp?error=password");
-            return;
-        }
+if (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{6,}$")) {
+    request.setAttribute("passwordError",
+            "Password must contain letters and numbers (min 6 chars)");
+    request.getRequestDispatcher("jobseeker_register.jsp")
+           .forward(request, response);
+    return;
+}
+
 
         try {
             // 3. Load MySQL driver
@@ -61,7 +69,7 @@ public class JobSeekerRegisterServelet extends HttpServlet {
             ps.setString(6, country);
             ps.setString(7, state);
             ps.setString(8, city);
-            ps.setString(9, dob);
+            ps.setDate(9, sqlDob);
 
             ps.executeUpdate();
             con.close();

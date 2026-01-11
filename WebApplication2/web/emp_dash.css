@@ -134,3 +134,16 @@ nav a {
     display: block;
 }
 
+.profile input[type="file"] {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.profile button {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #637b96;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}

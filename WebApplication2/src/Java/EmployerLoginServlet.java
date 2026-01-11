@@ -17,6 +17,7 @@ public class EmployerLoginServlet extends HttpServlet {
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        
 System.out.println("Email: " + email);
 System.out.println("Password: " + password);
         try {
@@ -29,7 +30,7 @@ System.out.println("Password: " + password);
                 ""
             );
 
-            String sql = "SELECT eid,ecompanyname, efirstname FROM employer WHERE eemail=? AND epwd=?";
+            String sql = "SELECT eid,ecompanyname, efirstname,ephoto FROM employer WHERE eemail=? AND epwd=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, email);
             ps.setString(2, password);
@@ -47,7 +48,13 @@ System.out.println("Password: " + password);
 session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
 
                 session.setAttribute("eemail", email);
-            
+                String photo = rs.getString("ephoto");
+               if (photo != null && !photo.trim().isEmpty()) {
+                    session.setAttribute("ephoto", photo);
+             } else {
+                    session.setAttribute("ephoto", null);
+                    }
+
                 response.sendRedirect("emp_dash.jsp");
                
             } else {
