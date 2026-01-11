@@ -49,28 +49,18 @@
 
        <div class="form-group">
     <label for="phone">Phone Number *</label>
-    <input type="tel"
-       id="phone"
-       name="phone"
-       value="${param.phone}"
-       pattern="[6-9][0-9]{9}"
-       title="Enter a valid 10-digit Indian mobile number"
-       required>
+    <input type="tel" id="phone" name="phone" value="${param.phone}" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" required>
 <span style="color:red;">
     ${phoneError}
 </span>
 
 </div>
       <div class="form-group">
-    <label for="email">Email ID *</label>
-    <input type="email" id="email" name="email"
-           value="${param.email}"
-           autocomplete="off"
-           required>
+      <label for="email">Email ID *</label>
+      <input type="email" id="email" name="email"
+           value="${param.email}" autocomplete="off" required>
 
-    <span style="color:red;">
-        ${emailError}
-    </span>
+    <span class="error-msg">${emailError}</span>
 </div>
 
       <div class="form-group">
@@ -83,7 +73,8 @@
                pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
                title="Password must contain letters and numbers (min 6 characters)"
                required>
-        <button type="button" class="password-toggle" onclick="togglePassword()">?</button>
+        <i class="fa-regular fa-eye password-toggle" onclick="togglePassword()"></i>
+
     </div>
     <span style="color:red;">
         ${passwordError}
