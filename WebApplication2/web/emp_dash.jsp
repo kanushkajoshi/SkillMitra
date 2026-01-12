@@ -158,28 +158,30 @@
         </div>
     </main>
 
-    <!-- RIGHT PROFILE (LINKEDIN STYLE) -->
+    <!-- RIGHT PROFILE  -->
    <aside class="profile">
-    <div class="profile-header" onclick="toggleProfileMenu()">
-        <img src="images/default-user.png">
-        <div>
-            <strong>
-                <%= session.getAttribute("efirstname") %>
-                <%= session.getAttribute("elastname") %>
-            </strong>
-            <p>
-                <%= session.getAttribute("ecompanyname") %>
-            </p>
+
+        <div class="profile-header">
+            <img src="images/default-user.png">
+            <div>
+                <strong>
+                    <%= session.getAttribute("efirstname") %>
+                    <%= session.getAttribute("elastname") %>
+                </strong>
+                <p>
+                    <%= session.getAttribute("ecompanyname") %>
+                </p>
+            </div>
         </div>
-    </div>
 
-    <div class="profile-menu" id="profileMenu">
-    <a href="employer_profile.jsp">View Profile</a>
-    <a href="EditEmployerProfileServlet">Edit Profile</a>
-    <a href="LogoutServlet">Logout</a>
-</div>
+        <!-- ALWAYS VISIBLE -->
+        <div class="profile-menu">
+            <a href="employer_profile.jsp">View Profile</a>
+            <a href="LogoutServlet">Logout</a>
+        </div>
 
-</aside>
+    </aside>
+
 
 
 </div>
@@ -204,10 +206,6 @@ function applyFilters() {
 
         card.style.display = match ? "block" : "none";
     });
-}
-
-function toggleProfileMenu() {
-    document.getElementById("profileMenu").classList.toggle("show");
 }
 </script>
 
