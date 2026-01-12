@@ -1,9 +1,3 @@
-<%-- 
-    Document   : emp_dash.jsp
-    Created on : 2 Jan, 2026, 10:33:58 PM
-    Author     : Ishitaa Gupta
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
@@ -11,8 +5,11 @@
 
 
 <%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
     // Session check
-    if (session.getAttribute("eemail") == null) {
+    if (session == null||session.getAttribute("eemail") == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -59,9 +56,9 @@
 <header>
     <div class="logo">SkillMitra</div>
     <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">Post Job</a>
-        <a href="#">Logout</a>
+        
+        <a href="post_job.jsp">Post Job</a>
+
     </nav>
 </header>
 
@@ -177,7 +174,7 @@
         <!-- ALWAYS VISIBLE -->
         <div class="profile-menu">
             <a href="employer_profile.jsp">View Profile</a>
-            <a href="LogoutServlet">Logout</a>
+            <a href="${pageContext.request.contextPath}/LogoutServlet">Logout</a>
         </div>
 
     </aside>
