@@ -12,10 +12,10 @@
 
 <%
     // Session check
-//    if (session.getAttribute("eemail") == null) {
-//        response.sendRedirect("login.jsp");
-//        return;
-//    }
+    if (session.getAttribute("eemail") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 
     // If name not already in session, fetch from DB
     if (session.getAttribute("efirstname") == null) {
@@ -207,6 +207,13 @@ function applyFilters() {
         card.style.display = match ? "block" : "none";
     });
 }
+</script>
+<script>
+document.querySelector(".profile-header")
+    .addEventListener("click", function () {
+        document.querySelector(".profile-menu")
+            .classList.toggle("show");
+    });
 </script>
 
 </body>
