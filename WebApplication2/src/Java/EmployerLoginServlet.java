@@ -47,6 +47,7 @@ System.out.println("Password: " + password);
                 session.setAttribute("elastname", "");   // placeholder for now
 session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
 
+
                 session.setAttribute("eemail", email);
                 String photo = rs.getString("ephoto");
                if (photo != null && !photo.trim().isEmpty()) {

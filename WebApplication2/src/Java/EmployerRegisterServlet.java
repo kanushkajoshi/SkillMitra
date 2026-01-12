@@ -86,6 +86,8 @@ public class EmployerRegisterServlet extends HttpServlet {
 
             // ✅ CREATE SESSION (FROM FORM DATA)
             HttpSession session = request.getSession();
+            session.setAttribute("employerId", eid);
+
             session.setAttribute("eemail", email);
             session.setAttribute("efirstname", firstName);
             session.setAttribute("elastname", lastName);

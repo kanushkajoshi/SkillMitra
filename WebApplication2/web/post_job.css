@@ -1,0 +1,89 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 12 Jan, 2026, 7:01:08 PM
+    Author     : Ishitaa Gupta
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+.header {
+    background: #2c3e50;
+    color: #fff;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header button {
+    background: #fff;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.post-job-form {
+    background: #fff;
+    padding: 25px;
+    width: 520px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.post-job-form h2 {
+    margin-bottom: 20px;
+}
+
+.post-job-form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.post-job-form input,
+.post-job-form textarea,
+.post-job-form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.row div {
+    flex: 1;
+}
+
+.skills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 8px;
+}
+
+.post-job-form button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #2c7be5;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
