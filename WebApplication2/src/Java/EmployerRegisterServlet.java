@@ -7,6 +7,8 @@ import javax.servlet.http.*;
 @WebServlet("/EmployerRegisterServlet")
 public class EmployerRegisterServlet extends HttpServlet {
 
+    private Object eid;
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -8,16 +8,14 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="java.sql.*" %>
-<!--//for for each loop-->
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 
 <%
     // Session check
-//    if (session.getAttribute("eemail") == null) {
-//        response.sendRedirect("login.jsp");
-//        return;
-//    }
+    if (session.getAttribute("eemail") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 
     // If name not already in session, fetch from DB
     if (session.getAttribute("efirstname") == null) {
@@ -25,9 +23,9 @@
         String email = (String) session.getAttribute("eemail");
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/skillmitra", "root", "");
+                "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
             PreparedStatement ps = con.prepareStatement(
                 "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
@@ -61,8 +59,8 @@
 <header>
     <div class="logo">SkillMitra</div>
     <nav>
-        <a href="EmployerJobsServlet">Dashboard</a>
-        <a href="post_job.jsp">Post Job</a>
+        <a href="#">Dashboard</a>
+        <a href="#">Post Job</a>
         <a href="#">Logout</a>
     </nav>
 </header>
@@ -158,61 +156,35 @@
             </div>
 
         </div>
-           <section class="posted-jobs">
-        <h2>Your Posted Jobs</h2>
-
-        <c:if test="${empty jobs}">
-            <p>You have not posted any jobs yet.</p>
-        </c:if>
-
-        <div class="job-cards">
-            <c:forEach var="job" items="${jobs}">
-                <div class="job-card">
-                    <h3>${job.job_title}</h3>
-                    <p>
-                         ${job.job_location}, ${job.job_city}<br>
-                         ${job.job_type}<br>
-                         ₹${job.wage}/day
-                    </p>
-                    <small>Posted on ${job.created_at}</small>
-                </div>
-            </c:forEach>
-        </div>
-    </section>
     </main>
-        
-         <aside class="profile">
-    <div class="profile-header" onclick="toggleProfileMenu()">
-        <img src="images/default-user.png">
-        <div>
-            <strong>
-                <%= session.getAttribute("efirstname") %>
-                <%= session.getAttribute("elastname") %>
-            </strong>
-            <p>
-                <%= session.getAttribute("ecompanyname") %>
-            </p>
+
+    <!-- RIGHT PROFILE  -->
+   <aside class="profile">
+
+        <div class="profile-header">
+            <img src="images/default-user.png">
+            <div>
+                <strong>
+                    <%= session.getAttribute("efirstname") %>
+                    <%= session.getAttribute("elastname") %>
+                </strong>
+                <p>
+                    <%= session.getAttribute("ecompanyname") %>
+                </p>
+            </div>
         </div>
-    </div>
 
-    <div class="profile-menu" id="profileMenu">
-    <a href="employer_profile.jsp">View Profile</a>
-    <a href="EditEmployerProfileServlet">Edit Profile</a>
-    <a href="LogoutServlet">Logout</a>
+        <!-- ALWAYS VISIBLE -->
+        <div class="profile-menu">
+            <a href="employer_profile.jsp">View Profile</a>
+            <a href="LogoutServlet">Logout</a>
+        </div>
+
+    </aside>
+
+
+
 </div>
-
-</aside>  
-</div>
-    
-
-    
-    <!--List of posted jobs-->
-
-
-    <!-- RIGHT PROFILE (LINKEDIN STYLE) -->
-   
-
-
 
 <!-- FILTER LOGIC -->
 <script>
@@ -235,10 +207,13 @@ function applyFilters() {
         card.style.display = match ? "block" : "none";
     });
 }
-
-function toggleProfileMenu() {
-    document.getElementById("profileMenu").classList.toggle("show");
-}
+</script>
+<script>
+document.querySelector(".profile-header")
+    .addEventListener("click", function () {
+        document.querySelector(".profile-menu")
+            .classList.toggle("show");
+    });
 </script>
 
 </body>

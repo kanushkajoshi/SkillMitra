@@ -37,8 +37,7 @@
 
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="first_name"
-                       placeholder="Enter your first name" required>
+                <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
             </div>
 
             <div class="form-group">
