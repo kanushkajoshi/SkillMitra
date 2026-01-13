@@ -1,18 +1,20 @@
-/*
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
-*/
-/* 
-    Created on : 22 Nov, 2025, 12:31:17 AM
-    Author     : hp
-*/
-
  * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        /* Remove Chrome autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe
@@ -93,6 +95,7 @@ UI', Roboto, sans-serif;
 
         .form-group {
             margin-bottom: 8px;
+            
         }
 
         .form-group.full-width {
@@ -109,6 +112,7 @@ UI', Roboto, sans-serif;
 
         input[type="text"],
         input[type="tel"],
+        input[type="email"],
         input[type="date"],
         input[type="url"],
         textarea,
@@ -125,6 +129,7 @@ UI', Roboto, sans-serif;
 
         input[type="text"]:focus,
         input[type="tel"]:focus,
+        input[type="email"]:focus,
         input[type="date"]:focus,
         input[type="url"]:focus,
         input[type="password"]:focus,

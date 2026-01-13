@@ -17,8 +17,10 @@
     </header>
 
     <div class="container">
-    <form class="register-form" action="JobSeekerRegisterServelet" method="post">
-        
+    <form class="register-form" action="JobSeekerRegisterServelet" method="post" autocomplete="off">
+ 
+
+ 
     <h1>Register as JobSeeker</h1>
 
     <div class="form-grid">
@@ -28,28 +30,48 @@
         </div>
 
         <div class="form-group">
-            <label for="last_name">Last Name </label>
+            <label for="last_name">Last Name* </label>
             <input type="text" id="last_name" name="last_name" required>
         </div>
 
-        <div class="form-group">
-            <label for="phone">Phone Number *</label>
-            <input type="tel" id="phone" name="phone" required>
-        </div>
+       <div class="form-group">
+    <label for="phone">Phone Number *</label>
+    <input type="tel"
+       id="phone"
+       name="phone"
+       value="${param.phone}"
+       pattern="[6-9][0-9]{9}"
+       title="Enter a valid 10-digit Indian mobile number"
+       required>
+<span style="color:red;">
+    ${phoneError}
+</span>
+
+</div>
+
 
         <div class="form-group">
             <label for="email">Email ID *</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email"  autocomplete="off" required>
         </div>
 
-        <div class="form-group">
-            <label for="password">Password *</label>
-            <div class="password-container">
-                <input type="password" id="password" name="password" required>
-                <button type="button" class="password-toggle" onclick="togglePassword()">?</button>
-            </div>
-        </div>
+      <div class="form-group">
+    <label for="password">Password *</label>
+    <div class="password-container">
+        <input type="password"
+               id="password"
+               name="password"
+               autocomplete="new-password"
+               pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
+               title="Password must contain letters and numbers (min 6 characters)"
+               required>
+        <button type="button" class="password-toggle" onclick="togglePassword()">?</button>
     </div>
+    <span style="color:red;">
+        ${passwordError}
+    </span>
+</div>
+
 
     <div class="form-grid">
         <div class="form-group">
@@ -75,7 +97,7 @@
 
     <div class="form-grid">
         <div class="form-group">
-            <label for="date_of_birth">Date of Birth</label>
+            <label for="date_of_birth">Date of Birth *</label>
             <input type="date" id="date_of_birth" name="date_of_birth" required>
         </div>
 

@@ -24,11 +24,12 @@
             <img src="skillmitralogo.jpg" alt="SkillMitra Logo">
             SkillMitra
         </div>
-        <button class="back-btn" onclick="window.location.href='home.jsp'">← Back to Home</button>
+        <button class="back-btn" onclick="window.location.href='home.jsp'">Back to Home</button>
     </header>
 
+
     <div class="container">
-<form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet">
+    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet"  autocomplete="off">
 
                 <h1>Register as Employer</h1>
 
@@ -36,8 +37,7 @@
 
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="first_name"
-                       placeholder="Enter your first name" required>
+                <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
             </div>
 
             <div class="form-group">
@@ -46,29 +46,39 @@
                        placeholder="Enter your last name" required>
             </div>
 
-            <div class="form-group">
-                <label for="phone">Phone Number *</label>
-                <input type="tel" id="phone" name="phone"
-                       placeholder="Enter your phone number (e.g. +91)" required>
-            </div>
+       <div class="form-group">
+    <label for="phone">Phone Number *</label>
+    <input type="tel" id="phone" name="phone" value="${param.phone}" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" required>
+<span style="color:red;">
+    ${phoneError}
+</span>
 
-            <div class="form-group">
-                <label for="email">Email ID *</label>
-                <div class="email-container">
-                <input type="email" id="email" name="email"
-                       placeholder="Enter your email ID" required>
-                </div>
-            </div>
+</div>
+      <div class="form-group">
+      <label for="email">Email ID *</label>
+      <input type="email" id="email" name="email"
+           value="${param.email}" autocomplete="off" required>
 
-            <div class="form-group">
-                <label for="password">Password *</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password"
-                           placeholder="Enter your password" required>
-                    <button type="button" class="password-toggle"
-                            onclick="togglePassword()">👁️</button>
-                </div>
-            </div>
+    <span class="error-msg">${emailError}</span>
+</div>
+
+      <div class="form-group">
+    <label for="password">Password *</label>
+    <div class="password-container">
+        <input type="password"
+               id="password"
+               name="password"
+               autocomplete="new-password"
+               pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
+               title="Password must contain letters and numbers (min 6 characters)"
+               required>
+        <i class="fa-regular fa-eye password-toggle" onclick="togglePassword()"></i>
+
+    </div>
+    <span style="color:red;">
+        ${passwordError}
+    </span>
+</div>
 
             <div class="form-group">
                 <label for="company_name">Company Name</label>
@@ -112,7 +122,7 @@
 
         <div class="form-footer">
             or<br><br>
-            Already have an account? <a href="#login">Sign In</a>
+            Already have an account? <a href="login.jsp">Sign In</a>
         </div>
 
     </form>
@@ -120,26 +130,7 @@
     </div>
 
     <script>
-//        function handleSubmit(event) {
-//            event.preventDefault();
-//
-//            const formData = new FormData(event.target);
-//            const data = Object.fromEntries(formData.entries());
-//
-//            if (!data.first_name || !data.last_name || !data.phone ||
-//!data.country || !data.state || !data.city) {
-//                alert('Please fill in all required fields marked with *');
-//                return;
-//            }
-//
-//            if (data.phone.length < 10) {
-//                alert('Please enter a valid phone number');
-//                return;
-//            }
-//
-//            alert('Registration successful! Welcome to SkillMitra!');
-//            console.log('Registration data:', data);
-//        }
+//       
 
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -151,17 +142,19 @@
         }
 
         // Remove or update the input focus effects
-        document.querySelectorAll('input, textarea, select').forEach(field => {
-            field.addEventListener('focus', function() {
-                // Remove the transform effect
-                this.style.transform = 'none';
-            });
+        document.addEventListener("DOMContentLoaded", function () {
 
-            field.addEventListener('blur', function() {
-                // Remove the transform effect
-                this.style.transform = 'none';
-            });
+    document.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('focus', function() {
+            this.style.transform = 'none';
         });
+
+        field.addEventListener('blur', function() {
+            this.style.transform = 'none';
+        });
+    });
+
+});
     </script>
     
     
