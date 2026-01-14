@@ -26,7 +26,7 @@
     </header>
 
     <div class="container">
-    <form method="post"
+    <form class="register-form" method="post"
       action="<%= request.getContextPath() %>/JobSeekerRegisterServlet">
 
 
