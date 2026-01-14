@@ -34,10 +34,12 @@
             </button>
 
             <!-- Jobseeker Button -->
-            <button class="register-btn" 
-                    onclick="window.location.href='jobseeker_register.jsp'">
-                Register as Jobseeker
-            </button>
+            <button class="register-btn" onclick="window.location.href='<%=request.getContextPath()%>/jobseeker-register'">
+    Register as Jobseeker
+</button>
+
+
+
 
             <div class="form-footer" style="margin-top:20px;">
                 Already have an account? <a href="login.jsp">Sign In</a>
