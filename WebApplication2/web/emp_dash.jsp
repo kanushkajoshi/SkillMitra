@@ -47,15 +47,16 @@
 <header>
     <div class="logo">SkillMitra</div>
     <nav>
-        <a href="#" onclick="showSection('dashboard')">Dashboard</a>
-        <a href="#" onclick="showSection('manageJobs')">Post Job</a>
+        <a href="#" onclick="showSection('dashboard'); return false;">Dashboard</a>
+        <a href="#" onclick="showSection('manageJobs'); return false;">Post Job</a>
         <a href="LogoutServlet">Logout</a>
     </nav>
 
+    <!-- PROFILE ICON DROPDOWN -->
     <div class="profile-dropdown">
         <img src="images/default-user.png" class="profile-icon" id="profileIcon">
         <div class="profile-menu" id="profileMenu">
-            <div class="profile-name">
+            <div class="profile-name" style="background:none; color:#000; font-weight:600; border-bottom:none;">
                 <%= session.getAttribute("efirstname") %> <%= session.getAttribute("elastname") %>
             </div>
             <a href="employer_profile.jsp">View Profile</a>
