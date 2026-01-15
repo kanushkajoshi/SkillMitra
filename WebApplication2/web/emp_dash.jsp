@@ -35,11 +35,15 @@ if (rs.next()) {
     session.setAttribute("efirstname", rs.getString("efirstname"));
     session.setAttribute("elastname", rs.getString("elastname"));
     session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
+    session.setAttribute("ephoto", rs.getString("ephoto"));
 
-    String sessionPhoto = (String) session.getAttribute("ephoto");
-if (sessionPhoto != null && !sessionPhoto.trim().equals("")) {
-    imgPath = request.getContextPath() + "/uploads/" + sessionPhoto;
-}
+    String photo = (String) session.getAttribute("ephoto");
+
+imgPath = (photo != null && !photo.trim().equals(""))
+    ? request.getContextPath() + "/uploads/" + photo
+    : request.getContextPath() + "/images/default-user.png";
+
+
 }
 
        
@@ -168,7 +172,8 @@ if (sessionPhoto != null && !sessionPhoto.trim().equals("")) {
    <aside class="profile">
 
         <div class="profile-header">
-            <img src="<%= imgPath %>"
+           <img src="<%= imgPath %>"
+
      style="width:60px;height:60px;
             border-radius:50%;
             border:2px solid #4a6fa5;">
