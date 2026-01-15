@@ -23,7 +23,10 @@
         <div class="login-container">
             <h1 class="login-title">Login as Employer</h1>
             
-            <form id="loginForm">
+            <form id="loginForm"
+      method="post"
+      action="<%= request.getContextPath() %>/EmployerLoginServlet">
+
                 <div class="form-group">
                     <label for="email" class="form-label">Email</label>
                     <input 

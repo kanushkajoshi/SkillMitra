@@ -1,5 +1,6 @@
 package servlet;
 
+import db.DBConnection;
 import java.io.IOException;
 import java.sql.*;
 import javax.servlet.ServletException;
@@ -11,97 +12,57 @@ public class EmployerRegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
-        String firstName = request.getParameter("first_name");
-        String lastName = request.getParameter("last_name");
-        String phone = request.getParameter("phone");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String companyName = request.getParameter("company_name");
-        String website = request.getParameter("website");
-        String country = request.getParameter("country");
-        String state = request.getParameter("state");
-        String city = request.getParameter("city");
-        String zipcode = request.getParameter("zipcode");
+    String fname = request.getParameter("firstname");
+    String lname = request.getParameter("lastname");
+    String email = request.getParameter("email");
+    String password = request.getParameter("password");
+    String phone = request.getParameter("phone");
+    String company = request.getParameter("companyname");
+    String website = request.getParameter("companywebsite");
+    String state = request.getParameter("state");
+    String country = request.getParameter("country");
+    String city = request.getParameter("city");
+    String zip = request.getParameter("zip");
+    System.out.println("DEBUG -> fname = " + fname + ", lname = " + lname);
+    try {
+        Connection con = DBConnection.getConnection();
 
-        // 🔐 PASSWORD VALIDATION
-        if (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{6,}$")) {
-            request.setAttribute("passwordError",
-                "Password must contain letters and numbers (min 6 characters)");
-            request.getRequestDispatcher("employer_register.jsp")
-                   .forward(request, response);
-            return;
-        }
+        String sql = "INSERT INTO employer " +
+             "(efirstname, elastname, eemail, epwd, ephone, ecompanyname, ecompanywebsite, estate, ecountry, ecity, ezip) " +
+             "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/skillmitra", "root", ""
-            );
 
-            // ✅ CHECK EMAIL
-            PreparedStatement emailPs = con.prepareStatement(
-                "SELECT 1 FROM employer WHERE eemail = ?");
-            emailPs.setString(1, email);
-            if (emailPs.executeQuery().next()) {
-                request.setAttribute("emailError", "Email already registered");
-                request.getRequestDispatcher("employer_register.jsp")
-                       .forward(request, response);
-                con.close();
-                return;
-            }
+        PreparedStatement ps = con.prepareStatement(sql);
 
-            // ✅ CHECK PHONE
-            PreparedStatement phonePs = con.prepareStatement(
-                "SELECT 1 FROM employer WHERE ephone = ?");
-            phonePs.setString(1, phone);
-            if (phonePs.executeQuery().next()) {
-                request.setAttribute("phoneError", "Phone number already registered");
-                request.getRequestDispatcher("employer_register.jsp")
-                       .forward(request, response);
-                con.close();
-                return;
-            }
+        ps.setString(1, fname);
+        ps.setString(2, lname);
+        ps.setString(3, email);
+        ps.setString(4, password);
+        ps.setString(5, phone);
+        ps.setString(6, company);
+        ps.setString(7, website);
+        ps.setString(8, state);
+        ps.setString(9, country);
+        ps.setString(10, city);
+        ps.setString(11, zip);
 
-            // ✅ INSERT
-            PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO employer " +
-                "(efirstname, elastname, ephone, eemail, epwd, " +
-                "ecompanyname, ecompanywebsite, ecountry, estate, ecity, ezip) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            );
+        int result = ps.executeUpdate();
 
-            ps.setString(1, firstName);
-            ps.setString(2, lastName);
-            ps.setString(3, phone);
-            ps.setString(4, email);
-            ps.setString(5, password);
-            ps.setString(6, companyName);
-            ps.setString(7, website);
-            ps.setString(8, country);
-            ps.setString(9, state);
-            ps.setString(10, city);
-            ps.setString(11, zipcode);
-
-            ps.executeUpdate();
-
-            // ✅ CREATE SESSION (FROM FORM DATA)
+        if (result > 0) {
             HttpSession session = request.getSession();
             session.setAttribute("eemail", email);
-            session.setAttribute("efirstname", firstName);
-            session.setAttribute("elastname", lastName);
-            session.setAttribute("ecompanyname", companyName);
-            session.setAttribute("ephoto", null);
+            session.setAttribute("efirstname", fname);
 
-            con.close();
-
-            // ✅ REDIRECT ON SUCCESS
             response.sendRedirect("emp_dash.jsp");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("error.jsp");
+        } else {
+            response.sendRedirect("employer_register.jsp?error=failed");
         }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.getWriter().println("ERROR: " + e.getMessage());
     }
+}
 }

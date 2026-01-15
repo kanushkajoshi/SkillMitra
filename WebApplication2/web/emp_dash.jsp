@@ -9,10 +9,14 @@
     response.setHeader("Pragma", "no-cache");
     response.setDateHeader("Expires", 0);
     // Session check
-    if (session == null||session.getAttribute("eemail") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+    if (session == null || session.getAttribute("eid") == null) {
+    response.sendRedirect(request.getContextPath() + "/login.jsp");
+    return;
+}
+    
+
+//     session.getAttribute("eemail") ;
+
 
     // If name not already in session, fetch from DB
     if (session.getAttribute("efirstname") == null) {
@@ -20,7 +24,7 @@
         String email = (String) session.getAttribute("eemail");
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
@@ -42,6 +46,9 @@
         }
     }
 %>
+<%
+    String successMsg = (String) session.getAttribute("jobSuccess");
+%>
 
 <!DOCTYPE html>
 <html>
@@ -51,13 +58,27 @@
 </head>
 
 <body>
+<%
+if (successMsg != null) {
+%>
+<div id="successModal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>✅ Success</h2>
+        <p><%= successMsg %></p>
+    </div>
+</div>
+<%
+    session.removeAttribute("jobSuccess"); // show only once
+}
+%>
 
 <!-- HEADER -->
 <header>
     <div class="logo">SkillMitra</div>
     <nav>
         
-        <a href="post_job.jsp">Post Job</a>
+        <a href="<%= request.getContextPath() %>/post-job">Post Job</a>
 
     </nav>
 </header>
@@ -211,6 +232,16 @@ document.querySelector(".profile-header")
         document.querySelector(".profile-menu")
             .classList.toggle("show");
     });
+</script>
+<script>
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
+}
+setTimeout(() => {
+    const modal = document.getElementById("successModal");
+    if (modal) modal.style.display = "none";
+}, 3000);
+
 </script>
 
 </body>

@@ -16,7 +16,7 @@ public class EmployerJobsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("employerId") == null) {
+        if (session == null || session.getAttribute("eid") == null) {
             response.sendRedirect("login.jsp");
             return;
         }

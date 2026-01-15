@@ -43,7 +43,7 @@ System.out.println("Password: " + password);
                 // Login success
                 System.out.println("LOGIN SUCCESS");
                 HttpSession session = request.getSession();
-                session.setAttribute("employerId", rs.getInt("eid"));
+                session.setAttribute("eid", rs.getInt("eid"));
                 session.setAttribute("employerName", rs.getString("efirstname"));
                 session.setAttribute("efirstname", rs.getString("efirstname"));
                 session.setAttribute("elastname", "");   // placeholder for now

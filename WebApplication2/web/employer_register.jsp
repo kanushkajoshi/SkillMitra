@@ -29,7 +29,7 @@
 
 
     <div class="container">
-    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet"  autocomplete="off">
+    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" method="post"  autocomplete="off">
 
                 <h1>Register as Employer</h1>
 
@@ -37,12 +37,12 @@
 
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
+                <input type="text" id="first_name" name="firstname" placeholder="Enter your first name" required>
             </div>
 
             <div class="form-group">
                 <label for="last_name">Last Name *</label>
-                <input type="text" id="last_name" name="last_name"
+                <input type="text" id="last_name" name="lastname"
                        placeholder="Enter your last name" required>
             </div>
 
@@ -82,13 +82,13 @@
 
             <div class="form-group">
                 <label for="company_name">Company Name</label>
-                <input type="text" id="company_name" name="company_name"
+                <input type="text" id="company_name" name="companyname"
                        placeholder="Enter your company name">
             </div>
 
             <div class="form-group">
                 <label for="website">Company Website</label>
-                <input type="url" id="website" name="website"
+                <input type="url" id="website" name="companywebsite"
                        placeholder="Enter company website">
             </div>
 
@@ -112,7 +112,7 @@
 
             <div class="form-group">
                 <label for="zipcode">Zipcode *</label>
-                <input type="text" id="zipcode" name="zipcode"
+                <input type="text" id="zipcode" name="zip"
                        placeholder="Enter zipcode" required>
             </div>
 
