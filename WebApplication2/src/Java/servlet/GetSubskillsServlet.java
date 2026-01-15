@@ -18,22 +18,22 @@ public class GetSubskillsServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String skillName = request.getParameter("skill");
-        List<String> subskills = new ArrayList<>();
+        String skillId = request.getParameter("skillId");
+        List<Map<String, Object>> subskills = new ArrayList<>();
 
-        if (skillName != null && !skillName.trim().isEmpty()) {
+        if (skillId != null && !skillId.isEmpty()) {
             try (Connection con = DBConnection.getConnection();
                  PreparedStatement ps = con.prepareStatement(
-                     "SELECT ss.subskill_name " +
-                     "FROM subskill ss " +
-                     "JOIN skill s ON ss.skill_id = s.skill_id " +
-                     "WHERE LOWER(s.skill_name) = LOWER(?)")) {
+                     "SELECT subskill_id, subskill_name FROM subskill WHERE skill_id = ?")) {
 
-                ps.setString(1, skillName.trim());
+                ps.setInt(1, Integer.parseInt(skillId));
 
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    subskills.add(rs.getString("subskill_name"));
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id", rs.getInt("subskill_id"));
+                    m.put("name", rs.getString("subskill_name"));
+                    subskills.add(m);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

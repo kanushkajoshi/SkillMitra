@@ -27,8 +27,9 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         String country      = request.getParameter("jcountry");
         String state        = request.getParameter("jstate");
         String city         = request.getParameter("jcity");
-        String skillName    = request.getParameter("skill");
-        String subskillName = request.getParameter("subskill");
+        String zip = request.getParameter("jzip");
+
+
         String dob          = request.getParameter("jdob");
 
         java.sql.Date sqlDob = java.sql.Date.valueOf(dob);
@@ -51,107 +52,96 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         Connection con = null;
 
         try {
-            // 3️⃣ DB Connection
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/skillmitra",
-                    "root",
-                    ""
-            );
+    // 3️⃣ DB Connection
+    Class.forName("com.mysql.jdbc.Driver");
+    con = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra",
+            "root",
+            ""
+    );
 
-            // 4️⃣ Check duplicate email
-            PreparedStatement checkEmail =
-                    con.prepareStatement("SELECT 1 FROM jobseeker WHERE jemail = ?");
-            checkEmail.setString(1, email);
+    // 4️⃣ Check duplicate email
+    PreparedStatement checkEmail =
+            con.prepareStatement("SELECT 1 FROM jobseeker WHERE jemail = ?");
+    checkEmail.setString(1, email);
 
-            ResultSet rsEmail = checkEmail.executeQuery();
-            if (rsEmail.next()) {
-                request.setAttribute("emailError", "Email already registered");
-                request.getRequestDispatcher("/jobseeker_register.jsp")
-                       .forward(request, response);
-                return;
-            }
+    ResultSet rsEmail = checkEmail.executeQuery();
+    if (rsEmail.next()) {
+        request.setAttribute("emailError", "Email already registered");
+        request.getRequestDispatcher("/jobseeker_register.jsp")
+               .forward(request, response);
+        return;
+    }
 
-            // 5️⃣ Insert Jobseeker
-            String insertJobseeker =
-                    "INSERT INTO jobseeker " +
-                    "(jfirstname, jlastname, jemail, jphone, jpwd, jeducation, jcountry, jstate, jcity, jdob) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            PreparedStatement ps =
-                    con.prepareStatement(insertJobseeker, Statement.RETURN_GENERATED_KEYS);
-
-            ps.setString(1, firstName);
-            ps.setString(2, lastName);
-            ps.setString(3, email);
-            ps.setString(4, phone);
-            ps.setString(5, password);
-            ps.setString(6, education);
-            ps.setString(7, country);
-            ps.setString(8, state);
-            ps.setString(9, city);
-            ps.setDate(10, sqlDob);
-
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            if (!rs.next()) {
-                throw new RuntimeException("Failed to get Jobseeker ID");
-            }
-            int jobseekerId = rs.getInt(1);
-
-            // 6️⃣ Fetch skill_id
-            PreparedStatement psSkill =
-                    con.prepareStatement("SELECT skill_id FROM skill WHERE skill_name = ?");
-            psSkill.setString(1, skillName);
-
-            ResultSet rsSkill = psSkill.executeQuery();
-            if (!rsSkill.next()) {
-                throw new RuntimeException("Skill not found: " + skillName);
-            }
-            int skillId = rsSkill.getInt("skill_id");
-
-            // 7️⃣ Fetch subskill_id
-            PreparedStatement psSub =
-                    con.prepareStatement(
-                            "SELECT subskill_id FROM subskill WHERE subskill_name = ? AND skill_id = ?");
-            psSub.setString(1, subskillName);
-            psSub.setInt(2, skillId);
-
-            ResultSet rsSub = psSub.executeQuery();
-            if (!rsSub.next()) {
-                throw new RuntimeException("Subskill not found: " + subskillName);
-            }
-            int subskillId = rsSub.getInt("subskill_id");
-
-            // 8️⃣ Insert into jobseeker_skills (LINK TABLE)
-            PreparedStatement psLink =
-    con.prepareStatement(
-        "INSERT INTO jobseeker_skills (jid, skill_id, subskill_id) VALUES (?, ?, ?)");
+    // 5️⃣ Insert Jobseeker
+    String insertJobseeker =
+    "INSERT INTO jobseeker " +
+    "(jfirstname, jlastname, jemail, jphone, jpwd, jeducation, " +
+    " jcountry, jstate, jcity, jzip, jdob) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-            psLink.setInt(1, jobseekerId);
-            psLink.setInt(2, skillId);
-            psLink.setInt(3, subskillId);
-            int result=psLink.executeUpdate();
-            
-            // 9️⃣ Close connection
-            con.close();
+    PreparedStatement ps =
+            con.prepareStatement(insertJobseeker, Statement.RETURN_GENERATED_KEYS);
 
-            System.out.println("REGISTER SESSION jobseekerId = " + jobseekerId);
-            if (result > 0) {
-            HttpSession session = request.getSession();
-            session.setAttribute("jobseekerId", jobseekerId);
-session.setAttribute("jobseekerName", firstName);
-session.setAttribute("jobseekerEmail", email);
+    ps.setString(1, firstName);
+    ps.setString(2, lastName);
+    ps.setString(3, email);
+    ps.setString(4, phone);
+    ps.setString(5, password);
+    ps.setString(6, education);
+    ps.setString(7, country);
+    ps.setString(8, state);
+    ps.setString(9, city);
+    ps.setString(10, zip);     // ✅ ADD THIS
+ps.setDate(11, sqlDob);
 
-            response.sendRedirect("jobseeker_dash.jsp");
-        } else {
-            response.sendRedirect("jobseeker_register.jsp?error=failed");
-        }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp");
-        }
+    ps.executeUpdate();
+
+    ResultSet rs = ps.getGeneratedKeys();
+    if (!rs.next()) {
+        throw new RuntimeException("Failed to get Jobseeker ID");
+    }
+    int jobseekerId = rs.getInt(1);
+
+    // 🔥 NEW: read IDs directly from form
+    int skillId = Integer.parseInt(request.getParameter("skill"));
+    int subskillId = Integer.parseInt(request.getParameter("subskill"));
+
+    // 6️⃣ Insert into jobseeker_skills (LINK TABLE)
+    PreparedStatement psLink =
+            con.prepareStatement(
+                "INSERT INTO jobseeker_skills (jid, skill_id, subskill_id) VALUES (?, ?, ?)");
+
+    psLink.setInt(1, jobseekerId);
+    psLink.setInt(2, skillId);
+    psLink.setInt(3, subskillId);
+
+    int result = psLink.executeUpdate();
+
+    con.close();
+
+    // 7️⃣ Session + redirect
+    if (result > 0) {
+        HttpSession session = request.getSession();
+        session.setAttribute("jobseekerId", jobseekerId);
+        session.setAttribute("jobseekerName", firstName);
+        session.setAttribute("jobseekerEmail", email);
+
+        response.sendRedirect(request.getContextPath() + "/jobseeker_dash.jsp");
+
+    } else {
+        response.sendRedirect("jobseeker_register.jsp?error=failed");
+    }
+//        }catch (Exception e) {
+//    e.printStackTrace();   // keep this
+//    throw new ServletException(e); // better than silent redirect
+}
+
+ catch (Exception e) {
+    e.printStackTrace();
+    response.sendRedirect(request.getContextPath() + "/error.jsp");
+}
+
     }
 }

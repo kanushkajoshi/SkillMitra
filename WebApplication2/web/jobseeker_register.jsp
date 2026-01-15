@@ -3,7 +3,7 @@
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="db.DBConnection" %>
 <%@ page import="java.util.List" %>
-
+<%@ page import="java.util.Map" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -116,21 +116,23 @@
     <label for="skill">Skill *</label>
 
     <select id="skill" name="skill" onchange="loadSubskills()" required>
-        <option value="">-- Select Skill --</option>
+    <option value="">-- Select Skill --</option>
 
-        <%
-            List<String> skills =
-                (List<String>) request.getAttribute("skills");
+<%
+    List<Map<String, Object>> skills =
+        (List<Map<String, Object>>) request.getAttribute("skills");
 
-            if (skills != null) {
-                for (String s : skills) {
-        %>
-                    <option value="<%= s %>"><%= s %></option>
-        <%
-                }
-            }
-        %>
-    </select>
+    if (skills != null) {
+        for (Map<String, Object> s : skills) {
+%>
+        <option value="<%= s.get("id") %>">
+            <%= s.get("name") %>
+        </option>
+<%
+        }
+    }
+%>
+</select>
 </div>
 
         <div class="form-group">
@@ -203,33 +205,26 @@
     }
 }
 function loadSubskills() {
-    const skill = document.getElementById("skill").value;
-    console.log("Selected skill:", skill);
-
+    const skillId = document.getElementById("skill").value;
     const sub = document.getElementById("subskill");
+
     sub.innerHTML = '<option value="">-- Select Subskill --</option>';
+    if (!skillId) return;
 
-    if (!skill) return;
-
-    fetch("<%= request.getContextPath() %>/GetSubskillsServlet?skill="
-        + encodeURIComponent(skill))
-        .then(res => {
-            console.log("HTTP status:", res.status);
-            return res.text();
-        })
-        .then(text => {
-            console.log("RAW response:", text);
-            const data = JSON.parse(text);
-
+    fetch("<%= request.getContextPath() %>/GetSubskillsServlet?skillId="
+        + encodeURIComponent(skillId))
+        .then(res => res.json())
+        .then(data => {
             data.forEach(s => {
                 let opt = document.createElement("option");
-                opt.value = s;
-                opt.textContent = s;
+                opt.value = s.id;
+                opt.textContent = s.name;
                 sub.appendChild(opt);
             });
         })
-        .catch(err => console.error("Fetch error:", err));
+        .catch(err => console.error(err));
 }
+
 
 </script>
 
