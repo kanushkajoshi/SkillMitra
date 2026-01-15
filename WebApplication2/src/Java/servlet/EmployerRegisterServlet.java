@@ -34,7 +34,8 @@ public class EmployerRegisterServlet extends HttpServlet {
              "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 
-        PreparedStatement ps = con.prepareStatement(sql);
+        PreparedStatement ps =
+    con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         ps.setString(1, fname);
         ps.setString(2, lname);
@@ -49,13 +50,19 @@ public class EmployerRegisterServlet extends HttpServlet {
         ps.setString(11, zip);
 
         int result = ps.executeUpdate();
+        ResultSet rs = ps.getGeneratedKeys();
+if (!rs.next()) {
+    throw new RuntimeException("Failed to get employer ID");
+}
+int eid = rs.getInt(1);
 
         if (result > 0) {
             HttpSession session = request.getSession();
+            session.setAttribute("eid", eid);
             session.setAttribute("eemail", email);
             session.setAttribute("efirstname", fname);
 
-            response.sendRedirect("emp_dash.jsp");
+            response.sendRedirect(request.getContextPath() + "/emp_dash.jsp");
         } else {
             response.sendRedirect("employer_register.jsp?error=failed");
         }

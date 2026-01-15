@@ -60,51 +60,53 @@
     <div class="cards">
 
 <%
-    Connection con = DBConnection.getConnection();
+Connection con = DBConnection.getConnection();
 
-    String sql =
-    "SELECT DISTINCT j.* " +
+String sql =
+    "SELECT DISTINCT j.job_id, j.title, j.city, j.salary, j.job_type " +
     "FROM jobs j " +
-    "JOIN jobseeker_skills js ON j.skill_id = js.skill_id " +
+    "JOIN job_skills jk ON jk.job_id = j.job_id " +
+    "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
+    "AND js.subskill_id = jk.subskill_id " +
     "WHERE js.jid = ? ";
 
+if (cityFilter != null && !cityFilter.isEmpty()) {
+    sql += " AND LOWER(j.city) LIKE LOWER(?) ";
+}
 
-    if (cityFilter != null && !cityFilter.isEmpty()) {
-        sql += " AND LOWER(j.city) LIKE LOWER(?) ";
-    }
+if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
+    sql += " AND j.min_salary >= ? ";
+}
 
-    if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
-        sql += " AND j.min_salary >= ? ";
-    }
+PreparedStatement ps = con.prepareStatement(sql);
 
-    PreparedStatement ps = con.prepareStatement(sql);
-    int idx = 1;
-    ps.setInt(idx++, jobseekerId);
+int idx = 1;
+ps.setInt(idx++, jobseekerId);
 
-    if (cityFilter != null && !cityFilter.isEmpty()) {
-        ps.setString(idx++, "%" + cityFilter + "%");
-    }
+if (cityFilter != null && !cityFilter.isEmpty()) {
+    ps.setString(idx++, "%" + cityFilter + "%");
+}
 
-    if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
-        ps.setInt(idx++, Integer.parseInt(minSalaryFilter));
-    }
+if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
+    ps.setInt(idx++, Integer.parseInt(minSalaryFilter));
+}
 
-    ResultSet rs = ps.executeQuery();
+ResultSet rs = ps.executeQuery();
 
-    while (rs.next()) {
+while (rs.next()) {
 %>
-
-        <div class="card">
-            <h3><%= rs.getString("title") %></h3>
-            <p><b>City:</b> <%= rs.getString("city") %></p>
-            <p><b>Salary:</b> ₹<%= rs.getString("salary") %></p>
-            <p><b>Type:</b> <%= rs.getString("job_type") %></p>
-        </div>
-
+    <div class="card">
+        <h3><%= rs.getString("title") %></h3>
+        <p><b>City:</b> <%= rs.getString("city") %></p>
+        <p><b>Salary:</b> ₹<%= rs.getString("salary") %></p>
+        <p><b>Type:</b> <%= rs.getString("job_type") %></p>
+    </div>
 <%
-    }
-    con.close();
+}
+
+con.close();
 %>
+
 
     </div>
 </div>

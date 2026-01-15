@@ -123,7 +123,7 @@ ps.setDate(11, sqlDob);
 
     // 7️⃣ Session + redirect
     if (result > 0) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(true);
         session.setAttribute("jobseekerId", jobseekerId);
         session.setAttribute("jobseekerName", firstName);
         session.setAttribute("jobseekerEmail", email);

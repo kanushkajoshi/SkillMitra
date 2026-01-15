@@ -1,3 +1,4 @@
+<%@page import="java.util.Map"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
@@ -22,20 +23,31 @@
         <h2>Post a New Job</h2>
 
         <label>Job Title*</label>
-<select id="jobSkill" name="jobSkill" onchange="loadJobSubskills()" required>
+
+<select id="jobSkill" name="skill_id" onchange="loadJobSubskills()" required>
     <option value="">-- Select Skill --</option>
 
     <%
-        List<String> skills = (List<String>) request.getAttribute("skills");
-        if (skills != null) {
-            for (String s : skills) {
+        List<Map<String, Object>> skills =
+            (List<Map<String, Object>>) request.getAttribute("skills");
+
+        for (Map<String, Object> s : skills) {
     %>
-        <option value="<%= s %>"><%= s %></option>
+        <option 
+            value="<%= s.get("id") %>" 
+            data-name="<%= s.get("name") %>">
+            <%= s.get("name") %>
+        </option>
     <%
-            }
         }
     %>
 </select>
+
+<!-- ✅ Hidden field that will store job title -->
+<input type="hidden" name="job_title" id="jobTitle">
+
+
+
 
 
         <label>Job Description *</label>
@@ -98,26 +110,36 @@
 </div>
 <script>
 function loadJobSubskills() {
-    const skill = document.getElementById("jobSkill").value;
+    const skillSelect = document.getElementById("jobSkill");
+    const skillId = skillSelect.value;
+
+    console.log("Selected skillId =", skillId);
+
+    if (!skillId) return;
+
+    // set job title
+    const skillName =
+        skillSelect.options[skillSelect.selectedIndex].dataset.name;
+    document.getElementById("jobTitle").value = skillName;
+
     const sub = document.getElementById("jobSubskill");
-
     sub.innerHTML = '<option value="">-- Select Subskill --</option>';
-    if (!skill) return;
 
-    fetch("<%= request.getContextPath() %>/GetSubskillsServlet?skill="
-        + encodeURIComponent(skill))
+    fetch("<%= request.getContextPath() %>/GetSubskillsServlet?skillId=" + skillId)
         .then(res => res.json())
         .then(data => {
+            console.log("Subskills:", data);
             data.forEach(s => {
-                let opt = document.createElement("option");
-                opt.value = s;
-                opt.textContent = s;
+                const opt = document.createElement("option");
+                opt.value = s.id;
+                opt.textContent = s.name;
                 sub.appendChild(opt);
             });
         })
         .catch(err => console.error(err));
 }
 </script>
+
 
 </body>
 </html>

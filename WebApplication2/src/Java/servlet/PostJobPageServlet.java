@@ -4,7 +4,9 @@ import db.DBConnection;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -16,27 +18,26 @@ public class PostJobPageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
-        // 🔐 Employer login check
         HttpSession session = request.getSession(false);
-        System.out.println("EID in session = " + 
-            (session != null ? session.getAttribute("eid") : "NO SESSION"));
         if (session == null || session.getAttribute("eid") == null) {
-    response.sendRedirect(request.getContextPath() + "/employer_login.jsp");
-    return;
-}
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
+        List<Map<String, Object>> skills = new ArrayList<>();
 
-        List<String> skills = new ArrayList<>();
-
-        try (Connection con = DBConnection.getConnection()) {
-            PreparedStatement ps =
-                con.prepareStatement("SELECT skill_name FROM skill");
-            ResultSet rs = ps.executeQuery();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps =
+                 con.prepareStatement("SELECT skill_id, skill_name FROM skill");
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                skills.add(rs.getString("skill_name"));
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", rs.getInt("skill_id"));
+                m.put("name", rs.getString("skill_name"));
+                skills.add(m);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

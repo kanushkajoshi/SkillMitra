@@ -119,20 +119,34 @@
     <option value="">-- Select Skill --</option>
 
 <%
-    List<Map<String, Object>> skills =
-        (List<Map<String, Object>>) request.getAttribute("skills");
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
 
-    if (skills != null) {
-        for (Map<String, Object> s : skills) {
+    try {
+        con = DBConnection.getConnection();
+        ps = con.prepareStatement(
+            "SELECT skill_id, skill_name FROM skill ORDER BY skill_name"
+        );
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
 %>
-        <option value="<%= s.get("id") %>">
-            <%= s.get("name") %>
-        </option>
+            <option value="<%= rs.getInt("skill_id") %>">
+                <%= rs.getString("skill_name") %>
+            </option>
 <%
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (rs != null) rs.close();
+        if (ps != null) ps.close();
+        if (con != null) con.close();
     }
 %>
 </select>
+
 </div>
 
         <div class="form-group">
