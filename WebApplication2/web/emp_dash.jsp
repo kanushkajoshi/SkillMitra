@@ -4,7 +4,7 @@
 <%@ page import="java.sql.*" %>
 
 
-<%
+<%  
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
     response.setDateHeader("Expires", 0);
@@ -13,35 +13,44 @@
         response.sendRedirect("login.jsp");
         return;
     }
+    String imgPath = request.getContextPath() + "/images/default-user.png";
 
     // If name not already in session, fetch from DB
-    if (session.getAttribute("efirstname") == null) {
+    
 
         String email = (String) session.getAttribute("eemail");
-
+       
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
             PreparedStatement ps = con.prepareStatement(
-                "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
-            ps.setString(1, email);
+    "SELECT efirstname, elastname, ecompanyname, ephoto FROM employer WHERE eemail = ?");
+ps.setString(1, email);
 
-            ResultSet rs = ps.executeQuery();
+ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                session.setAttribute("efirstname", rs.getString("efirstname"));
-                session.setAttribute("elastname", rs.getString("elastname"));
-                session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
-            }
+if (rs.next()) {
+    session.setAttribute("efirstname", rs.getString("efirstname"));
+    session.setAttribute("elastname", rs.getString("elastname"));
+    session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
 
+    String sessionPhoto = (String) session.getAttribute("ephoto");
+if (sessionPhoto != null && !sessionPhoto.trim().equals("")) {
+    imgPath = request.getContextPath() + "/uploads/" + sessionPhoto;
+}
+}
+
+       
             con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    
 %>
+
+
 
 <!DOCTYPE html>
 <html>
@@ -159,7 +168,11 @@
    <aside class="profile">
 
         <div class="profile-header">
-            <img src="images/default-user.png">
+            <img src="<%= imgPath %>"
+     style="width:60px;height:60px;
+            border-radius:50%;
+            border:2px solid #4a6fa5;">
+
             <div>
                 <strong>
                     <%= session.getAttribute("efirstname") %>
