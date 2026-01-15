@@ -27,7 +27,7 @@
         if ("update".equals(action)) {
 
             PreparedStatement ups = con.prepareStatement(
-                "UPDATE employer SET efirstname=?, elastname=?, ephone=?, " +
+                "UPDATE employer SET  efirstname=?, elastname=?, ephone=?, " +
                 "ecompanyname=?, ecompanywebsite=?, ecity=?, estate=?, ecountry=?, ezip=? " +
                 "WHERE eemail=?");
 
