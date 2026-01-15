@@ -34,9 +34,12 @@
             </button>
 
             <!-- Jobseeker Button -->
-            <button class="register-btn" onclick="window.location.href='<%=request.getContextPath()%>/jobseeker-register'">
+            <button type="button"
+        class="register-btn"
+        onclick="window.location.href='<%=request.getContextPath()%>/jobseeker-register'">
     Register as Jobseeker
 </button>
+
 
 
 

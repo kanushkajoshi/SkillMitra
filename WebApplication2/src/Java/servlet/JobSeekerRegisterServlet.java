@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet("/JobSeekerRegisterServlet")
 public class JobSeekerRegisterServlet extends HttpServlet {
@@ -125,21 +126,29 @@ public class JobSeekerRegisterServlet extends HttpServlet {
 
             // 8️⃣ Insert into jobseeker_skills (LINK TABLE)
             PreparedStatement psLink =
-                    con.prepareStatement(
-                            "INSERT INTO jobseeker_skills (jobseeker_id, skill_id, subskill_id) " +
-                            "VALUES (?, ?, ?)");
+    con.prepareStatement(
+        "INSERT INTO jobseeker_skills (jid, skill_id, subskill_id) VALUES (?, ?, ?)");
+
 
             psLink.setInt(1, jobseekerId);
             psLink.setInt(2, skillId);
             psLink.setInt(3, subskillId);
-            psLink.executeUpdate();
-
+            int result=psLink.executeUpdate();
+            
             // 9️⃣ Close connection
             con.close();
 
-            // 🔟 SUCCESS → redirect to dashboard
-            response.sendRedirect(request.getContextPath() + "/jobseeker_dash.jsp");
+            System.out.println("REGISTER SESSION jobseekerId = " + jobseekerId);
+            if (result > 0) {
+            HttpSession session = request.getSession();
+            session.setAttribute("jobseekerId", jobseekerId);
+session.setAttribute("jobseekerName", firstName);
+session.setAttribute("jobseekerEmail", email);
 
+            response.sendRedirect("jobseeker_dash.jsp");
+        } else {
+            response.sendRedirect("jobseeker_register.jsp?error=failed");
+        }
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/error.jsp");
