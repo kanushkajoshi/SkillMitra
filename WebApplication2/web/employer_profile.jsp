@@ -16,6 +16,7 @@
 
     String fname="", lname="", phone="", company="",
            website="", city="", state="", country="", zip="";
+    String photo = "";
 
     try {
         Class.forName("com.mysql.jdbc.Driver");
@@ -62,13 +63,19 @@
             state = rs.getString("estate");
             country = rs.getString("ecountry");
             zip = rs.getString("ezip");
+            photo = rs.getString("ephoto");
+
         }
 
         con.close();
     } catch (Exception e) {
         out.println("DB ERROR: " + e);
     }
+    String imgPath = (photo != null && !photo.trim().equals(""))
+        ? request.getContextPath() + "/uploads/" + photo
+        : request.getContextPath() + "/images/default-user.png";
 %>
+
 
 
 
@@ -101,6 +108,31 @@
             font-weight: bold;
             color: #555;
         }
+        .profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4a6fa5;
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.photo-upload {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input[type="file"] {
+    border: 1px solid #ccc;
+    padding: 6px;
+    width: 100%;
+}
+
+.profile-box, .box {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
         /*for view+edit*/
         body{font-family:Arial;background:#f5f5f5;}
         .box{width:60%;margin:40px auto;background:white;
@@ -120,10 +152,30 @@
     <% if (action == null) { %>
 
     <div class="profile-box">
+        <div style="text-align:left;margin-bottom:10px;">
+    <a href="emp_dash.jsp" style="
+    position:absolute;
+    left:20px;
+    top:20px;
+    text-decoration:none;
+    font-size:18px;
+    color:#4a6fa5;">
+    ← Back
+</a>
+
+</div>
+
 
         <div style="text-align:right">
             <a href="employer_profile.jsp?action=edit" class="btn">Edit Profile</a>
         </div>
+        <img src="<%= imgPath %>" 
+     style="width:120px;height:120px;
+            border-radius:50%;
+            display:block;
+            margin:0 auto 15px;
+            border:3px solid #4a6fa5;">
+
 
         <h2>Employer Profile</h2>
 
@@ -151,7 +203,17 @@
     <div class="box">
     <h2>Edit Profile</h2>
 
-    <form method="post" action="employer_profile.jsp?action=update">
+
+    <form method="post" action="EmployerPhotoUploadServlet" enctype="multipart/form-data">
+   <div style="text-align:center;margin-bottom:15px;">
+    <img src="<%= imgPath %>"
+         style="width:120px;height:120px;
+                border-radius:50%;
+                border:3px solid #4a6fa5;
+                margin-bottom:10px;">
+    <input type="file" name="photo" accept="image/*">
+</div>
+
 
     First Name:
     <input type="text" name="fname" value="<%=fname%>" required>
