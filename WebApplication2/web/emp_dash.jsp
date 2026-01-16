@@ -34,7 +34,9 @@
         }
     }
 %>
-
+<%
+    String successMsg = (String) session.getAttribute("jobSuccess");
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,14 +45,24 @@
 </head>
 
 <body>
+<%
+if (successMsg != null) {
+%>
+<div id="successModal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>✅ Success</h2>
+        <p><%= successMsg %></p>
+    </div>
+</div>
+<%
+    session.removeAttribute("jobSuccess"); // show only once
+}
+%>
 
 <header>
     <div class="logo">SkillMitra</div>
-    <nav>
-        <a href="#" onclick="showSection('dashboard'); return false;">Dashboard</a>
-        <a href="#" onclick="showSection('manageJobs'); return false;">Post Job</a>
-        <a href="LogoutServlet">Logout</a>
-    </nav>
+    
 
     <!-- PROFILE ICON DROPDOWN -->
     <div class="profile-dropdown">
@@ -84,6 +96,13 @@
     </aside>
 
     <main class="content">
+
+       <!-- WELCOME BAR (below blue navbar, like Job Seeker) -->
+ <div class="topbar">
+        <div>Welcome, <b><%= session.getAttribute("employerName") %></b></div>
+       
+    </div>
+
         <div class="top-search">
             <input type="text" placeholder="Search workers by skill or location">
         </div>
@@ -503,6 +522,16 @@ const profileMenu = document.getElementById("profileMenu");
 profileIcon.addEventListener("click", () => {
     profileMenu.style.display = profileMenu.style.display === "block" ? "none" : "block";
 });
+</script>
+<script>
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
+}
+setTimeout(() => {
+    const modal = document.getElementById("successModal");
+    if (modal) modal.style.display = "none";
+}, 3000);
+
 </script>
 
 </body>
