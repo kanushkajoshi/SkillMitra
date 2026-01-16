@@ -1,3 +1,4 @@
+/* ================= GLOBAL ================= */
 * {
     margin: 0;
     padding: 0;
@@ -7,26 +8,28 @@
 
 body {
     background-color: #f4f6f9;
-    display: flex;
     min-height: 100vh;
+    display: flex;
 }
 
 /* ================= SIDEBAR ================= */
-.sidebar { width: 230px; 
-          background-color: #4f6d84;
-          color: #fff; 
-          padding: 20px 0;
-          position: fixed; 
-          height: 100vh; }
-
+.sidebar {
+    width: 230px;
+    background-color: #4f6d84;
+    color: #fff;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
 .sidebar h2 {
     text-align: center;
-    margin: 20px 0 30px;   /* more space from top */
+    margin: 20px 0 30px;
     font-size: 22px;
     font-weight: 600;
 }
-
 
 .sidebar a {
     display: block;
@@ -37,88 +40,44 @@ body {
     transition: background 0.3s;
 }
 
-.sidebar a:hover {
+.sidebar a:hover,
+.sidebar a.active {
     background-color: #3e5a70;
 }
 
-/* ================= MAIN CONTENT ================= */
-.main {
-    margin-left: 230px;
-    margin-top: 60px; /* height of navbar */
-    width: calc(100% - 230px);
-    padding: 25px;
-}
-
-
-/* ================= TOP BAR ================= */
-.topbar {
-    background-color: #fff;
-    padding: 15px 20px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
-
-.topbar a {
-    text-decoration: none;
-    color: #4f6d84;
-    font-weight: 500;
-}
-/* ================= NAVBAR (ADDED ABOVE WELCOME BAR) ================= */
-/* ================= TOP NAV BAR ================= */
+/* ================= NAVBAR ================= */
 .navbar {
     position: fixed;
     top: 0;
-    left: 230px; /* sidebar width */
+    left: 230px; /* start after sidebar */
     width: calc(100% - 230px);
     height: 60px;
-
-    background-color: #4f6d84; /* same blue */
+    background-color: #4f6d84;
     color: #fff;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 0 25px;
     z-index: 1000;
 }
 
-
-
-/* Left text: SkillMitra */
 .nav-left {
     color: #ffffff;
-    font-size: 20px;     /* slightly bigger */
-    font-weight: 700;    /* bolder for brand name */
+    font-size: 20px;
+    font-weight: 700;
     letter-spacing: 0.5px;
 }
 
-
-/* Right profile container */
 .nav-right {
     display: flex;
     align-items: center;
 }
 
-/* Profile image (same as emp dashboard style) */
-.profile-img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid #ffffff;
-}
 /* ================= PROFILE DROPDOWN ================= */
-
 .profile-dropdown {
     position: relative;
 }
 
-/* Profile Icon */
 .profile-icon {
     width: 38px;
     height: 38px;
@@ -127,34 +86,27 @@ body {
     border: 2px solid #fff;
 }
 
-/* Dropdown Menu */
 .profile-menu {
     display: none;
     position: absolute;
     right: 0;
     top: 55px;
-
     background: #ffffff;
     width: 200px;
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     z-index: 2000;
-     color: inherit;
 }
 
-/* Name Section */
 .profile-name {
     padding: 12px 14px;
-    font-weight: 700;       /* make it bold */
-    font-size: 15px;        /* slightly bigger */
+    font-weight: 700;
+    font-size: 15px;
     background: #f4f6fa;
     border-bottom: 1px solid #e0e0e0;
-    color: #000000 !important; /* force black */
+    color: #000000 !important;
 }
 
-
-
-/* Menu Links */
 .profile-menu a {
     display: block;
     padding: 10px 14px;
@@ -167,20 +119,40 @@ body {
     background: #f0f5ff;
 }
 
-/* ================= SEARCH BAR ================= */
+/* ================= MAIN CONTENT ================= */
+.main {
+    margin-left: 230px; /* sidebar width */
+    margin-top: 60px;   /* navbar height */
+    padding: 25px;
+    width: calc(100% - 230px);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ================= WELCOME BOX ================= */
+.welcome-box {
+    background-color: #ffffff;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    font-size: 16px;
+    color: #333;
+}
+
+/* ================= SEARCH BOX ================= */
 .search-box {
     background-color: #fff;
     padding: 15px;
     border-radius: 6px;
     display: flex;
     gap: 15px;
-    margin-bottom: 25px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .search-box input {
     padding: 10px;
-    width: 200px;
+    flex: 1;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -189,7 +161,7 @@ body {
     padding: 10px 18px;
     background-color: #4f6d84;
     border: none;
-    color: white;
+    color: #fff;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
@@ -210,8 +182,7 @@ body {
     background-color: #fff;
     padding: 18px;
     border-radius: 8px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);.main {
-
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     transition: transform 0.2s;
 }
 
@@ -228,5 +199,68 @@ body {
 .card p {
     font-size: 14px;
     color: #555;
-    margin-bottom: 6px;
+}
+
+/* ================= MODALS ================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-box {
+    background: #ffffff;
+    padding: 25px 30px;
+    width: 350px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: popup 0.3s ease;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #555;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+@keyframes popup {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .navbar {
+        left: 0;
+        width: 100%;
+    }
+    .main {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 120px; /* navbar + top spacing */
+    }
+    .cards {
+        grid-template-columns: 1fr;
+    }
 }
