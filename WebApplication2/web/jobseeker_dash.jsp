@@ -20,8 +20,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Job Seeker Dashboard | SkillMitra</title>
-<link rel="stylesheet"
-      href="<%= request.getContextPath() %>/jobseeker_dash.css">
+<link rel="stylesheet" href="jobseeker_dash.css">
+
 
 </head>
 
