@@ -2,6 +2,36 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="db.DBConnection" %>
 
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+
+  
+
+    if (session.getAttribute("jfirstname") == null) {
+        int jid = (Integer) session.getAttribute("jobseekerId");
+        String email = (String) session.getAttribute("jemail");
+        try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection con = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
+
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT jfirstname, jlastname FROM jobseeker WHERE jid = ?");
+        ps.setInt(1, jid);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            session.setAttribute("jfirstname", rs.getString("jfirstname"));
+            session.setAttribute("jlastname", rs.getString("jlastname"));
+        }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+%>
 
 <%
     if (session == null || session.getAttribute("jobseekerId") == null) {
@@ -29,8 +59,8 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <h2>SkillMitra</h2>
-    <a href="jobseeker_dash.jsp">Job Seeker Dashboard</a>
+    <h2>JobSeeker</h2>
+    <a href="jobseeker_dash.jsp"> Dashboard</a>
     <a href="#">Applied Jobs</a>
     <a href="#">Assigned Job</a>
     <a href="#">Payment History</a>
@@ -38,11 +68,49 @@
 </div>
 
 <div class="main">
+    <!-- ===================== -->
+    <!-- ADDED NAVBAR (NEW) -->
+    <!-- ===================== -->
+    <!-- This navbar starts AFTER sidebar and is ABOVE welcome bar -->
+    <div class="navbar">
+        <div class="nav-left">SkillMitra</div>
+
+        <div class="nav-right">
+
+    <!-- PROFILE DROPDOWN WRAPPER (IMPORTANT) -->
+    <div class="profile-dropdown">
+
+        <!-- Profile Icon -->
+        <img src="images/default-user.png"
+             class="profile-icon"
+             id="profileIcon">
+
+        <!-- Profile Menu -->
+        <div class="profile-menu" id="profileMenu">
+            <div class="profile-name">
+                <%
+                    String fname = (String) session.getAttribute("jfirstname");
+                    String lname = (String) session.getAttribute("jlastname");
+                %>
+                <%= fname != null ? fname : "" %> <%= lname != null ? lname : "" %>
+            </div>
+
+            <a href="jobseeker_profile.jsp">View Profile</a>
+            <a href="LogoutServlet">Logout</a>
+        </div>
+
+    </div>
+</div>
+
+
+    </div>
+    <!-- ===== END NAVBAR ===== -->
+
 
     <!-- Top Bar -->
     <div class="topbar">
         <div>Welcome, <b><%= session.getAttribute("jobseekerName") %></b></div>
-        <div><a href="LogoutServlet">Logout</a></div>
+<!--        <div><a href="LogoutServlet">Logout</a></div>-->
     </div>
 
     <!-- Search Bar -->
@@ -106,6 +174,21 @@ while (rs.next()) {
 
 con.close();
 %>
+<script>
+    const profileIcon = document.getElementById("profileIcon");
+    const profileMenu = document.getElementById("profileMenu");
+
+    profileIcon.addEventListener("click", function (e) {
+        e.stopPropagation();
+        profileMenu.style.display =
+            profileMenu.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", function () {
+        profileMenu.style.display = "none";
+    });
+</script>
+
 
 
     </div>
