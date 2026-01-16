@@ -24,7 +24,13 @@
        <button class="back-btn" onclick="window.location.href='home.jsp'">Back to Home</button>
 
     </header>
+    <% if (request.getAttribute("emailError") != null) { %>
+    <p style="color:red;"><%= request.getAttribute("emailError") %></p>
+<% } %>
 
+<% if (request.getAttribute("dobError") != null) { %>
+    <p style="color:red;"><%= request.getAttribute("dobError") %></p>
+<% } %>
     <div class="container">
     <form class="register-form" method="post"
       action="<%= request.getContextPath() %>/JobSeekerRegisterServlet">
@@ -103,6 +109,7 @@
                 <option value="Graduate">Graduate</option>
             </select>
         </div>
+
 
         <div class="form-group">
     <label for="jdob">Date of Birth *</label>

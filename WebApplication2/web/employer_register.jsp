@@ -18,6 +18,24 @@
      <link rel="icon" href="skillmitralogo.jpg" type="image/x-icon">
      <link rel="stylesheet" href="employer_register.css">
     </head>
+    <script>
+function validateEmail() {
+    const email = document.getElementById("email").value;
+    const errorSpan = document.getElementById("emailError");
+
+    // Strong email regex (industry standard)
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+        errorSpan.innerText = "❌ Invalid email address. Please enter a valid email (example@gmail.com)";
+        return false;
+    } else {
+        errorSpan.innerText = "";
+        return true;
+    }
+}
+</script>
+
    <body>
     <header class="header">
         <div class="logo">
@@ -27,9 +45,12 @@
         <button class="back-btn" onclick="window.location.href='home.jsp'">Back to Home</button>
     </header>
 
+<% if (request.getAttribute("error") != null) { %>
+    <p style="color:red;"><%= request.getAttribute("error") %></p>
+<% } %>
 
     <div class="container">
-    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" method="post"  autocomplete="off">
+    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" method="post"  autocomplete="off" onsubmit="return validateEmail();">
 
                 <h1>Register as Employer</h1>
 

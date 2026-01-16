@@ -2,6 +2,8 @@ package servlet;
 
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.Period;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +23,18 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         String firstName    = request.getParameter("jfirstname");
         String lastName     = request.getParameter("jlastname");
         String email        = request.getParameter("jemail");
+        // ================= EMAIL FORMAT VALIDATION =================
+String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|org|net|in)$";
+
+if (email == null || !email.matches(emailRegex)) {
+    request.setAttribute("emailError", 
+        "Invalid email address. Use a valid email like example@gmail.com");
+    request.getRequestDispatcher("/jobseeker_register.jsp")
+           .forward(request, response);
+    return;
+}
+// ===========================================================
+
         String phone        = request.getParameter("jphone");
         String password     = request.getParameter("jpwd");
         String education    = request.getParameter("jeducation");
@@ -33,6 +47,20 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         String dob          = request.getParameter("jdob");
 
         java.sql.Date sqlDob = java.sql.Date.valueOf(dob);
+        // ================= AGE VALIDATION (16+ ONLY) =================
+LocalDate dobDate = sqlDob.toLocalDate();
+LocalDate today = LocalDate.now();
+
+int age = Period.between(dobDate, today).getYears();
+
+if (age < 16) {
+    request.setAttribute("dobError", "You must be at least 16 years old to register.");
+    request.getRequestDispatcher("/jobseeker_register.jsp")
+           .forward(request, response);
+    return;
+}
+// =============================================================
+
 
         // 2️⃣ Server-side validation
         if (!phone.matches("^[6-9][0-9]{9}$")) {

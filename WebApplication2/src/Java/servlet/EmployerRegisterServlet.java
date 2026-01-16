@@ -48,6 +48,30 @@ public class EmployerRegisterServlet extends HttpServlet {
         ps.setString(9, country);
         ps.setString(10, city);
         ps.setString(11, zip);
+        
+        // ================= EMAIL VALIDATION START =================
+    String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|org|net|in)$";
+
+
+    if (email == null || !email.matches(emailRegex)) {
+    request.setAttribute("error", "Invalid email address. Please enter a valid email (example@gmail.com)");
+    request.getRequestDispatcher("employer_register.jsp").forward(request, response);
+    return; // VERY IMPORTANT
+}
+// ================= EMAIL VALIDATION END =================
+
+// ================= DUPLICATE EMAIL CHECK =================
+String checkEmailSql = "SELECT eemail FROM employer WHERE eemail = ?";
+PreparedStatement checkPs = con.prepareStatement(checkEmailSql);
+checkPs.setString(1, email);
+ResultSet checkRs = checkPs.executeQuery();
+
+if (checkRs.next()) {
+    request.setAttribute("error", "Email already registered. Please login or use another email.");
+    request.getRequestDispatcher("employer_register.jsp").forward(request, response);
+    return;
+}
+// =========================================================
 
         int result = ps.executeUpdate();
         ResultSet rs = ps.getGeneratedKeys();

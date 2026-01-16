@@ -57,7 +57,13 @@
         <img src="images/default-user.png" class="profile-icon" id="profileIcon">
         <div class="profile-menu" id="profileMenu">
             <div class="profile-name" style="background:none; color:#000; font-weight:600; border-bottom:none;">
-                <%= session.getAttribute("efirstname") %> <%= session.getAttribute("elastname") %>
+                <%
+    String fname = (String) session.getAttribute("efirstname");
+    String lname = (String) session.getAttribute("elastname");
+%>
+
+<%= fname != null ? fname : "" %> <%= lname != null ? lname : "" %>
+
             </div>
             <a href="employer_profile.jsp">View Profile</a>
             <a href="LogoutServlet">Logout</a>
