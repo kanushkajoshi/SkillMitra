@@ -1,0 +1,131 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: 230px;
+    background-color: #4f6d84;
+    color: #fff;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 25px;
+    color: #e8eef3;
+    text-decoration: none;
+    font-size: 15px;
+    transition: background 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #3e5a70;
+}
+
+/* ================= MAIN CONTENT ================= */
+.main {
+    margin-left: 230px;
+    width: calc(100% - 230px);
+    padding: 25px;
+}
+
+/* ================= TOP BAR ================= */
+.topbar {
+    background-color: #fff;
+    padding: 15px 20px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.topbar a {
+    text-decoration: none;
+    color: #4f6d84;
+    font-weight: 500;
+}
+
+/* ================= SEARCH BAR ================= */
+.search-box {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.search-box input {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-box button {
+    padding: 10px 18px;
+    background-color: #4f6d84;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.search-box button:hover {
+    background-color: #3e5a70;
+}
+
+/* ================= JOB CARDS ================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);.main {
+
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 6px;
+}
