@@ -40,7 +40,8 @@ public class JobSeekerLoginServlet extends HttpServlet {
                 // Login success
                 HttpSession session = request.getSession();
                 session.setAttribute("jobseekerId", rs.getInt("jid"));
-                session.setAttribute("jobseekerName", rs.getString("jfirstname"));
+                session.setAttribute("jfirstname", rs.getString("jfirstname"));
+session.setAttribute("jlastname", rs.getString("jlastname"));
                 session.setAttribute("jobseekerEmail", email);
 
                 response.sendRedirect("jobseeker_dash.jsp");
