@@ -4,36 +4,29 @@
 <%@ page import="java.sql.*" %>
 
 <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
+String email = (String) session.getAttribute("eemail");
 
-    if (session == null || session.getAttribute("eemail") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+try {
+    Class.forName("com.mysql.jdbc.Driver");
+    Connection con = DriverManager.getConnection(
+        "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
-    if (session.getAttribute("efirstname") == null) {
-        String email = (String) session.getAttribute("eemail");
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
-            PreparedStatement ps = con.prepareStatement(
-                "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                session.setAttribute("efirstname", rs.getString("efirstname"));
-                session.setAttribute("elastname", rs.getString("elastname"));
-                session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
-            }
-            con.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    PreparedStatement ps = con.prepareStatement(
+        "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
+    ps.setString(1, email);
+
+    ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+        session.setAttribute("efirstname", rs.getString("efirstname"));
+        session.setAttribute("elastname", rs.getString("elastname"));
+        session.setAttribute("ecompanyname", rs.getString("ecompanyname"));
     }
+    con.close();
+} catch (Exception e) {
+    e.printStackTrace();
+}
 %>
+
 <%
     String successMsg = (String) session.getAttribute("jobSuccess");
 %>
@@ -99,7 +92,12 @@ if (successMsg != null) {
 
      
  <div class="topbar">
-        <div>Welcome, <b><%= session.getAttribute("employerName") %></b></div>
+        <div>
+    Welcome,
+    <b><%= session.getAttribute("efirstname") %>
+    <%= session.getAttribute("elastname") %></b>
+</div>
+
        
     </div>
 

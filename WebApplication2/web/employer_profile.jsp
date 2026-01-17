@@ -3,13 +3,13 @@
 <%@ page import="java.sql.*" %>
 
 <%
+    
     /* SESSION CHECK */
     if (session.getAttribute("eemail") == null) 
     {
         response.sendRedirect("login.jsp");
         return;
     }
-
 
     String email = (String) session.getAttribute("eemail");
     String action = request.getParameter("action");
@@ -26,26 +26,39 @@
         /* UPDATE  */
         if ("update".equals(action)) {
 
-            PreparedStatement ups = con.prepareStatement(
-                "UPDATE employer SET  efirstname=?, elastname=?, ephone=?, " +
-                "ecompanyname=?, ecompanywebsite=?, ecity=?, estate=?, ecountry=?, ezip=? " +
-                "WHERE eemail=?");
+    String newFname = request.getParameter("fname");
+    String newLname = request.getParameter("lname");
 
-            ups.setString(1, request.getParameter("fname"));
-            ups.setString(2, request.getParameter("lname"));
-            ups.setString(3, request.getParameter("phone"));
-            ups.setString(4, request.getParameter("company"));
-            ups.setString(5, request.getParameter("website"));
-            ups.setString(6, request.getParameter("city"));
-            ups.setString(7, request.getParameter("state"));
-            ups.setString(8, request.getParameter("country"));
-            ups.setString(9, request.getParameter("zip"));
-            ups.setString(10, email);
+    PreparedStatement ups = con.prepareStatement(
+        "UPDATE employer SET efirstname=?, elastname=?, ephone=?, " +
+        "ecompanyname=?, ecompanywebsite=?, ecity=?, estate=?, ecountry=?, ezip=? " +
+        "WHERE eemail=?");
 
-            ups.executeUpdate();
-            response.sendRedirect("employer_profile.jsp");
-            return;
-        }
+    ups.setString(1, newFname);
+    ups.setString(2, newLname);
+    ups.setString(3, request.getParameter("phone"));
+    ups.setString(4, request.getParameter("company"));
+    ups.setString(5, request.getParameter("website"));
+    ups.setString(6, request.getParameter("city"));
+    ups.setString(7, request.getParameter("state"));
+    ups.setString(8, request.getParameter("country"));
+    ups.setString(9, request.getParameter("zip"));
+    ups.setString(10, email);
+
+    ups.executeUpdate();
+
+    // ✅ SYNC SESSION (MOST IMPORTANT)
+    session.setAttribute("efirstname", newFname);
+    session.setAttribute("elastname", newLname);
+    session.setAttribute("employerName", newFname + " " + newLname);
+
+    // ✅ REDIRECT TO DASHBOARD (REAL-TIME UPDATE)
+    response.sendRedirect("emp_dash.jsp");
+    return;
+}
+
+
+
 
         /* FETCH DATA */
         PreparedStatement ps = con.prepareStatement(
@@ -204,52 +217,59 @@ input[type="file"] {
     <h2>Edit Profile</h2>
 
 
-    <form method="post" action="EmployerPhotoUploadServlet" enctype="multipart/form-data">
-   <div style="text-align:center;margin-bottom:15px;">
-    <img src="<%= imgPath %>"
-         style="width:120px;height:120px;
-                border-radius:50%;
-                border:3px solid #4a6fa5;
-                margin-bottom:10px;">
-    <input type="file" name="photo" accept="image/*">
-</div>
+    <<form method="post"
+      action="EmployerPhotoUploadServlet"
+      enctype="multipart/form-data">
+
+<img src="<%= imgPath %>"
+     style="width:120px;height:120px;border-radius:50%;">
+
+<input type="file" name="photo" accept="image/*">
+<br><br>
+<button class="btn">Upload Photo</button>
+
+</form>
 
 
-    First Name:
-    <input type="text" name="fname" value="<%=fname%>" required>
 
-    Last Name:
-    <input type="text" name="lname" value="<%=lname%>" required>
+    <form method="post" action="employer_profile.jsp?action=update">
 
-    Email:
-    <input type="email" value="<%=email%>" disabled>
+First Name:
+<input type="text" name="fname" value="<%=fname%>" required>
 
-    Phone:
-    <input type="text" name="phone" value="<%=phone%>">
+Last Name:
+<input type="text" name="lname" value="<%=lname%>" required>
 
-    Company:
-    <input type="text" name="company" value="<%=company%>">
+Email:
+<input type="email" value="<%=email%>" disabled>
 
-    Website:
-    <input type="text" name="website" value="<%=website%>">
+Phone:
+<input type="text" name="phone" value="<%=phone%>">
 
-    City:
-    <input type="text" name="city" value="<%=city%>">
+Company:
+<input type="text" name="company" value="<%=company%>">
 
-    State:
-    <input type="text" name="state" value="<%=state%>">
+Website:
+<input type="text" name="website" value="<%=website%>">
 
-    Country:
-    <input type="text" name="country" value="<%=country%>">
+City:
+<input type="text" name="city" value="<%=city%>">
 
-    ZIP:
-    <input type="text" name="zip" value="<%=zip%>">
+State:
+<input type="text" name="state" value="<%=state%>">
 
-    <br><br>
-    <button class="btn">Update</button>
-    <a href="employer_profile.jsp" class="btn">Cancel</a>
+Country:
+<input type="text" name="country" value="<%=country%>">
 
-    </form>
+ZIP:
+<input type="text" name="zip" value="<%=zip%>">
+
+<br><br>
+<button class="btn" type="submit">Update</button>
+<a href="employer_profile.jsp" class="btn">Cancel</a>
+
+</form>
+
     </div>
 
     <% } %>
