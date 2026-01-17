@@ -29,7 +29,7 @@ public class JobSeekerLoginServlet extends HttpServlet {
                 ""
             );
 
-            String sql = "SELECT jid, jfirstname FROM jobseeker WHERE jemail=? AND jpwd=?";
+            String sql = "SELECT jid, jfirstname,jlastname FROM jobseeker WHERE jemail=? AND jpwd=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, email);
             ps.setString(2, password);
@@ -41,7 +41,7 @@ public class JobSeekerLoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("jobseekerId", rs.getInt("jid"));
                 session.setAttribute("jfirstname", rs.getString("jfirstname"));
-session.setAttribute("jlastname", rs.getString("jlastname"));
+                session.setAttribute("jlastname", rs.getString("jlastname"));
                 session.setAttribute("jobseekerEmail", email);
 
                 response.sendRedirect("jobseeker_dash.jsp");
