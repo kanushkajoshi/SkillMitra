@@ -72,10 +72,10 @@ nav a:hover {
     background-image:
         linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
         url("images/workers.jpeg");
-    background-size: cover;      /* image full cover ho jaye */
-    background-position: center; /* center me ho */
+    background-size: cover;      
+    background-position: center; 
     background-repeat: no-repeat;
-    min-height: 70vh;        /* 👈 KEY LINE */
+    min-height: 70vh;        
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -117,18 +117,18 @@ nav a:hover {
 
 /* About Us Section */
 .about-section {
-    background: #e6f0ff; /* light blue background */
+    background: #e6f0ff; 
     text-align: center;
     padding: 60px 20px;
 }
 .about-section h2 {
     font-size: 32px;
-    color: #1a3d7c; /* dark blue */
+    color: #1a3d7c; 
     margin-bottom: 15px;
 }
 .about-section p {
     font-size: 18px;
-    color: #334d80; /* medium blue */
+    color: #334d80; 
     margin-bottom: 40px;
 }
 
@@ -169,18 +169,18 @@ nav a:hover {
 
 /* FAQ Section */
 .faq-section {
-    background: #e6f0ff; /* light blue background */
+    background: #e6f0ff; 
     padding: 60px 20px;
     text-align: center;
 }
 .faq-section h2 {
     font-size: 32px;
-    color: #1a3d7c; /* dark blue */
+    color: #1a3d7c; 
     margin-bottom: 10px;
 }
 .faq-section p {
     font-size: 18px;
-    color: #334d80; /* medium blue */
+    color: #334d80;
     margin-bottom: 40px;
 }
 .faq-container {
@@ -221,7 +221,7 @@ nav a:hover {
 
 /* Features Section */
 #features {
-    background-color: #e6f0ff; /* Same as FAQ section background */
+    background-color: #e6f0ff; 
     padding: 60px 20px;
     font-family: Arial, sans-serif;
 }
@@ -231,7 +231,7 @@ nav a:hover {
     text-align: center;
 }
 #features h2 {
-    color: #004aad; /* Blue accent like FAQ heading */
+    color: #004aad; 
     font-size: 36px;
     margin-bottom: 40px;
 }
@@ -274,13 +274,13 @@ nav a:hover {
 }
 /* Contact Section */
 #contact {
-    background-color: #e6f0ff; /* FAQ/Features blue background */
+    background-color: #e6f0ff; 
     padding: 60px 20px;
     font-family: Arial, sans-serif;
     text-align: center;
 }
 #contact h2 {
-    color: #004aad; /* Blue heading like FAQ */
+    color: #004aad; 
     font-size: 36px;
     margin-bottom: 20px;
 }
@@ -294,7 +294,7 @@ nav a:hover {
     flex-direction: column;
     gap: 15px;
     max-width: 500px;
-    margin: auto; /* center align form */
+    margin: auto;
 }
 .contact-form input,
 .contact-form textarea {

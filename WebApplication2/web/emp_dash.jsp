@@ -56,7 +56,7 @@ if (successMsg != null) {
     </div>
 </div>
 <%
-    session.removeAttribute("jobSuccess"); // show only once
+    session.removeAttribute("jobSuccess");
 }
 %>
 
@@ -64,7 +64,7 @@ if (successMsg != null) {
     <div class="logo">SkillMitra</div>
     
 
-    <!-- PROFILE ICON DROPDOWN -->
+   
     <div class="profile-dropdown">
         <img src="images/default-user.png" class="profile-icon" id="profileIcon">
         <div class="profile-menu" id="profileMenu">
@@ -97,7 +97,7 @@ if (successMsg != null) {
 
     <main class="content">
 
-       <!-- WELCOME BAR (below blue navbar, like Job Seeker) -->
+     
  <div class="topbar">
         <div>Welcome, <b><%= session.getAttribute("employerName") %></b></div>
        
@@ -200,8 +200,7 @@ if (successMsg != null) {
             </div>
         </div>
 
-        <!-- REVIEW, ACCEPTED, REJECTED sections remain same as before -->
-        <!-- ... keep all remaining HTML unchanged ... -->
+        
         <!-- REVIEW APPLICATIONS SECTION -->
 <div id="reviewApplicationsSection" style="display:none; width:100%; max-width:900px;">
 
@@ -212,7 +211,6 @@ if (successMsg != null) {
         </div>
     </div>
 
-    <!-- APPLICATION CARD EXAMPLES -->
     <div class="review-card">
         <div class="worker-info">
             <div class="avatar">RK</div>
@@ -282,7 +280,6 @@ if (successMsg != null) {
 <div id="acceptedApplicationsSection"
      style="display:none; width:100%; max-width:900px;">
 
-    <!-- HEADER -->
     <div class="manage-header">
         <div>
             <h2>Accepted Applications</h2>
@@ -293,7 +290,7 @@ if (successMsg != null) {
     <div class="worker-info"
          style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
 
-        <!-- LEFT CONTENT -->
+       
         <div style="display:flex; gap:16px;">
             <div class="avatar">RK</div>
 
@@ -314,7 +311,7 @@ if (successMsg != null) {
             </div>
         </div>
 
-        <!-- RIGHT BOTTOM CONTENT -->
+       
         <div style="text-align:right;">
             <div style="font-weight:600; font-size:15px;">
                 ₹800 / day
@@ -331,7 +328,7 @@ if (successMsg != null) {
     <div class="worker-info"
          style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
 
-        <!-- LEFT CONTENT -->
+        
         <div style="display:flex; gap:16px;">
             <div class="avatar">SD</div>
 
@@ -352,7 +349,7 @@ if (successMsg != null) {
             </div>
         </div>
 
-        <!-- RIGHT BOTTOM CONTENT -->
+       
         <div style="text-align:right;">
             <div style="font-weight:600; font-size:15px;">
                 ₹600 / day
@@ -372,7 +369,6 @@ if (successMsg != null) {
 <div id="rejectedApplicationsSection"
      style="display:none; width:100%; max-width:900px;">
 
-    <!-- HEADER -->
     <div class="manage-header">
         <div>
             <h2>Rejected Applications</h2>
@@ -393,7 +389,6 @@ if (successMsg != null) {
     <div class="worker-info"
          style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
 
-        <!-- LEFT -->
         <div style="display:flex; gap:16px;">
             <div class="avatar">MR</div>
 
@@ -440,7 +435,7 @@ if (successMsg != null) {
     <div class="worker-info"
          style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
 
-        <!-- LEFT -->
+       
         <div style="display:flex; gap:16px;">
             <div class="avatar">KS</div>
 
@@ -461,7 +456,7 @@ if (successMsg != null) {
             </div>
         </div>
 
-        <!-- RIGHT BOTTOM -->
+       
         <div style="text-align:right;">
             <div style="font-weight:600; font-size:15px;">
                 ₹500 / day
@@ -480,7 +475,7 @@ if (successMsg != null) {
     </main>
 </div>
 
-<!-- JS Scripts remain unchanged -->
+<!-- JS  -->
 <script>
 const filters = document.querySelectorAll("select, input");
 const cards = document.querySelectorAll(".worker-card");

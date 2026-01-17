@@ -3,27 +3,27 @@
 <%@ page import="db.DBConnection" %>
 
 <%
-    // ----------------------------
-    // Session check: redirect if not logged in
-    // ----------------------------
+   
+    // Session check
+    
     if (session.getAttribute("jobseekerId") == null) {
         response.sendRedirect("login.jsp");
         return;
     }
 
     int jid = (Integer) session.getAttribute("jobseekerId");
-    String action = request.getParameter("action"); // null, "edit", "update"
+    String action = request.getParameter("action"); 
 
-    // Variables for profile
+  
     String fname="", lname="", email="", phone="", country="", state="", city="",
            zip="", education="", dob="";
 
     try {
         Connection con = DBConnection.getConnection();
 
-        // ----------------------------
+     
         // Fetch current profile
-        // ----------------------------
+        
         PreparedStatement psSelect = con.prepareStatement(
             "SELECT * FROM jobseeker WHERE jid=?"
         );
@@ -42,15 +42,15 @@
             education = rs.getString("jeducation");
             dob = rs.getString("jdob");
 
-            // Update session for dashboard display
+            
             session.setAttribute("jfirstname", fname);
             session.setAttribute("jlastname", lname);
             session.setAttribute("jemail", email);
         }
 
-        // ----------------------------
+       
         // Handle update form submission
-        // ----------------------------
+        
         if ("update".equals(action)) {
             PreparedStatement psUpdate = con.prepareStatement(
                 "UPDATE jobseeker SET jfirstname=?, jlastname=?, jphone=?, " +
@@ -71,11 +71,11 @@
 
             psUpdate.executeUpdate();
 
-            // Update session immediately
+            // Update session 
             session.setAttribute("jfirstname", request.getParameter("fname"));
             session.setAttribute("jlastname", request.getParameter("lname"));
 
-            response.sendRedirect("jobseeker_profile.jsp"); // Redirect to view profile
+            response.sendRedirect("jobseeker_profile.jsp"); 
             return;
         }
 
@@ -103,7 +103,7 @@
     </style>
 </head>
 <body>
-<!-- Back arrow at top-left inside box -->
+
 <a href="jobseeker_dash.jsp" 
    style="text-decoration:none; color:black; font-weight:bold; font-size:16px; display:block; margin-bottom:10px;">
     &#8592; Back to Dashboard

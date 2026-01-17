@@ -1,16 +1,16 @@
 
-/* =======================
+/* 
    GLOBAL RESET
-   ======================= */
+   */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* =======================
+/* 
    BODY
-   ======================= */
+   */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #e6f0ff 0%, #bad4f5 100%);
@@ -19,9 +19,9 @@ body {
     flex-direction: column;
 }
 
-/* =======================
+/*
    HEADER
-   ======================= */
+    */
 .header {
     background-color: #637b96;
     padding: 12px;
@@ -59,9 +59,9 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* =======================
+/*
    CONTAINER
-   ======================= */
+    */
 .container {
     flex: 1;
     display: flex;
@@ -71,9 +71,9 @@ body {
     width: 100%;
 }
 
-/* =======================
+/* 
    REGISTER FORM
-   ======================= */
+   */
 .register-form {
     background: white;
     border-radius: 20px;
@@ -89,9 +89,9 @@ h1 {
     margin-bottom: 15px;
 }
 
-/* =======================
+/* 
    FORM GRID
-   ======================= */
+    */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -115,9 +115,9 @@ label {
     margin-bottom: 4px;
 }
 
-/* =======================
+/* 
    INPUTS & SELECTS
-   ======================= */
+   */
 input[type="text"],
 input[type="tel"],
 input[type="date"],
@@ -155,9 +155,9 @@ textarea {
     min-height: 45px;
 }
 
-/* =======================
+/* 
    PASSWORD FIELD
-   ======================= */
+   */
 .password-container {
     position: relative;
     width: 100%;
@@ -188,9 +188,9 @@ textarea {
     color: #5a7ba0;
 }
 
-/* =======================
+/* 
    SKILL INPUT (DATALIST)
-   ======================= */
+    */
 input[list] {
     width: 100%;
     padding: 8px;
@@ -208,9 +208,9 @@ input[list]:focus {
     background-color: white;
 }
 
-/* =======================
+/* 
    BUTTON
-   ======================= */
+    */
 .register-btn {
     width: 100%;
     background: linear-gradient(135deg, #7c9cc4 0%, #5a7ba0 100%);
@@ -234,9 +234,9 @@ input[list]:focus {
     transform: translateY(0);
 }
 
-/* =======================
+/* 
    FOOTER
-   ======================= */
+   */
 .form-footer {
     text-align: center;
     margin-top: 15px;
@@ -254,9 +254,9 @@ input[list]:focus {
     text-decoration: underline;
 }
 
-/* =======================
+/*
    RESPONSIVE
-   ======================= */
+   */
 @media (max-width: 1200px) {
     .form-grid {
         grid-template-columns: repeat(2, 1fr);

@@ -10,7 +10,7 @@
         return;
     }
 
-    /*  BASIC VARIABLES */
+
     String email = (String) session.getAttribute("eemail");
     String action = request.getParameter("action");
 
@@ -23,7 +23,7 @@
         Connection con = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/skillmitra", "root", "");
 
-        /* UPDATE LOGIC */
+        /* UPDATE  */
         if ("update".equals(action)) {
 
             PreparedStatement ups = con.prepareStatement(

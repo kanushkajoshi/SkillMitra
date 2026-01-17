@@ -23,7 +23,7 @@ function validateEmail() {
     const email = document.getElementById("email").value;
     const errorSpan = document.getElementById("emailError");
 
-    // Strong email regex (industry standard)
+    // Strong email regex 
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailPattern.test(email)) {

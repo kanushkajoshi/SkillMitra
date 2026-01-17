@@ -4,7 +4,7 @@ body {
     background: #ffffff;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 header {
     background: #637b96;
     padding: 12px 40px;
@@ -21,7 +21,7 @@ nav a {
     text-decoration: none;
 }
 
-/* ================= DASHBOARD LAYOUT ================= */
+/* DASHBOARD LAYOUT  */
 .dashboard {
     display: grid;
     grid-template-columns: 240px 1fr;
@@ -29,7 +29,7 @@ nav a {
     padding: 0;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 .sidebar {
     background: #70879d;
     color: white;
@@ -60,7 +60,7 @@ nav a {
     background: #4f657a;
 }
 
-/* ================= CENTER CONTENT ================= */
+/*CENTER CONTENT */
 .content {
     padding: 20px;
     display: flex;
@@ -68,7 +68,7 @@ nav a {
     align-items: center;
 }
 
-/* ================= DASHBOARD HEADER ================= */
+/*DASHBOARD HEADER */
 .dashboard-header {
     text-align: center;
     margin-bottom: 20px;
@@ -121,7 +121,7 @@ nav a {
     color: #888;
 }
 
-/* ================= LOWER SECTION ================= */
+/* LOWER SECTION  */
 .lower-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -159,7 +159,7 @@ nav a {
     color: #555;
 }
 
-/* ================= MANAGE JOBS HEADER ================= */
+/*MANAGE JOBS HEADER  */
 .manage-header {
     width: 100%;
     max-width: 900px;
@@ -175,7 +175,7 @@ nav a {
     color: #222;
 }
 
-/* ================= POST JOB BUTTON ================= */
+/* POST JOB BUTTON  */
 .post-job-btn {
     background: #637b96;
     color: white;
@@ -191,7 +191,7 @@ nav a {
     background: #4f657a;
 }
 
-/* ================= MANAGE JOBS CARDS ================= */
+/*  MANAGE JOBS CARDS  */
 .job-card {
     background: white;
     padding: 20px;
@@ -234,7 +234,7 @@ nav a {
     cursor: pointer;
 }
 
-/* ================= TOP SEARCH BAR ================= */
+/*TOP SEARCH BAR */
 .top-search {
     width: 100%;
     max-width: 900px;
@@ -254,7 +254,7 @@ nav a {
     border-color: #637b96;
 }
 
-/* ================= PROFILE DROPDOWN ================= */
+/*  PROFILE DROPDOWN  */
 .profile-dropdown {
     position: relative;
 }
@@ -300,7 +300,7 @@ nav a {
     background: #f0f5ff;
 }
 
-/* ================= REVIEW APPLICATIONS ================= */
+/* REVIEW APPLICATIONS  */
 .review-card {
     background: white;
     padding: 18px 20px;
@@ -314,7 +314,7 @@ nav a {
     margin-bottom: 16px;
 }
 
-/* ================= RESPONSIVE ================= */
+/* RESPONSIVE  */
 @media (max-width: 768px) {
     .dashboard {
         grid-template-columns: 1fr;
@@ -334,7 +334,7 @@ nav a {
         gap: 14px;
     }
 }
-/* ===== REVIEW APPLICATION ACTION BUTTONS ===== */
+/*  REVIEW APPLICATION ACTION BUTTONS*/
 .review-card .actions {
     display: flex;
     gap: 10px;

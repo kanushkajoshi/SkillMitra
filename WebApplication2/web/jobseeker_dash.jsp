@@ -68,16 +68,16 @@
 </div>
 
 <div class="main">
-    <!-- ===================== -->
-    <!-- ADDED NAVBAR (NEW) -->
-    <!-- ===================== -->
-    <!-- This navbar starts AFTER sidebar and is ABOVE welcome bar -->
+   
+    <!-- ADDED NAVBAR  -->
+    
+    
     <div class="navbar">
         <div class="nav-left">SkillMitra</div>
 
         <div class="nav-right">
 
-    <!-- PROFILE DROPDOWN WRAPPER (IMPORTANT) -->
+    <!-- PROFILE DROPDOWN WRAPPER -->
     <div class="profile-dropdown">
 
         <!-- Profile Icon -->
@@ -85,7 +85,7 @@
              class="profile-icon"
              id="profileIcon">
 
-        <!-- Profile Menu -->
+        
         <div class="profile-menu" id="profileMenu">
             <div class="profile-name">
                 <%
@@ -104,13 +104,13 @@
 
 
     </div>
-    <!-- ===== END NAVBAR ===== -->
+    
 
 
     <!-- Top Bar -->
     <div class="topbar">
         <div>Welcome, <b><%= session.getAttribute("jobseekerName") %></b></div>
-<!--        <div><a href="LogoutServlet">Logout</a></div>-->
+
     </div>
 
     <!-- Search Bar -->
