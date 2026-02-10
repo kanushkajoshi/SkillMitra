@@ -17,6 +17,10 @@
   
     String fname="", lname="", email="", phone="", country="", state="", city="",
            zip="", education="", dob="";
+    /* ===== ADDED: skill & subskill variables ===== */
+    int skillId = 0, subskillId = 0;
+    String skillName = "", subskillName = "";
+
 
     try {
         Connection con = DBConnection.getConnection();
@@ -47,6 +51,23 @@
             session.setAttribute("jlastname", lname);
             session.setAttribute("jemail", email);
         }
+        /* ===== ADDED: fetch skill & subskill using mapping table ===== */
+        PreparedStatement psSkill = con.prepareStatement(
+            "SELECT s.skill_id, s.skill_name, ss.subskill_id, ss.subskill_name " +
+            "FROM jobseeker_skills js " +
+            "JOIN skill s ON js.skill_id = s.skill_id " +
+            "JOIN subskill ss ON js.subskill_id = ss.subskill_id " +
+            "WHERE js.jid=?"
+        );
+        psSkill.setInt(1, jid);
+        ResultSet rsSkill = psSkill.executeQuery();
+
+        if (rsSkill.next()) {
+            skillId = rsSkill.getInt("skill_id");
+            subskillId = rsSkill.getInt("subskill_id");
+            skillName = rsSkill.getString("skill_name");
+            subskillName = rsSkill.getString("subskill_name");
+        }
 
        
         // Handle update form submission
@@ -70,6 +91,15 @@
             psUpdate.setInt(10, jid);
 
             psUpdate.executeUpdate();
+            
+             /* ===== ADDED: update skill & subskill mapping ===== */
+            PreparedStatement psUpdateSkill = con.prepareStatement(
+                "UPDATE jobseeker_skills SET skill_id=?, subskill_id=? WHERE jid=?"
+            );
+            psUpdateSkill.setInt(1, Integer.parseInt(request.getParameter("skill")));
+            psUpdateSkill.setInt(2, Integer.parseInt(request.getParameter("subskill")));
+            psUpdateSkill.setInt(3, jid);
+            psUpdateSkill.executeUpdate();
 
             // Update session 
             session.setAttribute("jfirstname", request.getParameter("fname"));
@@ -125,6 +155,11 @@
     <div class="row"><span class="label">Phone:</span> <%=phone%></div>
     <div class="row"><span class="label">Education:</span> <%=education%></div>
     <div class="row"><span class="label">DOB:</span> <%=dob%></div>
+    
+    <!-- ===== ADDED: display skill & subskill ===== -->
+    <div class="row"><span class="label">Skill:</span> <%=skillName%></div>
+    <div class="row"><span class="label">Subskill:</span> <%=subskillName%></div>
+
     <div class="row"><span class="label">City:</span> <%=city%></div>
     <div class="row"><span class="label">State:</span> <%=state%></div>
     <div class="row"><span class="label">Country:</span> <%=country%></div>
@@ -132,9 +167,7 @@
 </div>
 <% } %>
 
-<%-- ----------------------------
-      EDIT PROFILE
-      ---------------------------- --%>
+<%-- EDIT PROFILE --%>
 <% if ("edit".equals(action)) { %>
 <div class="box">
     <h2>Edit Profile</h2>
@@ -145,7 +178,33 @@
         Phone: <input name="phone" value="<%=phone%>">
         Education: <input name="education" value="<%=education%>">
         DOB: <input type="date" name="dob" value="<%=dob%>">
-        City: <input name="city" value="<%=city%>">
+
+        <!-- ===== ADDED: skill dropdown (same as register) ===== -->
+        Skill:
+        <select name="skill" required onchange="loadSubskills()">
+            <option value="">-- Select Skill --</option>
+            <%
+                Connection c2 = DBConnection.getConnection();
+                PreparedStatement p2 = c2.prepareStatement(
+                    "SELECT skill_id, skill_name FROM skill"
+                );
+                ResultSet r2 = p2.executeQuery();
+                while (r2.next()) {
+            %>
+            <option value="<%=r2.getInt("skill_id")%>"
+                <%= (r2.getInt("skill_id") == skillId ? "selected" : "") %>>
+                <%=r2.getString("skill_name")%>
+            </option>
+            <% } c2.close(); %>
+        </select>
+
+        <!-- ===== ADDED: subskill dropdown ===== -->
+        Subskill:
+        <select name="subskill" id="subskill" required>
+            <option value="<%=subskillId%>"><%=subskillName%></option>
+        </select>
+
+        City:<input name="city" value="<%=city%>">
         State: <input name="state" value="<%=state%>">
         Country: <input name="country" value="<%=country%>">
         ZIP: <input name="zip" value="<%=zip%>">
@@ -156,6 +215,25 @@
     </form>
 </div>
 <% } %>
+
+<script>
+function loadSubskills() {
+    const skillId = document.querySelector("select[name='skill']").value;
+    const sub = document.getElementById("subskill");
+    sub.innerHTML = '<option value="">-- Select Subskill --</option>';
+
+    fetch("<%=request.getContextPath()%>/GetSubskillsServlet?skillId=" + skillId)
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(s => {
+                let opt = document.createElement("option");
+                opt.value = s.id;
+                opt.textContent = s.name;
+                sub.appendChild(opt);
+            });
+        });
+}
+</script>
 
 </body>
 </html>
