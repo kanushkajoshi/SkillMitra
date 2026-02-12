@@ -153,19 +153,72 @@ if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
 
 ResultSet rs = ps.executeQuery();
 
+
 while (rs.next()) {
 %>
-    <div class="card">
-        <h3><%= rs.getString("title") %></h3>
-        <p><b>City:</b> <%= rs.getString("city") %></p>
-        <p><b>Salary:</b> ₹<%= rs.getString("salary") %></p>
-        <p><b>Type:</b> <%= rs.getString("job_type") %></p>
+
+<div class="card" style="
+        background:white;
+        padding:18px;
+        margin-bottom:18px;
+        border-radius:10px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.08);
+">
+
+    <!-- Job Title -->
+    <h3 style="margin:0; font-size:20px;">
+        <%= rs.getString("title") %>
+    </h3>
+
+    <!-- Salary Highlight -->
+    <div style="font-size:16px; font-weight:bold; color:#1dbf73; margin-top:6px;">
+        💰 ₹<%= rs.getString("salary") %>
     </div>
+
+    <!-- Location -->
+    <p style="margin:6px 0;">
+        📍 <%= rs.getString("city") %>
+    </p>
+
+    <!-- Job Type Badge -->
+    <div style="margin-top:8px;">
+        <span style="
+            background:#eef2ff;
+            padding:4px 12px;
+            border-radius:15px;
+            font-size:13px;">
+            <%= rs.getString("job_type") %>
+        </span>
+    </div>
+
+    <!-- Buttons -->
+    <div style="margin-top:15px;">
+        
+        <!-- Apply Button -->
+        <form action="ApplyJobServlet" method="post" style="display:inline;">
+            <input type="hidden" name="jobId" value="<%= rs.getInt("job_id") %>">
+            <button type="submit" style="
+                background:#007bff;
+                color:white;
+                padding:8px 16px;
+                border:none;
+                border-radius:6px;
+                cursor:pointer;">
+                Apply Now
+            </button>
+        </form>
+
+       
+
+    </div>
+
+</div>
+
 <%
 }
-
 con.close();
 %>
+
 
 <script>
     const profileIcon = document.getElementById("profileIcon");
