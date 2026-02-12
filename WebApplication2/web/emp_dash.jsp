@@ -2,9 +2,27 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="java.sql.*" %>
+<%
+    // 🔐 Prevent browser cache (Back button protection)
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+
+    // 🔐 Check if employer is logged in
+   HttpSession currentSession = request.getSession(false);
+
+if (currentSession == null || currentSession.getAttribute("eemail") == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+String email = (String) currentSession.getAttribute("eemail");
+
+%>
+
 
 <%
-String email = (String) session.getAttribute("eemail");
+//String email = (String) session.getAttribute("eemail");
 
 try {
     Class.forName("com.mysql.jdbc.Driver");

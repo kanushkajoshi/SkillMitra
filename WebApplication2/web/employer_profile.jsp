@@ -85,8 +85,9 @@
         out.println("DB ERROR: " + e);
     }
     String imgPath = (photo != null && !photo.trim().equals(""))
-        ? request.getContextPath() + "/uploads/" + photo
+        ? request.getContextPath() + "/uploads/" + photo + "?t=" + System.currentTimeMillis()
         : request.getContextPath() + "/images/default-user.png";
+
 %>
 
 
@@ -217,7 +218,7 @@ input[type="file"] {
     <h2>Edit Profile</h2>
 
 
-    <<form method="post"
+    <form method="post"
       action="EmployerPhotoUploadServlet"
       enctype="multipart/form-data">
 

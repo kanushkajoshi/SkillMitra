@@ -3,46 +3,49 @@
 <%@ page import="db.DBConnection" %>
 
 <%
+    // 🔴 ADDED: Prevent browser cache (VERY IMPORTANT)
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
     response.setDateHeader("Expires", 0);
 
-  
+    // 🔴 ADDED: Strict Session Check FIRST
+    HttpSession currentSession = request.getSession(false);
 
-    if (session.getAttribute("jfirstname") == null) {
-        int jid = (Integer) session.getAttribute("jobseekerId");
-        String email = (String) session.getAttribute("jemail");
+    if (currentSession == null || currentSession.getAttribute("jobseekerId") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    int jobseekerId = (Integer) currentSession.getAttribute("jobseekerId");
+
+    String cityFilter = request.getParameter("city");
+    String minSalaryFilter = request.getParameter("min_salary");
+%>
+
+<%
+    // Load firstname only if not already in session
+    if (currentSession.getAttribute("jfirstname") == null) {
+
         try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conTemp = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
-        PreparedStatement ps = con.prepareStatement(
-            "SELECT jfirstname, jlastname FROM jobseeker WHERE jid = ?");
-        ps.setInt(1, jid);
+            PreparedStatement psTemp = conTemp.prepareStatement(
+                "SELECT jfirstname, jlastname FROM jobseeker WHERE jid = ?");
+            psTemp.setInt(1, jobseekerId);
 
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            session.setAttribute("jfirstname", rs.getString("jfirstname"));
-            session.setAttribute("jlastname", rs.getString("jlastname"));
-        }
-            con.close();
+            ResultSet rsTemp = psTemp.executeQuery();
+            if (rsTemp.next()) {
+                currentSession.setAttribute("jfirstname", rsTemp.getString("jfirstname"));
+                currentSession.setAttribute("jlastname", rsTemp.getString("jlastname"));
+            }
+
+            conTemp.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-%>
-
-<%
-    if (session == null || session.getAttribute("jobseekerId") == null) {
-        response.sendRedirect("register.jsp");
-        return;
-    }
-
-    int jobseekerId = (Integer) session.getAttribute("jobseekerId");
-
-    String cityFilter = request.getParameter("city");
-    String minSalaryFilter = request.getParameter("min_salary");
 %>
 
 <!DOCTYPE html>
@@ -51,8 +54,6 @@
 <meta charset="UTF-8">
 <title>Job Seeker Dashboard | SkillMitra</title>
 <link rel="stylesheet" href="jobseeker_dash.css">
-
-
 </head>
 
 <body>
@@ -60,7 +61,7 @@
 <!-- Sidebar -->
 <div class="sidebar">
     <h2>JobSeeker</h2>
-    <a href="jobseeker_dash.jsp"> Dashboard</a>
+    <a href="jobseeker_dash.jsp">Dashboard</a>
     <a href="#">Applied Jobs</a>
     <a href="#">Assigned Job</a>
     <a href="#">Payment History</a>
@@ -68,49 +69,40 @@
 </div>
 
 <div class="main">
-   
-    <!-- ADDED NAVBAR  -->
-    
-    
+
+    <!-- Navbar -->
     <div class="navbar">
         <div class="nav-left">SkillMitra</div>
 
         <div class="nav-right">
+            <div class="profile-dropdown">
 
-    <!-- PROFILE DROPDOWN WRAPPER -->
-    <div class="profile-dropdown">
+                <img src="images/default-user.png"
+                     class="profile-icon"
+                     id="profileIcon">
 
-        <!-- Profile Icon -->
-        <img src="images/default-user.png"
-             class="profile-icon"
-             id="profileIcon">
+                <div class="profile-menu" id="profileMenu">
+                    <div class="profile-name">
+                        <%= currentSession.getAttribute("jfirstname") != null ?
+                            currentSession.getAttribute("jfirstname") : "" %>
 
-        
-        <div class="profile-menu" id="profileMenu">
-            <div class="profile-name">
-                <%
-                    String fname = (String) session.getAttribute("jfirstname");
-                    String lname = (String) session.getAttribute("jlastname");
-                %>
-                <%= fname != null ? fname : "" %> <%= lname != null ? lname : "" %>
+                        <%= currentSession.getAttribute("jlastname") != null ?
+                            currentSession.getAttribute("jlastname") : "" %>
+                    </div>
+
+                    <a href="jobseeker_profile.jsp">View Profile</a>
+                    <a href="LogoutServlet">Logout</a>
+                </div>
             </div>
-
-            <a href="jobseeker_profile.jsp">View Profile</a>
-            <a href="LogoutServlet">Logout</a>
         </div>
-
     </div>
-</div>
-
-
-    </div>
-    
-
 
     <!-- Top Bar -->
     <div class="topbar">
-        <div>Welcome, <b><%= session.getAttribute("jobseekerName") %></b></div>
-
+        <div>
+            Welcome,
+            <b><%= currentSession.getAttribute("jfirstname") %></b>
+        </div>
     </div>
 
     <!-- Search Bar -->
@@ -174,6 +166,7 @@ while (rs.next()) {
 
 con.close();
 %>
+
 <script>
     const profileIcon = document.getElementById("profileIcon");
     const profileMenu = document.getElementById("profileMenu");
@@ -188,8 +181,6 @@ con.close();
         profileMenu.style.display = "none";
     });
 </script>
-
-
 
     </div>
 </div>

@@ -1,6 +1,5 @@
 package servlet;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +30,12 @@ public class EmployerPhotoUploadServlet extends HttpServlet {
 
         // 2️⃣ GET FILE
         Part part = request.getPart("photo");
+
+        // 🔥 ADD: Stop if no file selected
+        if (part == null || part.getSize() == 0) {
+            response.sendRedirect("employer_profile.jsp");
+            return;
+        }
 
         // 3️⃣ UPLOAD FOLDER (inside web app)
         String appPath = request.getServletContext().getRealPath("");
@@ -65,24 +70,30 @@ public class EmployerPhotoUploadServlet extends HttpServlet {
             }
         }
 
-        // 5️⃣ UPDATE DATABASE
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/skillmitra", "root", "");
-                 PreparedStatement ps = con.prepareStatement(
-                    "UPDATE employer SET ephoto=? WHERE eemail=?")) {
-
-                ps.setString(1, fileName);
-                ps.setString(2, email);
-                ps.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 6️⃣ UPDATE SESSION (IMPORTANT)
+        // 🔥 ADD: Only update DB if fileName is not null
         if (fileName != null) {
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                try (Connection con = DriverManager.getConnection(
+                        "jdbc:mysql://localhost:3306/skillmitra", "root", "");
+                     PreparedStatement ps = con.prepareStatement(
+                        "UPDATE employer SET ephoto=? WHERE eemail=?")) {
+
+                    ps.setString(1, fileName);
+                    ps.setString(2, email);
+
+                    int rows = ps.executeUpdate();   // 🔥 ADD THIS
+
+                    // 🔥 ADD: Debug check
+                    System.out.println("Photo Update Rows: " + rows);
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // 6️⃣ UPDATE SESSION
             session.setAttribute("ephoto", fileName);
         }
 
@@ -90,3 +101,4 @@ public class EmployerPhotoUploadServlet extends HttpServlet {
         response.sendRedirect("employer_profile.jsp");
     }
 }
+//
