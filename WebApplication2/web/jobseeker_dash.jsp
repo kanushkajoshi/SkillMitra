@@ -123,12 +123,16 @@
 Connection con = DBConnection.getConnection();
 
 String sql =
-    "SELECT DISTINCT j.job_id, j.title, j.city, j.salary, j.job_type " +
+    "SELECT DISTINCT j.job_id, j.title, j.city, j.salary, j.job_type, a.status, " +
+    "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
     "FROM jobs j " +
     "JOIN job_skills jk ON jk.job_id = j.job_id " +
     "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
     "AND js.subskill_id = jk.subskill_id " +
+    "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
     "WHERE js.jid = ? ";
+
+
 
 if (cityFilter != null && !cityFilter.isEmpty()) {
     sql += " AND LOWER(j.city) LIKE LOWER(?) ";
@@ -141,7 +145,10 @@ if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) {
 PreparedStatement ps = con.prepareStatement(sql);
 
 int idx = 1;
-ps.setInt(idx++, jobseekerId);
+ps.setInt(idx++, jobseekerId); // for LEFT JOIN
+ps.setInt(idx++, jobseekerId); // for WHERE
+
+
 
 if (cityFilter != null && !cityFilter.isEmpty()) {
     ps.setString(idx++, "%" + cityFilter + "%");
@@ -194,8 +201,27 @@ while (rs.next()) {
     <!-- Buttons -->
     <div style="margin-top:15px;">
         
-        <!-- Apply Button -->
-        <form action="ApplyJobServlet" method="post" style="display:inline;">
+    <%
+    boolean isApplied = rs.getInt("applied") == 1;
+    String status = rs.getString("status");
+
+    if (isApplied) {
+%>
+
+        <button disabled style="
+            background:#cccccc;
+            color:#555;
+            padding:8px 16px;
+            border:none;
+            border-radius:6px;">
+            ✓ <%= status %>
+        </button>
+
+<%
+    } else {
+%>
+
+        <form action="job_details.jsp" method="post" style="display:inline;">
             <input type="hidden" name="jobId" value="<%= rs.getInt("job_id") %>">
             <button type="submit" style="
                 background:#007bff;
@@ -207,6 +233,13 @@ while (rs.next()) {
                 Apply Now
             </button>
         </form>
+
+
+
+<%
+    }
+%>
+
 
        
 
@@ -239,4 +272,56 @@ con.close();
 </div>
 
 </body>
+<%
+    String msg = request.getParameter("msg");
+    String popupMessage = "";
+
+    if (msg != null) {
+        if ("applied".equals(msg)) {
+            popupMessage = "Application submitted successfully!";
+        } else if ("already".equals(msg)) {
+            popupMessage = "You have already applied for this job.";
+        } else if ("error".equals(msg)) {
+            popupMessage = "Something went wrong. Please try again.";
+        }
+    }
+%>
+
+<% if (!popupMessage.equals("")) { %>
+
+<div id="popupMessage" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #1dbf73;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: slideIn 0.5s ease;
+">
+    <%= popupMessage %>
+</div>
+
+<script>
+    setTimeout(function() {
+        var popup = document.getElementById("popupMessage");
+        if (popup) {
+            popup.style.display = "none";
+        }
+    }, 3000);
+</script>
+
+<style>
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+</style>
+
+<% } %>
+
+
 </html>
