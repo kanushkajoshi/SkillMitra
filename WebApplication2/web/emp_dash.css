@@ -27,13 +27,13 @@ nav a {
     grid-template-columns: 240px 1fr;
     gap: 24px;
     padding: 0;
+   
 }
 
 /* SIDEBAR */
 .sidebar {
     background: #70879d;
     color: white;
-    min-height: 100vh;
     position: sticky;
     top: 0;
     display: flex;
@@ -63,10 +63,10 @@ nav a {
 /*CENTER CONTENT */
 .content {
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    
+    
 }
+
 
 /*DASHBOARD HEADER */
 .dashboard-header {
@@ -197,14 +197,16 @@ nav a {
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-    display: flex;
-    justify-content: space-between;
+   
+   
     align-items: center;
     margin-bottom: 18px;
     width: 100%;
     max-width: 900px;
 }
-
+.job-details {
+    margin-bottom: 15px;
+}
 .job-details h3 {
     margin: 0;
     font-size: 20px;
@@ -226,7 +228,7 @@ nav a {
 
 .job-actions {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     font-size: 18px;
 }
 
@@ -418,6 +420,79 @@ nav a {
 
 .close-btn:hover {
     color: red;
+}
+html, body {
+    height: auto;
+    overflow-y: auto;
+}
+#manageJobsSection,
+#dashboardSection,
+#reviewApplicationsSection,
+#acceptedApplicationsSection,
+#rejectedApplicationsSection {
+    width: 100%;
+}
+.form-input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-top: 6px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: #637b96;
+}
+/* EDIT JOB FORM */
+
+
+
+/* ================= EDIT JOB PAGE ================= */
+
+.edit-page-wrapper {
+    background: #f4f6fa;
+    min-height: 100vh;
+    padding: 60px 0;
+}
+
+.edit-job-card {
+    width: 900px;
+    margin: auto;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.edit-job-card h2 {
+    margin-bottom: 30px;
+}
+
+.edit-job-form label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.edit-job-form input,
+.edit-job-form textarea,
+.edit-job-form select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.edit-job-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 /* Animation */

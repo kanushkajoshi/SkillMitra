@@ -221,18 +221,17 @@ while (rs.next()) {
     } else {
 %>
 
-        <form action="job_details.jsp" method="post" style="display:inline;">
-            <input type="hidden" name="jobId" value="<%= rs.getInt("job_id") %>">
-            <button type="submit" style="
-                background:#007bff;
-                color:white;
-                padding:8px 16px;
-                border:none;
-                border-radius:6px;
-                cursor:pointer;">
-                Apply Now
-            </button>
-        </form>
+     <a href="job_details.jsp?jobId=<%= rs.getInt("job_id") %>">
+    <button type="button" style="
+        background:#007bff;
+        color:white;
+        padding:8px 16px;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;">
+        View Job
+    </button>
+</a>
 
 
 
