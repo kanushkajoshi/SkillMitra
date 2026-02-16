@@ -1,99 +1,45 @@
 package servlet;
 
-import db.DBConnection;
 import java.io.IOException;
-import java.sql.*;
-import javax.servlet.ServletException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet("/EmployerRegisterServlet")
 public class EmployerRegisterServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+protected void doPost(HttpServletRequest request,
+                      HttpServletResponse response)
+                      throws IOException, ServletException {
 
-    String fname = request.getParameter("firstname");
-    String lname = request.getParameter("lastname");
+    HttpSession session = request.getSession();
+
     String email = request.getParameter("email");
-    String password = request.getParameter("password");
-    String phone = request.getParameter("phone");
-    String company = request.getParameter("companyname");
-    String website = request.getParameter("companywebsite");
-    String state = request.getParameter("state");
-    String country = request.getParameter("country");
-    String city = request.getParameter("city");
-    String zip = request.getParameter("zip");
-    System.out.println("DEBUG -> fname = " + fname + ", lname = " + lname);
-    try {
-        Connection con = DBConnection.getConnection();
 
-        String sql = "INSERT INTO employer " +
-             "(efirstname, elastname, eemail, epwd, ephone, ecompanyname, ecompanywebsite, estate, ecountry, ecity, ezip) " +
-             "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+    String otp = String.valueOf((int)(Math.random()*900000)+100000);
+    
 
+    session.setAttribute("otp", otp);
+    long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5 mins
+    session.setAttribute("otpExpiry", expiryTime);
 
-        PreparedStatement ps =
-    con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    // ✅ COPY PARAM MAP (VERY IMPORTANT)
+    Map<String,String[]> formData = new HashMap<>();
+    request.getParameterMap()
+           .forEach((k,v)->formData.put(k,v));
 
-        ps.setString(1, fname);
-        ps.setString(2, lname);
-        ps.setString(3, email);
-        ps.setString(4, password);
-        ps.setString(5, phone);
-        ps.setString(6, company);
-        ps.setString(7, website);
-        ps.setString(8, state);
-        ps.setString(9, country);
-        ps.setString(10, city);
-        ps.setString(11, zip);
-        
-        // ================= EMAIL VALIDATION START =================
-    String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|org|net|in)$";
+    session.setAttribute("regData", formData);
+    session.setAttribute("role","employer");
+    session.setAttribute("otp", otp);
+    session.setAttribute("city",
+    request.getParameter("city"));
 
+    System.out.println("EMPLOYER OTP = " + otp);
 
-    if (email == null || !email.matches(emailRegex)) {
-    request.setAttribute("error", "Invalid email address. Please enter a valid email (example@gmail.com)");
-    request.getRequestDispatcher("employer_register.jsp").forward(request, response);
-    return; // VERY IMPORTANT
-}
-// ================= EMAIL VALIDATION END =================
+    EmailUtility.sendOTP(email, otp);
 
-// ================= DUPLICATE EMAIL CHECK =================
-String checkEmailSql = "SELECT eemail FROM employer WHERE eemail = ?";
-PreparedStatement checkPs = con.prepareStatement(checkEmailSql);
-checkPs.setString(1, email);
-ResultSet checkRs = checkPs.executeQuery();
-
-if (checkRs.next()) {
-    request.setAttribute("error", "Email already registered. Please login or use another email.");
-    request.getRequestDispatcher("employer_register.jsp").forward(request, response);
-    return;
-}
-// =========================================================
-
-        int result = ps.executeUpdate();
-        ResultSet rs = ps.getGeneratedKeys();
-if (!rs.next()) {
-    throw new RuntimeException("Failed to get employer ID");
-}
-int eid = rs.getInt(1);
-
-        if (result > 0) {
-            HttpSession session = request.getSession();
-            session.setAttribute("eid", eid);
-            session.setAttribute("eemail", email);
-            session.setAttribute("efirstname", fname);
-
-            response.sendRedirect(request.getContextPath() + "/emp_dash.jsp");
-        } else {
-            response.sendRedirect("employer_register.jsp?error=failed");
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.getWriter().println("ERROR: " + e.getMessage());
-    }
+    response.sendRedirect("verify_otp.jsp");
 }
 }

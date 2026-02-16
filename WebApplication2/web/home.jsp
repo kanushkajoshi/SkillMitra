@@ -98,7 +98,7 @@
         <section id="contact">
             <div class="container">
                 <h2>Contact Us</h2>
-                <p class="contact-email">support@skillmitra.com</p>
+                <p class="contact-email">skillmitra.noreply@gmail.com</p>
 
                 <form id="contactForm" class="contact-form">
             <input type="text" name="name" placeholder="Your Name" required>

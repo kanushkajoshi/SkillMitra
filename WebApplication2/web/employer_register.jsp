@@ -6,35 +6,18 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
-        
-    <title>Employer Registration - SkillMitra</title>
-     <link rel="icon" href="skillmitralogo.jpg" type="image/x-icon">
-     <link rel="stylesheet" href="employer_register.css">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <title>Employer Registration - SkillMitra</title>
+        <link rel="icon" href="skillmitralogo.jpg" type="image/x-icon">
+        <link rel="stylesheet" href="employer_register.css">
     </head>
-    <script>
-function validateEmail() {
-    const email = document.getElementById("email").value;
-    const errorSpan = document.getElementById("emailError");
-
-    // Strong email regex 
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (!emailPattern.test(email)) {
-        errorSpan.innerText = "❌ Invalid email address. Please enter a valid email (example@gmail.com)";
-        return false;
-    } else {
-        errorSpan.innerText = "";
-        return true;
-    }
-}
-</script>
 
    <body>
     <header class="header">
@@ -50,7 +33,7 @@ function validateEmail() {
 <% } %>
 
     <div class="container">
-    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" method="post"  autocomplete="off" onsubmit="return validateEmail();">
+    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" autocomplete="off" onsubmit="return validateEmail();">
 
                 <h1>Register as Employer</h1>
 
@@ -58,13 +41,18 @@ function validateEmail() {
 
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="firstname" placeholder="Enter your first name" required>
+                <input type="text" id="first_name" name="firstname"
+       value="${param.firstname}"
+       placeholder="Enter your first name" required>
+
             </div>
 
             <div class="form-group">
                 <label for="last_name">Last Name *</label>
                 <input type="text" id="last_name" name="lastname"
-                       placeholder="Enter your last name" required>
+       value="${param.lastname}"
+       placeholder="Enter your last name" required>
+
             </div>
 
        <div class="form-group">
@@ -104,38 +92,57 @@ function validateEmail() {
             <div class="form-group">
                 <label for="company_name">Company Name</label>
                 <input type="text" id="company_name" name="companyname"
-                       placeholder="Enter your company name">
+       value="${param.companyname}"
+       placeholder="Enter your company name">
+
             </div>
 
             <div class="form-group">
                 <label for="website">Company Website</label>
                 <input type="url" id="website" name="companywebsite"
-                       placeholder="Enter company website">
-            </div>
+       value="${param.companywebsite}"
+       placeholder="Enter company website">
 
+            </div>
+            <div class="form-group">
+                <label for="zipcode">Zipcode *</label>
+                <input type="text" id="zipcode" name="zip"
+       value="${param.zip}"
+       maxlength="6" pattern="\d{6}" required>
+
+            </div>
+    
             <div class="form-group">
                 <label for="country">Country *</label>
-                <input type="text" id="country" name="country"
-                       placeholder="Enter your country" required>
+                <input type="text" id="country" name="country" required readonly>
             </div>
 
             <div class="form-group">
                 <label for="state">State *</label>
-                <input type="text" id="state" name="state"
-                       placeholder="Enter your state" required>
+                <input type="text" id="state" name="state" required readonly>
             </div>
 
             <div class="form-group">
-                <label for="city">City *</label>
-                <input type="text" id="city" name="city"
-                       placeholder="Enter your city" required>
+                <label for="district">District (City) *</label>
+                <input type="text" id="district" name="district" required readonly>
+            </div>
+    
+            <div class="form-group">
+                <label for="area">Locality/Area *</label>
+                <select id="area" name="area" required>
+    <option value="">Select area</option>
+    <c:if test="${not empty param.area}">
+        <option value="${param.area}" selected>
+            ${param.area}
+        </option>
+    </c:if>
+</select>
+
             </div>
 
-            <div class="form-group">
-                <label for="zipcode">Zipcode *</label>
-                <input type="text" id="zipcode" name="zip"
-                       placeholder="Enter zipcode" required>
-            </div>
+
+            
+
 
         </div>
 
@@ -165,17 +172,87 @@ function validateEmail() {
         // Remove or update the input focus effects
         document.addEventListener("DOMContentLoaded", function () {
 
-    document.querySelectorAll('input, textarea, select').forEach(field => {
-        field.addEventListener('focus', function() {
-            this.style.transform = 'none';
-        });
+            document.querySelectorAll('input, textarea, select').forEach(field => {field.addEventListener('focus', function() {
+                    this.style.transform = 'none';
+                });
 
-        field.addEventListener('blur', function() {
-            this.style.transform = 'none';
+                field.addEventListener('blur', function() { this.style.transform = 'none';});
+            });
         });
+        //Zipcode
+        document.addEventListener("DOMContentLoaded", function () {
+
+    const zipInput = document.getElementById("zipcode");
+    const district = document.getElementById("district");
+    const state = document.getElementById("state");
+    const country = document.getElementById("country");
+    const areaSelect = document.getElementById("area");
+
+    zipInput.addEventListener("input", function () {
+
+        let pincode = this.value.trim();
+
+        if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
+
+            fetch("https://api.postalpincode.in/pincode/" + pincode)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log(data); // debug
+
+                if (data[0].Status === "Success") {
+
+                    let po = data[0].PostOffice;
+
+                    // Fill fields
+                    district.value = po[0].District;
+                    state.value = po[0].State;
+                    country.value = po[0].Country;
+
+                    // Fill area dropdown
+                    areaSelect.innerHTML = "";
+
+                    po.forEach(p => {
+                        let opt = document.createElement("option");
+                        opt.value = p.Name;
+                        opt.textContent = p.Name;
+                        areaSelect.appendChild(opt);
+                    });
+
+                } else {
+                    alert("Invalid Pincode");
+
+                    district.value = "";
+                    state.value = "";
+                    country.value = "";
+                    areaSelect.innerHTML =
+                        "<option value=''>Select area</option>";
+                }
+            })
+            .catch(err => console.log(err));
+        }
     });
 
 });
+
+
+    //VALID EMAIL
+    function validateEmail() 
+    {
+        const email = document.getElementById("email").value;
+        const errorSpan = document.getElementById("emailError");
+
+        // Strong email regex 
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailPattern.test(email)) {
+            errorSpan.innerText = "❌ Invalid email address. Please enter a valid email (example@gmail.com)";
+            return false;
+        } else {
+            errorSpan.innerText = "";
+            return true;
+        }
+    }
     </script>
     
     

@@ -27,7 +27,7 @@
     if (currentSession.getAttribute("jfirstname") == null) {
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
             Connection conTemp = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
 
