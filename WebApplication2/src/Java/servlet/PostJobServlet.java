@@ -21,6 +21,7 @@ public class PostJobServlet extends HttpServlet {
         }
 
         int eid = (Integer) session.getAttribute("eid");
+System.out.println("EID inserting: " + eid);
 
         int skillId = Integer.parseInt(request.getParameter("skill_id"));
         int subskillId = Integer.parseInt(request.getParameter("jobSubskill"));
@@ -101,7 +102,7 @@ public class PostJobServlet extends HttpServlet {
             con.close();
 
             session.setAttribute("jobSuccess", "Job posted successfully!");
-            response.sendRedirect(request.getContextPath() + "/emp_dash.jsp");
+            response.sendRedirect(request.getContextPath() + "/emp_dash.jsp?section=manageJobs");
 
         } catch (Exception e) {
             e.printStackTrace();

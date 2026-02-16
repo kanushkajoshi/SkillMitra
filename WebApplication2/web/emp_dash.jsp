@@ -11,12 +11,13 @@
     // 🔐 Check if employer is logged in
    HttpSession currentSession = request.getSession(false);
 
-if (currentSession == null || currentSession.getAttribute("eemail") == null) {
+if (currentSession == null || currentSession.getAttribute("eid") == null) {
     response.sendRedirect("login.jsp");
     return;
 }
 
-String email = (String) currentSession.getAttribute("eemail");
+
+//String email = (String) currentSession.getAttribute("eemail");
 
 %>
 
@@ -27,11 +28,14 @@ String email = (String) currentSession.getAttribute("eemail");
 try {
     Class.forName("com.mysql.jdbc.Driver");
     Connection con = DriverManager.getConnection(
-        "jdbc:mysql://localhost:3306/skillmitra", "root", "password");
+        "jdbc:mysql://localhost:3306/skillmitra", "root", "");
 
-    PreparedStatement ps = con.prepareStatement(
-        "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eemail = ?");
-    ps.setString(1, email);
+   Integer employerId = (Integer) session.getAttribute("eid");
+
+PreparedStatement ps = con.prepareStatement(
+    "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eid = ?");
+ps.setInt(1, employerId);
+
 
     ResultSet rs = ps.executeQuery();
     if (rs.next()) {
@@ -54,6 +58,8 @@ try {
     <title>Employer Dashboard | SkillMitra</title>
     <link rel="stylesheet" href="emp_dash.css">
 </head>
+
+
 
 <body>
 <%
@@ -176,45 +182,133 @@ if (successMsg != null) {
             </div>
         </div>
 
-        <!-- MANAGE JOBS SECTION -->
-        <div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
-            <div class="manage-header">
-                <h2>Manage Jobs</h2>
-                <a href="<%= request.getContextPath() %>/post-job">
-               <button class="post-job-btn">+ Post Job</button>
-                </a>
-            </div>
+<!-- MANAGE JOBS SECTION -->
+<div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
 
-            <div class="job-card">
-                <div class="job-details">
-                    <h3>Electrician</h3>
-                    <p class="job-desc">Looking for an experienced electrician for home wiring work.</p>
-                    <div class="job-meta">
-                        <span>📍 Delhi</span>
-                        <span>💰 ₹800 / day</span>
-                    </div>
-                </div>
-                <div class="job-actions">
-                    <span class="edit">✏️</span>
-                    <span class="delete">🗑️</span>
-                </div>
-            </div>
 
-            <div class="job-card">
-                <div class="job-details">
-                    <h3>Plumber</h3>
-                    <p class="job-desc">Looking for a plumber for bathroom fitting and repair.</p>
-                    <div class="job-meta">
-                        <span>📍 Noida</span>
-                        <span>💰 ₹750 / day</span>
-                    </div>
-                </div>
-                <div class="job-actions">
-                    <span class="edit">✏️</span>
-                    <span class="delete">🗑️</span>
-                </div>
-            </div>
-        </div>
+    <!-- Header (Post Job button remains here) -->
+    <div class="manage-header">
+        <h2>Manage Jobs</h2>
+        <a href="<%= request.getContextPath() %>/post-job">
+            <button class="post-job-btn">+ Post Job</button>
+        </a>
+    </div>
+
+<%
+Integer employerId = (Integer) session.getAttribute("eid");
+
+if(employerId != null){
+
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
+
+        Connection con2 = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra",
+            "root",
+            ""
+        );
+
+        PreparedStatement ps2 = con2.prepareStatement(
+            "SELECT * FROM jobs WHERE eid = ? ORDER BY job_id DESC"
+        );
+
+        ps2.setInt(1, employerId);
+
+        ResultSet rs2 = ps2.executeQuery();
+
+        boolean hasJobs = false;
+
+        
+        while(rs2.next()){
+    
+            
+%>
+
+
+    <!-- JOB CARD -->
+    <div class="job-card">
+    <div class="job-details">
+        <h3><%= rs2.getString("title") %></h3>
+
+        <p><strong>Description:</strong>
+            <%= rs2.getString("description") %>
+        </p>
+
+        <p><strong>Location:</strong>
+            <%= rs2.getString("locality") %>,
+            <%= rs2.getString("city") %>,
+            <%= rs2.getString("state") %>,
+            <%= rs2.getString("country") %>
+        </p>
+
+        <p><strong>Salary:</strong>
+            ₹<%= rs2.getString("salary") %>
+        </p>
+
+        <p><strong>Minimum Salary:</strong>
+            ₹<%= rs2.getString("min_salary") %>
+        </p>
+
+        <p><strong>Experience Level:</strong>
+            <%= rs2.getString("experience_level") %>
+        </p>
+
+        <p><strong>Job Type:</strong>
+            <%= rs2.getString("job_type") %>
+        </p>
+
+        <p><strong>Languages Preferred:</strong>
+            <%= rs2.getString("languages_preferred") %>
+        </p>
+
+        <p><strong>ZIP Code:</strong>
+            <%= rs2.getString("zip") %>
+        </p>
+
+      <p><strong>Posted On:</strong>
+<%
+Timestamp ts = rs2.getTimestamp("created_at");
+if(ts != null){
+    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
+}
+%>
+</p>
+
+
+    </div>
+
+    <div class="job-actions">
+        <a href="EditJobServlet?job_id=<%= rs2.getInt("job_id") %>" class="edit-btn"> Edit</a>
+
+        <a href="DeleteJobServlet?job_id=<%= rs2.getInt("job_id") %>"
+           class="delete-btn"
+           onclick="return confirm('Are you sure you want to delete this job?');">
+           Delete
+        </a>
+    </div>
+</div>
+
+
+
+<%
+    }
+
+        if(hasJobs==false){
+%>
+        <p style="margin-top:20px;">No jobs posted yet.</p>
+<%
+        }
+
+        con2.close();
+
+    } catch(Exception e){
+        e.printStackTrace();
+    }
+}
+%>
+
+</div>
+
 
         
         <!-- REVIEW APPLICATIONS SECTION -->
@@ -226,69 +320,110 @@ if (successMsg != null) {
             <p>Review and manage candidate applications</p>
         </div>
     </div>
+    <%
+Integer employerId2 = (Integer) session.getAttribute("eid");
 
-    <div class="review-card">
-        <div class="worker-info">
-            <div class="avatar">RK</div>
-            <div class="worker-details">
-                <h3>Rakesh Kumar</h3>
-                <p>rakesh@example.com</p>
-                <div class="meta">
-                    <span>Skill: Electrician</span>
-                    <span>📍 Delhi</span>
-                    <span>₹800 / day</span>
-                </div>
-            </div>
+if(employerId2 != null){
+
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
+
+        Connection con3 = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra",
+            "root",
+            ""
+        );
+
+        PreparedStatement ps3 = con3.prepareStatement(
+            "SELECT a.application_id, a.applied_at, j.title, " +
+            "js.jid, js.jfirstname, js.jlastname, js.jemail, js.jcity, js.jjob " +
+            "FROM applications a " +
+            "JOIN jobs j ON a.job_id = j.job_id " +
+            "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+            "WHERE j.eid = ? AND a.status = 'Pending' " +
+            "ORDER BY a.applied_at DESC"
+        );
+
+        ps3.setInt(1, employerId2);
+
+        ResultSet rs3 = ps3.executeQuery();
+
+        boolean hasApps = false;
+
+        while(rs3.next()){
+            hasApps = true;
+%>
+
+<div class="review-card">
+
+    <div class="worker-info">
+        <div class="avatar">
+            <%= rs3.getString("jfirstname").charAt(0) %>
+            <%= rs3.getString("jlastname").charAt(0) %>
         </div>
 
-        <div class="actions">
-            <button class="view-btn">View Profile</button>
-            <button class="accept-btn">Accept</button>
-            <button class="reject-btn">Reject</button>
+        <div class="worker-details">
+            <h3>
+                <%= rs3.getString("jfirstname") %>
+                <%= rs3.getString("jlastname") %>
+            </h3>
+
+            <p><%= rs3.getString("jemail") %></p>
+
+            <div class="meta">
+                <span>Applied For: <%= rs3.getString("title") %></span>
+                <span>📍 <%= rs3.getString("jcity") %></span>
+                <span>Skill: <%= rs3.getString("jjob") %></span>
+            </div>
+
+            <div style="font-size:13px; margin-top:6px;">
+                Applied On:
+                <%
+                Timestamp ts = rs3.getTimestamp("applied_at");
+                if(ts != null){
+                    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
+                }
+                %>
+            </div>
         </div>
     </div>
 
-    <div class="review-card">
-        <div class="worker-info">
-            <div class="avatar">SD</div>
-            <div class="worker-details">
-                <h3>Sunita Devi</h3>
-                <p>sunita@example.com</p>
-                <div class="meta">
-                    <span>Skill: House Maid</span>
-                    <span>📍 Noida</span>
-                    <span>₹600 / day</span>
-                </div>
-            </div>
-        </div>
+    <div class="actions">
 
-        <div class="actions">
-            <button class="view-btn">View Profile</button>
-            <button class="accept-btn">Accept</button>
-            <button class="reject-btn">Reject</button>
-        </div>
+        <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Accepted"
+           class="accept-btn">
+           Accept
+        </a>
+
+        <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Rejected"
+           class="reject-btn">
+           Reject
+        </a>
+
     </div>
 
-    <div class="review-card">
-        <div class="worker-info">
-            <div class="avatar">AS</div>
-            <div class="worker-details">
-                <h3>Ajay Singh</h3>
-                <p>ajay@example.com</p>
-                <div class="meta">
-                    <span>Skill: Plumber</span>
-                    <span>📍 Gurgaon</span>
-                    <span>₹750 / day</span>
-                </div>
-            </div>
-        </div>
+</div>
 
-        <div class="actions">
-            <button class="view-btn">View Profile</button>
-            <button class="accept-btn">Accept</button>
-            <button class="reject-btn">Reject</button>
-        </div>
-    </div>
+<%
+        }
+
+        if(!hasApps){
+%>
+<p>No pending applications.</p>
+<%
+        }
+
+        con3.close();
+
+    } catch(Exception e){
+        e.printStackTrace();
+    }
+}
+%>
+
+   
+
+
 
 </div>
 
@@ -526,6 +661,18 @@ function showSection(section) {
     event.target.classList.add("active");
 }
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get("section");
+
+    if (section === "manageJobs") {
+        showSection("manageJobs");
+    }
+
+});
+</script>
 
 <script>
 const profileIcon = document.getElementById("profileIcon");
@@ -544,6 +691,7 @@ setTimeout(() => {
 }, 3000);
 
 </script>
+
 
 </body>
 </html> 
