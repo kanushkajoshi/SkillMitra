@@ -1,262 +1,265 @@
-body {
+/* ================= GLOBAL ================= */
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #ffffff;
-}
-
-/* HEADER */
-header {
-    background: #637b96;
-    padding: 12px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-}
-
-nav a {
-    color: white;
-    margin-left: 20px;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-/* DASHBOARD LAYOUT  */
-.dashboard {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 24px;
     padding: 0;
-   
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
-/* SIDEBAR */
-.sidebar {
-    background: #70879d;
-    color: white;
-    position: sticky;
+body {
+    background-color: #f4f6f9;
+}
+
+/* ================= HEADER ================= */
+header {
+    position: fixed;
     top: 0;
+    left: 230px;
+    width: calc(100% - 230px);
+    height: 60px;
+    background-color: #4f6d84;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    color: white;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100vh;
+    background-color: #4f6d84;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
 }
 
-
 .sidebar h2 {
-    margin: 0;
-    padding: 20px 16px;
-    font-size: 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
 }
 
 .sidebar a {
-    color: white;
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 12px 25px;
+    color: #e8eef3;
     text-decoration: none;
+    font-size: 15px;
+    transition: 0.3s;
 }
 
-.sidebar a.active,
-.sidebar a:hover {
-    background: #4f657a;
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #3e5a70;
 }
 
-/*CENTER CONTENT */
+/* ================= MAIN CONTENT ================= */
+.dashboard {
+    display: flex;
+}
+
 .content {
-    padding: 20px;
-    
-    
+    margin-left: 230px;
+    margin-top: 60px;
+    padding: 25px;
+    width: calc(100% - 230px);
 }
 
-
-/*DASHBOARD HEADER */
-.dashboard-header {
-    text-align: center;
+/* ================= TOPBAR ================= */
+.topbar {
     margin-bottom: 20px;
+    font-size: 16px;
 }
 
-.dashboard-header h2 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
+/* ================= SEARCH ================= */
+.top-search {
+    margin-bottom: 25px;
 }
 
-.dashboard-header p {
-    margin: 4px 0 0;
-    color: #666;
-    font-size: 14px;
+.top-search input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
-/* ================= STATS CARDS ================= */
+/* ================= DASHBOARD CARDS ================= */
 .stats-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
-    width: 100%;
-    max-width: 800px;
+    margin-bottom: 30px;
 }
 
 .stats-card {
     background: white;
     padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 120px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .stats-card .title {
     font-size: 14px;
-    color: #555;
+    color: #666;
 }
 
 .stats-card .number {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
+    margin: 8px 0;
 }
 
 .stats-card .change {
-    font-size: 12px;
-    color: #888;
+    font-size: 13px;
+    color: green;
 }
 
-/* LOWER SECTION  */
+/* ================= TABLES ================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #eee;
+    font-size: 14px;
+}
+
+table th {
+    background: #f1f1f1;
+}
+
+/* ================= LOWER CARDS ================= */
 .lower-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin-top: 40px;
 }
 
 .lower-card {
     background: white;
-    border-radius: 14px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
     padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.lower-card h3 {
-    margin-bottom: 12px;
-    font-size: 18px;
-}
-
-.lower-card table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.lower-card table th,
-.lower-card table td {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-}
-
-.lower-card table th {
-    color: #555;
-}
-
-/*MANAGE JOBS HEADER  */
+/* ================= MANAGE JOBS ================= */
 .manage-header {
-    width: 100%;
-    max-width: 900px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
-.manage-header h2 {
-    margin: 0;
-    font-size: 26px;
-    color: #222;
-}
-
-/* POST JOB BUTTON  */
 .post-job-btn {
-    background: #637b96;
-    color: white;
+    padding: 8px 15px;
     border: none;
-    padding: 14px 30px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 14px;
+    background: #4f6d84;
+    color: white;
+    border-radius: 6px;
     cursor: pointer;
 }
 
 .post-job-btn:hover {
-    background: #4f657a;
+    background: #3e5a70;
 }
 
-/*  MANAGE JOBS CARDS  */
 .job-card {
     background: white;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-   
-   
-    align-items: center;
-    margin-bottom: 18px;
-    width: 100%;
-    max-width: 900px;
-}
-.job-details {
-    margin-bottom: 15px;
-}
-.job-details h3 {
-    margin: 0;
-    font-size: 20px;
-    color: #222;
-}
-
-.job-desc {
-    margin: 6px 0 12px;
-    font-size: 14px;
-    color: #666;
-}
-
-.job-meta {
-    display: flex;
-    gap: 20px;
-    font-size: 14px;
-    color: #555;
-}
-
-.job-actions {
-    display: flex;
-    gap: 10px;
-    font-size: 18px;
-}
-
-.job-actions span {
-    cursor: pointer;
-}
-
-/*TOP SEARCH BAR */
-.top-search {
-    width: 100%;
-    max-width: 900px;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     margin-bottom: 20px;
 }
 
-.top-search input {
-    width: 100%;
-    padding: 12px 16px;
+.job-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.edit-btn {
+    background: #1dbf73;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.delete-btn {
+    background: #e53935;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* ================= REVIEW CARDS ================= */
+.review-card {
+    background: white;
+    padding: 18px;
     border-radius: 12px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    outline: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    margin-bottom: 18px;
 }
 
-.top-search input:focus {
-    border-color: #637b96;
+.worker-info {
+    display: flex;
+    justify-content: space-between;
 }
 
-/*  PROFILE DROPDOWN  */
+.avatar {
+    width: 50px;
+    height: 50px;
+    background: #4f6d84;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.worker-details h3 {
+    margin-bottom: 5px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.accept-btn {
+    background: #1dbf73;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.reject-btn {
+    background: #e53935;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* ================= PROFILE DROPDOWN ================= */
 .profile-dropdown {
     position: relative;
 }
@@ -266,200 +269,50 @@ nav a {
     height: 38px;
     border-radius: 50%;
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 2px solid white;
 }
 
 .profile-menu {
     display: none;
     position: absolute;
     right: 0;
-    top: 65px;
-    background: #fff;
+    top: 55px;
+    background: white;
     width: 200px;
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    overflow: hidden;
-    z-index: 1000;
-}
-
-.profile-name {
-    padding: 12px 14px;
-    font-weight: 600;
-    font-size: 14px;
-    background: #f4f6fa;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .profile-menu a {
     display: block;
     padding: 10px 14px;
-    font-size: 14px;
     color: #333;
     text-decoration: none;
 }
 
 .profile-menu a:hover {
-    background: #f0f5ff;
+    background: #f0f0f0;
 }
 
-/* REVIEW APPLICATIONS  */
-.review-card {
-    background: white;
-    padding: 18px 20px;
-    border-radius: 14px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 16px;
-}
-
-/* RESPONSIVE  */
-@media (max-width: 768px) {
-    .dashboard {
-        grid-template-columns: 1fr;
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:relative;
     }
 
-    .lower-section {
-        grid-template-columns: 1fr;
+    header{
+        left:0;
+        width:100%;
     }
 
-    .stats-cards {
-        grid-template-columns: 1fr;
+    .content{
+        margin-left:0;
+        width:100%;
     }
 
-    .manage-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-    }
-}
-/*  REVIEW APPLICATION ACTION BUTTONS*/
-.review-card .actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.review-card .actions button {
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    font-weight: 500;
-}
-
-/* View Profile */
-.review-card .actions .view-btn {
-    background: white;
-    color: #637b96;
-    border: 1.5px solid #637b96;
-}
-
-.review-card .actions .view-btn:hover {
-    background: #f0f5ff;
-}
-
-/* Accept */
-.review-card .actions .accept-btn {
-    background: #0b63ff;
-    color: white;
-}
-
-.review-card .actions .accept-btn:hover {
-    background: #084ed1;
-}
-
-/* Reject */
-.review-card .actions .reject-btn {
-    background: #ff3b3b;
-    color: white;
-}
-
-.review-card .actions .reject-btn:hover {
-    background: #d63030;
-}
-/* Modal background */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-/* Modal box */
-.modal-box {
-    background: #ffffff;
-    padding: 25px 30px;
-    width: 350px;
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    animation: popup 0.3s ease;
-}
-
-/* Close button */
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
-    cursor: pointer;
-    color: #555;
-}
-
-.close-btn:hover {
-    color: red;
-}
-html, body {
-    height: auto;
-    overflow-y: auto;
-}
-#manageJobsSection,
-#dashboardSection,
-#reviewApplicationsSection,
-#acceptedApplicationsSection,
-#rejectedApplicationsSection {
-    width: 100%;
-}
-.form-input {
-    width: 100%;
-    padding: 12px 14px;
-    margin-top: 6px;
-    margin-bottom: 18px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    outline: none;
-}
-
-.form-input:focus {
-    border-color: #637b96;
-}
-/* EDIT JOB FORM */
-
-
-
-/* ================= EDIT JOB PAGE ================= */
-
-/* Animation */
-@keyframes popup {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
+    .lower-section{
+        grid-template-columns:1fr;
     }
 }
