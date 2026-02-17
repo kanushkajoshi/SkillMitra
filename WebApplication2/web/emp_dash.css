@@ -452,49 +452,6 @@ html, body {
 
 /* ================= EDIT JOB PAGE ================= */
 
-.edit-page-wrapper {
-    background: #f4f6fa;
-    min-height: 100vh;
-    padding: 60px 0;
-}
-
-.edit-job-card {
-    width: 900px;
-    margin: auto;
-    background: white;
-    padding: 40px;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.edit-job-card h2 {
-    margin-bottom: 30px;
-}
-
-.edit-job-form label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 6px;
-}
-
-.edit-job-form input,
-.edit-job-form textarea,
-.edit-job-form select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    margin-bottom: 20px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.edit-job-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
 /* Animation */
 @keyframes popup {
     from {

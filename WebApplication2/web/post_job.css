@@ -55,12 +55,38 @@ body {
 }
 
 .post-job-form input,
-.post-job-form textarea,
 .post-job-form select {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
+    box-sizing: border-box;   /* 🔥 IMPORTANT */
 }
+#subskillSelect {
+    margin-bottom: 10px;
+}
+.checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.skill-tag {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.skill-tag span {
+    cursor: pointer;
+    font-weight: bold;
+}
+
 
 .row {
     display: flex;
@@ -86,4 +112,40 @@ body {
     border: none;
     font-size: 16px;
     cursor: pointer;
+}
+/*select[multiple] {
+    height: 120px;
+}*/
+.post-job-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 120px;
+    max-height: 200px;
+}
+
+
+.selected-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.skill-tag {
+    background: #e6f0ff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.skill-tag span {
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
 }

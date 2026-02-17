@@ -185,8 +185,6 @@ if (successMsg != null) {
 <!-- MANAGE JOBS SECTION -->
 <div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
 
-
-    <!-- Header (Post Job button remains here) -->
     <div class="manage-header">
         <h2>Manage Jobs</h2>
         <a href="<%= request.getContextPath() %>/post-job">
@@ -200,6 +198,7 @@ Integer employerId = (Integer) session.getAttribute("eid");
 if(employerId != null){
 
     try{
+
         Class.forName("com.mysql.jdbc.Driver");
 
         Connection con2 = DriverManager.getConnection(
@@ -208,8 +207,16 @@ if(employerId != null){
             ""
         );
 
+        // ✅ FIXED QUERY (Distinct + Proper Grouping)
         PreparedStatement ps2 = con2.prepareStatement(
-            "SELECT * FROM jobs WHERE eid = ? ORDER BY job_id DESC"
+            "SELECT j.*, " +
+            "GROUP_CONCAT(DISTINCT s.subskill_name SEPARATOR ', ') AS subskills " +
+            "FROM jobs j " +
+            "LEFT JOIN job_skills js ON j.job_id = js.job_id " +
+            "LEFT JOIN subskill s ON js.subskill_id = s.subskill_id " +
+            "WHERE j.eid = ? " +
+            "GROUP BY j.job_id " +
+            "ORDER BY j.job_id DESC"
         );
 
         ps2.setInt(1, employerId);
@@ -218,82 +225,108 @@ if(employerId != null){
 
         boolean hasJobs = false;
 
-        
         while(rs2.next()){
-    
-            
+            hasJobs = true;
 %>
-
 
     <!-- JOB CARD -->
     <div class="job-card">
-    <div class="job-details">
-        <h3><%= rs2.getString("title") %></h3>
+        <div class="job-details">
 
-        <p><strong>Description:</strong>
-            <%= rs2.getString("description") %>
-        </p>
+            <h3><%= rs2.getString("title") %></h3>
 
-        <p><strong>Location:</strong>
-            <%= rs2.getString("locality") %>,
-            <%= rs2.getString("city") %>,
-            <%= rs2.getString("state") %>,
-            <%= rs2.getString("country") %>
-        </p>
+            <p><strong>Description:</strong>
+                <%= rs2.getString("description") %>
+            </p>
 
-        <p><strong>Salary:</strong>
-            ₹<%= rs2.getString("salary") %>
-        </p>
+            <!-- ✅ FIXED SUBSKILLS DISPLAY -->
+            <p><strong>Required Subskills:</strong>
+                <%
+                String subs = rs2.getString("subskills");
+                if(subs != null && !subs.trim().isEmpty()){
+                    out.print(subs);
+                } else {
+                    out.print("Not specified");
+                }
+                %>
+            </p>
 
-        <p><strong>Minimum Salary:</strong>
-            ₹<%= rs2.getString("min_salary") %>
-        </p>
+            <p><strong>Location:</strong>
+                <%= rs2.getString("locality") %>,
+                <%= rs2.getString("city") %>,
+                <%= rs2.getString("state") %>,
+                <%= rs2.getString("country") %>
+            </p>
 
-        <p><strong>Experience Level:</strong>
-            <%= rs2.getString("experience_level") %>
-        </p>
+            <p><strong>Salary:</strong>
+                ₹<%= rs2.getString("salary") %>
+            </p>
 
-        <p><strong>Job Type:</strong>
-            <%= rs2.getString("job_type") %>
-        </p>
+            <p><strong>Minimum Salary:</strong>
+                ₹<%= rs2.getString("min_salary") %>
+            </p>
 
-        <p><strong>Languages Preferred:</strong>
-            <%= rs2.getString("languages_preferred") %>
-        </p>
+            <p><strong>Experience Required:</strong>
+                <%= rs2.getString("experience_required") %>
+            </p>
 
-        <p><strong>ZIP Code:</strong>
-            <%= rs2.getString("zip") %>
-        </p>
+            <p><strong>Workers Required:</strong>
+                <%= rs2.getInt("workers_required") %>
+            </p>
 
-      <p><strong>Posted On:</strong>
-<%
-Timestamp ts = rs2.getTimestamp("created_at");
-if(ts != null){
-    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
-}
-%>
-</p>
+            <p><strong>Working Hours:</strong>
+                <%= rs2.getString("working_hours") %>
+            </p>
 
+            <p><strong>Gender Preference:</strong>
+                <%= rs2.getString("gender_preference") %>
+            </p>
 
+            <p><strong>Expiry Date:</strong>
+                <%= rs2.getDate("expiry_date") %>
+            </p>
+
+            <p><strong>Job Type:</strong>
+                <%= rs2.getString("job_type") %>
+            </p>
+
+            <p><strong>Languages Preferred:</strong>
+                <%= rs2.getString("languages_preferred") %>
+            </p>
+
+            <p><strong>ZIP Code:</strong>
+                <%= rs2.getString("zip") %>
+            </p>
+
+            <p><strong>Posted On:</strong>
+                <%
+                Timestamp ts = rs2.getTimestamp("created_at");
+                if(ts != null){
+                    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a")
+                    .format(ts));
+                }
+                %>
+            </p>
+
+        </div>
+
+        <div class="job-actions">
+            <a href="EditJobServlet?job_id=<%= rs2.getInt("job_id") %>" class="edit-btn">
+                Edit
+            </a>
+
+            <a href="DeleteJobServlet?job_id=<%= rs2.getInt("job_id") %>"
+               class="delete-btn"
+               onclick="return confirm('Are you sure you want to delete this job?');">
+               Delete
+            </a>
+        </div>
     </div>
 
-    <div class="job-actions">
-        <a href="EditJobServlet?job_id=<%= rs2.getInt("job_id") %>" class="edit-btn"> Edit</a>
-
-        <a href="DeleteJobServlet?job_id=<%= rs2.getInt("job_id") %>"
-           class="delete-btn"
-           onclick="return confirm('Are you sure you want to delete this job?');">
-           Delete
-        </a>
-    </div>
-</div>
-
-
-
 <%
-    }
+        }
 
-        if(hasJobs==false){
+        if(!hasJobs){
 %>
         <p style="margin-top:20px;">No jobs posted yet.</p>
 <%
