@@ -3,7 +3,6 @@ package servlet;
 import db.DBConnection;
 import java.io.IOException;
 import java.sql.*;
-import java.util.Map;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -27,32 +26,22 @@ protected void doPost(HttpServletRequest request,
     String realOtp = (String) session.getAttribute("otp");
     String role    = (String) session.getAttribute("role");
 
-    Map<String,String[]> data =
-        (Map<String,String[]>) session.getAttribute("regData");
+    Long expiry = (Long) session.getAttribute("otpExpiry");
 
-    // ===== SAFETY CHECK =====
-    if(realOtp == null || role == null || data == null){
-        response.sendRedirect(
-            role!=null && role.equals("employer")
-            ? "employer_register.jsp"
-            : "jobseeker_register.jsp");
+    if(realOtp == null || role == null){
+        response.sendRedirect("home.jsp");
         return;
     }
-    Long expiry =
-    (Long) session.getAttribute("otpExpiry");
 
-    if(expiry == null ||
-       System.currentTimeMillis() > expiry){
-
-        request.setAttribute("error",
-            "OTP expired. Please resend.");
-
+    // ✅ EXPIRY CHECK
+    if(expiry == null || System.currentTimeMillis() > expiry){
+        request.setAttribute("error","OTP expired. Please resend.");
         request.getRequestDispatcher("verify_otp.jsp")
                .forward(request,response);
         return;
     }
 
-    // ===== WRONG OTP =====
+    // ❌ WRONG OTP
     if(userOtp == null || !userOtp.equals(realOtp)){
         request.setAttribute("error","Wrong OTP!");
         request.getRequestDispatcher("verify_otp.jsp")
@@ -70,22 +59,23 @@ protected void doPost(HttpServletRequest request,
             "INSERT INTO employer "+
             "(efirstname,elastname,eemail,epwd,ephone,"+
             "ecompanyname,ecompanywebsite,estate,ecountry,"+
-            "edistrict,earea,ezip,email_verified) "+
-            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1)",
+            "ecity,edistrict,earea,ezip,email_verified) "+
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,1)",
             Statement.RETURN_GENERATED_KEYS);
 
-            ps.setString(1, get(data,"firstname"));
-            ps.setString(2, get(data,"lastname"));
-            ps.setString(3, get(data,"email"));
-            ps.setString(4, get(data,"password"));
-            ps.setString(5, get(data,"phone"));
-            ps.setString(6, get(data,"companyname"));
-            ps.setString(7, get(data,"companywebsite"));
-            ps.setString(8, get(data,"state"));
-            ps.setString(9, get(data,"country"));
-            ps.setString(10,get(data,"district"));
-            ps.setString(11,get(data,"area"));
-            ps.setString(12,get(data,"zip"));
+            ps.setString(1,(String)session.getAttribute("firstname"));
+            ps.setString(2,(String)session.getAttribute("lastname"));
+            ps.setString(3,(String)session.getAttribute("email"));
+            ps.setString(4,(String)session.getAttribute("password"));
+            ps.setString(5,(String)session.getAttribute("phone"));
+            ps.setString(6,(String)session.getAttribute("company"));
+            ps.setString(7,(String)session.getAttribute("website"));
+            ps.setString(8,(String)session.getAttribute("state"));
+            ps.setString(9,(String)session.getAttribute("country"));
+            ps.setString(10,(String)session.getAttribute("district")); // ecity
+            ps.setString(11,(String)session.getAttribute("district"));
+            ps.setString(12,(String)session.getAttribute("area"));
+            ps.setString(13,(String)session.getAttribute("zip"));
 
             ps.executeUpdate();
 
@@ -108,20 +98,20 @@ protected void doPost(HttpServletRequest request,
             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1)",
             Statement.RETURN_GENERATED_KEYS);
 
-            ps.setString(1,get(data,"jfirstname"));
-            ps.setString(2,get(data,"jlastname"));
-            ps.setString(3,get(data,"jemail"));
-            ps.setString(4,get(data,"jphone"));
-            ps.setString(5,get(data,"jpwd"));
-            ps.setString(6,get(data,"jeducation"));
-            ps.setString(7,get(data,"jcountry"));
-            ps.setString(8,get(data,"jstate"));
-            ps.setString(9,get(data,"jdistrict"));
-            ps.setString(10,get(data,"jarea"));
-            ps.setString(11,get(data,"jzip"));
+            ps.setString(1,(String)session.getAttribute("jfirstname"));
+            ps.setString(2,(String)session.getAttribute("jlastname"));
+            ps.setString(3,(String)session.getAttribute("jemail"));
+            ps.setString(4,(String)session.getAttribute("jphone"));
+            ps.setString(5,(String)session.getAttribute("jpwd"));
+            ps.setString(6,(String)session.getAttribute("jeducation"));
+            ps.setString(7,(String)session.getAttribute("jcountry"));
+            ps.setString(8,(String)session.getAttribute("jstate"));
+            ps.setString(9,(String)session.getAttribute("jdistrict"));
+            ps.setString(10,(String)session.getAttribute("jarea"));
+            ps.setString(11,(String)session.getAttribute("jzip"));
 
-            String dob = get(data,"jdob");
-            if(dob!=null)
+            String dob = (String)session.getAttribute("jdob");
+            if(dob != null)
                 ps.setDate(12, java.sql.Date.valueOf(dob));
             else
                 ps.setNull(12, java.sql.Types.DATE);
@@ -136,9 +126,9 @@ protected void doPost(HttpServletRequest request,
             response.sendRedirect("jobseeker_dash.jsp");
         }
 
-        // ===== CLEAN =====
+        // CLEAN SESSION
         session.removeAttribute("otp");
-        session.removeAttribute("regData");
+        session.removeAttribute("otpExpiry");
         session.removeAttribute("role");
 
     }catch(Exception e){
@@ -147,12 +137,5 @@ protected void doPost(HttpServletRequest request,
         request.getRequestDispatcher("verify_otp.jsp")
                .forward(request,response);
     }
-}
-
-// ===== SAFE GET METHOD =====
-private String get(Map<String,String[]> data, String key){
-    if(data.get(key)==null || data.get(key).length==0)
-        return null;
-    return data.get(key)[0];
 }
 }
