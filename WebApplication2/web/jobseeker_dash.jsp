@@ -3,12 +3,12 @@
 <%@ page import="db.DBConnection" %>
 
 <%
-    // 🔴 ADDED: Prevent browser cache (VERY IMPORTANT)
+    // ADDED: Prevent browser cache (VERY IMPORTANT)
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
     response.setDateHeader("Expires", 0);
 
-    // 🔴 ADDED: Strict Session Check FIRST
+    // ADDED: Strict Session Check FIRST
     HttpSession currentSession = request.getSession(false);
 
     if (currentSession == null || currentSession.getAttribute("jobseekerId") == null) {
