@@ -23,17 +23,16 @@ public class PostJobServlet extends HttpServlet {
 
         int eid = (Integer) session.getAttribute("eid");
 
-        // Basic Info
+        // 🔹 Skill & Subskills
         String skillIdStr = request.getParameter("skill_id");
-    String subskillsString = request.getParameter("selectedSubskills");
+        String subskillsString = request.getParameter("selectedSubskills");
 
-String[] subskills = null;
-if (subskillsString != null && !subskillsString.isEmpty()) {
-    subskills = subskillsString.split(",");
-}
+        String[] subskills = null;
+        if (subskillsString != null && !subskillsString.isEmpty()) {
+            subskills = subskillsString.split(",");
+        }
 
-
-
+        // 🔹 Job Basic Info
         String jobTitle = request.getParameter("job_title");
         String jobDescription = request.getParameter("job_description");
         String locality = request.getParameter("job_location");
@@ -47,9 +46,9 @@ if (subskillsString != null && !subskillsString.isEmpty()) {
         String[] languages = request.getParameterValues("languages_preferred");
 
         String languageString = null;
-                if (languages != null) {
-                      languageString = String.join(",", languages);
-                }
+        if (languages != null) {
+            languageString = String.join(",", languages);
+        }
 
         String jobType = request.getParameter("job_type");
         String experienceRequired = request.getParameter("experience_required");
@@ -61,19 +60,13 @@ if (subskillsString != null && !subskillsString.isEmpty()) {
         Connection con = null;
 
         try {
-
             con = DBConnection.getConnection();
-
             con.setAutoCommit(false);
 
-            // 🔹 Insert into jobs table
+            // 🔥 INSERT INTO jobs
             String jobSql = "INSERT INTO jobs " +
-"(eid, title, description, locality, city, state, country, zip, salary, min_salary, job_type, experience_required, languages_preferred, workers_required, working_hours, gender_preference, expiry_date) " +
-"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-
-
-
+                    "(eid, title, description, locality, city, state, country, zip, salary, min_salary, job_type, experience_required, languages_preferred, workers_required, working_hours, gender_preference, expiry_date) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement psJob = con.prepareStatement(jobSql, Statement.RETURN_GENERATED_KEYS);
 
@@ -94,51 +87,48 @@ if (subskillsString != null && !subskillsString.isEmpty()) {
 
             psJob.setString(11, jobType);
             psJob.setString(12, experienceRequired);
-psJob.setString(13, languageString);   // 🔥 ADD THIS
-psJob.setInt(14, Integer.parseInt(workersRequiredStr));
-psJob.setString(15, workingHours);
-psJob.setString(16, genderPreference);
-psJob.setDate(17, Date.valueOf(expiryDate));
-
+            psJob.setString(13, languageString);
+            psJob.setInt(14, Integer.parseInt(workersRequiredStr));
+            psJob.setString(15, workingHours);
+            psJob.setString(16, genderPreference);
+            psJob.setDate(17, Date.valueOf(expiryDate));
 
             psJob.executeUpdate();
 
-            // 🔹 Get generated job_id
+            // 🔥 Get job_id
             ResultSet rs = psJob.getGeneratedKeys();
             rs.next();
             int jobId = rs.getInt(1);
 
-            // 🔹 Insert multiple subskills
-            if (subskills != null) {
+            // 🔥 INSERT INTO job_skills
+            if (subskills != null && skillIdStr != null) {
 
                 int skillId = Integer.parseInt(skillIdStr);
 
+                String skillInsertSql =
+                        "INSERT INTO job_skills (job_id, skill_id, subskill_id) VALUES (?, ?, ?)";
+
+                PreparedStatement psSkill = con.prepareStatement(skillInsertSql);
+
                 for (String subId : subskills) {
-
-                    PreparedStatement psSkill = con.prepareStatement(
-                            "INSERT INTO job_skills (job_id, skill_id, subskill_id) VALUES (?, ?, ?)");
-
                     psSkill.setInt(1, jobId);
                     psSkill.setInt(2, skillId);
                     psSkill.setInt(3, Integer.parseInt(subId));
-
-                    psSkill.executeUpdate();
+                    psSkill.addBatch();
                 }
+
+                psSkill.executeBatch();
             }
 
             con.commit();
-            System.out.println("JOB INSERTED SUCCESSFULLY");
-
             con.close();
 
             response.sendRedirect("emp_dash.jsp?section=manageJobs");
 
         } catch (Exception e) {
-
             try {
                 if (con != null) con.rollback();
-            } catch (Exception ex) {}
-
+            } catch (Exception ignored) {}
             e.printStackTrace();
             response.sendRedirect("emp_dash.jsp?section=manageJobs");
         }

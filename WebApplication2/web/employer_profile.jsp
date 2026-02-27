@@ -31,7 +31,7 @@
 
     PreparedStatement ups = con.prepareStatement(
         "UPDATE employer SET efirstname=?, elastname=?, ephone=?, " +
-        "ecompanyname=?, ecompanywebsite=?, ecity=?, estate=?, ecountry=?, ezip=? " +
+        "ecompanyname=?, ecompanywebsite=?, estate=?, ecountry=?, ezip=? " +
         "WHERE eemail=?");
 
     ups.setString(1, newFname);
@@ -39,11 +39,11 @@
     ups.setString(3, request.getParameter("phone"));
     ups.setString(4, request.getParameter("company"));
     ups.setString(5, request.getParameter("website"));
-    ups.setString(6, request.getParameter("city"));
-    ups.setString(7, request.getParameter("state"));
-    ups.setString(8, request.getParameter("country"));
-    ups.setString(9, request.getParameter("zip"));
-    ups.setString(10, email);
+   
+    ups.setString(6, request.getParameter("state"));
+    ups.setString(7, request.getParameter("country"));
+    ups.setString(8, request.getParameter("zip"));
+    ups.setString(9, email);
 
     ups.executeUpdate();
 
@@ -72,7 +72,7 @@
             phone = rs.getString("ephone");
             company = rs.getString("ecompanyname");
             website = rs.getString("ecompanywebsite");
-            city = rs.getString("ecity");
+            
             state = rs.getString("estate");
             country = rs.getString("ecountry");
             zip = rs.getString("ezip");
@@ -204,7 +204,7 @@ input[type="file"] {
 
         <hr>
 
-        <div class="row"><span class="label">City:</span> <%= city %></div>
+        
         <div class="row"><span class="label">State:</span> <%= state %></div>
         <div class="row"><span class="label">Country:</span> <%= country %></div>
         <div class="row"><span class="label">ZIP Code:</span> <%= zip %></div>

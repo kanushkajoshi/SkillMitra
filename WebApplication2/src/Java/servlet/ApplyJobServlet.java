@@ -10,7 +10,6 @@ import javax.servlet.http.*;
 @WebServlet("/ApplyJobServlet")
 public class ApplyJobServlet extends HttpServlet {
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -21,51 +20,37 @@ public class ApplyJobServlet extends HttpServlet {
             return;
         }
 
-        int jobseekerId = (int) session.getAttribute("jobseekerId");
-        String jobIdParam = request.getParameter("jobId");
+        int jobseekerId = (Integer) session.getAttribute("jobseekerId");
+        int jobId = Integer.parseInt(request.getParameter("jobId"));
 
-        if (jobIdParam == null || jobIdParam.isEmpty()) {
-            response.sendRedirect("jobseeker_dash.jsp?msg=error");
-            return;
-        }
+        try (Connection con = DBConnection.getConnection()) {
 
-        int jobId = Integer.parseInt(jobIdParam);
-
-        Connection con = null;
-
-        try {
-            con = DBConnection.getConnection();
-
-            // 🔹 Check duplicate application
-            String checkQuery = "SELECT * FROM applications WHERE job_id=? AND jobseeker_id=?";
-            PreparedStatement ps1 = con.prepareStatement(checkQuery);
-            ps1.setInt(1, jobId);
-            ps1.setInt(2, jobseekerId);
-
-            ResultSet rs = ps1.executeQuery();
+            // 🔹 Duplicate check
+            String checkSql = "SELECT application_id FROM applications WHERE job_id=? AND jobseeker_id=?";
+            PreparedStatement checkPs = con.prepareStatement(checkSql);
+            checkPs.setInt(1, jobId);
+            checkPs.setInt(2, jobseekerId);
+            ResultSet rs = checkPs.executeQuery();
 
             if (rs.next()) {
-                response.sendRedirect("jobseeker_dash.jsp?msg=already");
+                // 🔹 If already applied → back to dashboard's Applied section
+                response.sendRedirect("jobseeker_dash.jsp?section=applied&msg=already");
                 return;
             }
 
             // 🔹 Insert application
-            String insertQuery = "INSERT INTO applications (job_id, jobseeker_id) VALUES (?, ?)";
-            PreparedStatement ps2 = con.prepareStatement(insertQuery);
-            ps2.setInt(1, jobId);
-            ps2.setInt(2, jobseekerId);
+            String insertSql = "INSERT INTO applications (job_id, jobseeker_id, status) VALUES (?, ?, 'Pending')";
+            PreparedStatement insertPs = con.prepareStatement(insertSql);
+            insertPs.setInt(1, jobId);
+            insertPs.setInt(2, jobseekerId);
+            insertPs.executeUpdate();
 
-            ps2.executeUpdate();
-
-            response.sendRedirect("jobseeker_dash.jsp?msg=applied");
+            // 🔹 Redirect to dashboard's Applied section
+            response.sendRedirect("jobseeker_dash.jsp?section=applied&msg=success");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("jobseeker_dash.jsp?msg=error");
-        } finally {
-            try {
-                if (con != null) con.close();
-            } catch (Exception e) {}
+            response.sendRedirect("jobseeker_dash.jsp?section=applied&msg=error");
         }
     }
 }

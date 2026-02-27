@@ -25,8 +25,7 @@ protected void doPost(HttpServletRequest request,
 
     String realOtp = (String) session.getAttribute("otp");
     String role    = (String) session.getAttribute("role");
-
-    Long expiry = (Long) session.getAttribute("otpExpiry");
+    Long expiry    = (Long) session.getAttribute("otpExpiry");
 
     if(realOtp == null || role == null){
         response.sendRedirect("home.jsp");
@@ -72,7 +71,7 @@ protected void doPost(HttpServletRequest request,
             ps.setString(7,(String)session.getAttribute("website"));
             ps.setString(8,(String)session.getAttribute("state"));
             ps.setString(9,(String)session.getAttribute("country"));
-            ps.setString(10,(String)session.getAttribute("district")); // ecity
+            ps.setString(10,(String)session.getAttribute("district"));
             ps.setString(11,(String)session.getAttribute("district"));
             ps.setString(12,(String)session.getAttribute("area"));
             ps.setString(13,(String)session.getAttribute("zip"));
@@ -121,7 +120,30 @@ protected void doPost(HttpServletRequest request,
             ResultSet rs = ps.getGeneratedKeys();
             rs.next();
 
-            session.setAttribute("jobseekerId", rs.getInt(1));
+            int newJid = rs.getInt(1);
+            session.setAttribute("jobseekerId", newJid);
+
+            // 🔥🔥 ADD THIS BLOCK (SKILL INSERT) 🔥🔥
+            String skill = (String) session.getAttribute("skill");
+            String[] subskills = (String[]) session.getAttribute("subskills");
+
+            if(skill != null && subskills != null){
+
+                PreparedStatement psSkill = con.prepareStatement(
+                "INSERT INTO jobseeker_skills (jid, skill_id, subskill_id) VALUES (?, ?, ?)");
+
+                for(String sub : subskills){
+
+                    psSkill.setInt(1, newJid);
+                    psSkill.setInt(2, Integer.parseInt(skill));
+                    psSkill.setInt(3, Integer.parseInt(sub));
+
+                    psSkill.executeUpdate();
+                }
+
+                psSkill.close();
+            }
+            // 🔥🔥 END ADD
 
             response.sendRedirect("jobseeker_dash.jsp");
         }
