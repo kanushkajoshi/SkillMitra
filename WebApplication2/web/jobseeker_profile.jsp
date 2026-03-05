@@ -41,7 +41,7 @@
             phone = rs.getString("jphone");
             country = rs.getString("jcountry");
             state = rs.getString("jstate");
-            city = rs.getString("jcity");
+           
             zip = rs.getString("jzip");
             education = rs.getString("jeducation");
             dob = rs.getString("jdob");
@@ -75,7 +75,7 @@
         if ("update".equals(action)) {
             PreparedStatement psUpdate = con.prepareStatement(
                 "UPDATE jobseeker SET jfirstname=?, jlastname=?, jphone=?, " +
-                "jcountry=?, jstate=?, jcity=?, jzip=?, jeducation=?, jdob=? " +
+                "jcountry=?, jstate=?,  jzip=?, jeducation=?, jdob=? " +
                 "WHERE jid=?"
             );
 
@@ -84,11 +84,11 @@
             psUpdate.setString(3, request.getParameter("phone"));
             psUpdate.setString(4, request.getParameter("country"));
             psUpdate.setString(5, request.getParameter("state"));
-            psUpdate.setString(6, request.getParameter("city"));
-            psUpdate.setString(7, request.getParameter("zip"));
-            psUpdate.setString(8, request.getParameter("education"));
-            psUpdate.setString(9, request.getParameter("dob"));
-            psUpdate.setInt(10, jid);
+            
+            psUpdate.setString(6, request.getParameter("zip"));
+            psUpdate.setString(7, request.getParameter("education"));
+            psUpdate.setString(8, request.getParameter("dob"));
+            psUpdate.setInt(9, jid);
 
             psUpdate.executeUpdate();
             
@@ -160,7 +160,7 @@
     <div class="row"><span class="label">Skill:</span> <%=skillName%></div>
     <div class="row"><span class="label">Subskill:</span> <%=subskillName%></div>
 
-    <div class="row"><span class="label">City:</span> <%=city%></div>
+    
     <div class="row"><span class="label">State:</span> <%=state%></div>
     <div class="row"><span class="label">Country:</span> <%=country%></div>
     <div class="row"><span class="label">ZIP:</span> <%=zip%></div>
@@ -204,7 +204,7 @@
             <option value="<%=subskillId%>"><%=subskillName%></option>
         </select>
 
-        City:<input name="city" value="<%=city%>">
+        
         State: <input name="state" value="<%=state%>">
         Country: <input name="country" value="<%=country%>">
         ZIP: <input name="zip" value="<%=zip%>">

@@ -14,7 +14,6 @@ protected void doPost(HttpServletRequest request,
 
     HttpSession session = request.getSession();
 
-
     // SAVE EACH FIELD
     session.setAttribute("jfirstname", request.getParameter("jfirstname"));
     session.setAttribute("jlastname", request.getParameter("jlastname"));
@@ -29,14 +28,25 @@ protected void doPost(HttpServletRequest request,
     session.setAttribute("jzip", request.getParameter("jzip"));
     session.setAttribute("jdob", request.getParameter("jdob"));
 
+    // 🔥 ADD THIS (VERY IMPORTANT)
+    // Skill & Subskills save in session
+    String skill = request.getParameter("skill");
+    String[] subskills = request.getParameterValues("subskills");
+
+    session.setAttribute("skill", skill);
+    session.setAttribute("subskills", subskills);
+    // 🔥 END ADD
+
     // OTP
     String otp = String.valueOf((int)(Math.random()*900000)+100000);
     session.setAttribute("otp", otp);
     long expiryTime = System.currentTimeMillis() + 5*60*1000; // 5 minutes
-
     session.setAttribute("otpExpiry", expiryTime);
+
     session.setAttribute("role","jobseeker");
+
     System.out.println("OTP = " + otp);
+
     session.setAttribute("regData", request.getParameterMap());
 
     EmailUtility.sendOTP(
