@@ -1,3 +1,15 @@
-/WebApplication2/nbproject/private/
-/WebApplication2/build/
-/WebApplication2/dist/
+# NetBeans build files
+build/
+dist/
+
+# NetBeans private settings
+nbproject/private/
+
+# temporary backup files
+*.~
+
+# compiled classes
+*.class
+
+# logs
+*.log
