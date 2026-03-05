@@ -86,16 +86,16 @@ Main entities used in the system:
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the Repository
+1️⃣ Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/SkillMitra.git
 ```
-### 2️⃣ Open the Project
+2️⃣ Open the Project
 
 Open the project using NetBeans IDE
 
-###3️⃣ Setup Database
+3️⃣ Setup Database
 
 Install MySQL
 
@@ -103,17 +103,17 @@ Create a new database
 
 Import the SQL tables for the project
 
-###4️⃣ Configure Server
+4️⃣ Configure Server
 
 Add and configure GlassFish Server in NetBeans.
 
-###5️⃣ Run the Project
+5️⃣ Run the Project
 
 Run the project from NetBeans and open the application in your browser:
 ```bash
 http://localhost:8080/SkillMitra
 ```
-###🧪 Testing
+🧪 Testing
 
 The system was tested using multiple testing approaches:
 
@@ -154,7 +154,7 @@ Kanushka Joshi
 Department of Computer Science
 Banasthali Vidyapith
 
-### ⭐ Support
+⭐ Support
 
-##If you like this project, consider giving it a ⭐ on GitHub!
+If you like this project, consider giving it a ⭐ on GitHub!
 
