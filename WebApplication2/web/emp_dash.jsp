@@ -83,7 +83,19 @@ if (successMsg != null) {
 
    
     <div class="profile-dropdown">
-        <img src="images/default-user.png" class="profile-icon" id="profileIcon">
+        <%
+String photo = (String) session.getAttribute("ephoto");
+
+String imgPath;
+
+if(photo != null && !photo.trim().isEmpty()){
+    imgPath = "uploads/" + photo;
+}else{
+    imgPath = "images/default-user.png";
+}
+%>
+
+<img src="<%= imgPath %>" class="profile-icon" id="profileIcon">
         <div class="profile-menu" id="profileMenu">
             <div class="profile-name" style="background:none; color:#000; font-weight:600; border-bottom:none;">
                 <%
@@ -369,7 +381,7 @@ if(employerId2 != null){
 
         PreparedStatement ps3 = con3.prepareStatement(
             "SELECT a.application_id, a.applied_at, j.title, " +
-            "js.jid, js.jfirstname, js.jlastname, js.jemail, js.jcity, js.jjob " +
+            "js.jid, js.jfirstname, js.jlastname, js.jemail, js.jdistrict, js.jeducation " +
             "FROM applications a " +
             "JOIN jobs j ON a.job_id = j.job_id " +
             "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
@@ -404,9 +416,22 @@ if(employerId2 != null){
             <p><%= rs3.getString("jemail") %></p>
 
             <div class="meta">
-                <span>Applied For: <%= rs3.getString("title") %></span>
-                <span>📍 <%= rs3.getString("jcity") %></span>
-                <span>Skill: <%= rs3.getString("jjob") %></span>
+
+                <span>
+                    Applied For:
+                    <%= rs3.getString("title") %>
+                </span>
+
+                <span>
+                    📍 Worker District:
+                    <%= rs3.getString("jdistrict") %>
+                </span>
+
+                <span>
+                    🎓 Education:
+                    <%= rs3.getString("jeducation") %>
+                </span>
+
             </div>
 
             <div style="font-size:13px; margin-top:6px;">

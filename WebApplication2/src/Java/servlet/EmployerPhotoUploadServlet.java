@@ -1,11 +1,12 @@
 package servlet;
 
+import db.DBConnection;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -16,11 +17,12 @@ import javax.servlet.http.*;
 @MultipartConfig
 public class EmployerPhotoUploadServlet extends HttpServlet {
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
+            throws ServletException, IOException {
 
-        // 1️⃣ SESSION CHECK
         HttpSession session = request.getSession(false);
+
         if (session == null || session.getAttribute("eemail") == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -28,77 +30,69 @@ public class EmployerPhotoUploadServlet extends HttpServlet {
 
         String email = (String) session.getAttribute("eemail");
 
-        // 2️⃣ GET FILE
         Part part = request.getPart("photo");
 
-        // 🔥 ADD: Stop if no file selected
         if (part == null || part.getSize() == 0) {
             response.sendRedirect("employer_profile.jsp");
             return;
         }
 
-        // 3️⃣ UPLOAD FOLDER (inside web app)
-        String appPath = request.getServletContext().getRealPath("");
-        String uploadPath = appPath + File.separator + "uploads";
+        String originalName = Paths.get(part.getSubmittedFileName())
+                .getFileName().toString();
+
+        String ext = originalName.substring(originalName.lastIndexOf("."));
+
+        String fileName = email.replaceAll("[^a-zA-Z0-9]", "")
+                + "_" + System.currentTimeMillis() + ext;
+
+        /* CORRECT PATH */
+        String uploadPath = getServletContext().getRealPath("/uploads");
 
         File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
 
-        String fileName = null;
-
-        // 4️⃣ SAVE FILE
-        if (part != null && part.getSize() > 0) {
-
-            fileName = email.replaceAll("[^a-zA-Z0-9]", "")
-                    + "_" + System.currentTimeMillis() + ".jpg";
-
-            File file = new File(uploadDir, fileName);
-
-            try (InputStream is = part.getInputStream();
-                 FileOutputStream fos = new FileOutputStream(file)) {
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.sendRedirect("employer_profile.jsp");
-                return;
-            }
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
         }
 
-        // 🔥 ADD: Only update DB if fileName is not null
-        if (fileName != null) {
+        File file = new File(uploadDir, fileName);
 
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                try (Connection con = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/skillmitra", "root", "");
-                     PreparedStatement ps = con.prepareStatement(
-                        "UPDATE employer SET ephoto=? WHERE eemail=?")) {
+        /* SAVE FILE MANUALLY (GlassFish safe method) */
 
-                    ps.setString(1, fileName);
-                    ps.setString(2, email);
+        try (InputStream is = part.getInputStream();
+             FileOutputStream fos = new FileOutputStream(file)) {
 
-                    int rows = ps.executeUpdate();   // 🔥 ADD THIS
+            byte[] buffer = new byte[1024];
+            int bytesRead;
 
-                    // 🔥 ADD: Debug check
-                    System.out.println("Photo Update Rows: " + rows);
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            while ((bytesRead = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
             }
 
-            // 6️⃣ UPDATE SESSION
-            session.setAttribute("ephoto", fileName);
         }
 
-        // 7️⃣ REDIRECT
+        /* UPDATE DATABASE */
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps =
+                    con.prepareStatement(
+                    "UPDATE employer SET ephoto=? WHERE eemail=?");
+
+            ps.setString(1, fileName);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+
+            con.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        session.setAttribute("ephoto", fileName);
+
         response.sendRedirect("employer_profile.jsp");
     }
 }
-//
