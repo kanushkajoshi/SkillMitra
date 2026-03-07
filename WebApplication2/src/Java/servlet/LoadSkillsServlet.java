@@ -24,7 +24,8 @@ public class LoadSkillsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         List<Map<String, Object>> skills = new ArrayList<>();
-System.out.println("LoadSkillsServlet HIT, skills=" + skills.size());
+
+        System.out.println("LoadSkillsServlet HIT");
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps =
@@ -41,6 +42,9 @@ System.out.println("LoadSkillsServlet HIT, skills=" + skills.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Debug after loading
+        System.out.println("Total skills loaded = " + skills.size());
 
         request.setAttribute("skills", skills);
         request.getRequestDispatcher("/jobseeker_register.jsp")

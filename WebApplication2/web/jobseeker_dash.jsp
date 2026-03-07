@@ -106,7 +106,7 @@ try {
         // 🔹 Fetch Applied Jobs
         String sqlApplied = "SELECT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
                             "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-                            "j.experience_required, j.experience_level, j.workers_required, " +
+                            "j.experience_level, j.workers_required, " +
                             "j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
                             "a.status " +
                             "FROM applications a " +
@@ -120,7 +120,7 @@ try {
         // 🔹 Normal Skill matched jobs fetch (existing logic)
         String sql = "SELECT DISTINCT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
                      "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-                     "j.experience_required, j.experience_level, j.workers_required, " +
+                     "j.experience_level, j.experience_level, j.workers_required, " +
                      "j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
                      "a.status, " +
                      "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
@@ -165,7 +165,7 @@ try {
 
 <p><b>Minimum Salary:</b> ₹<%= rs.getString("min_salary") %></p>
 
-<p><b>Experience Required:</b> <%= rs.getString("experience_required") %></p>
+<p><b>Experience Required:</b> <%= rs.getString("experience_level") %></p>
 
 <p><b>Experience Level:</b> <%= rs.getString("experience_level") %></p>
 

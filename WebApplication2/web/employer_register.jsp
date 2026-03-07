@@ -33,127 +33,160 @@
 <% } %>
 
     <div class="container">
-    <form class="register-form" method="post" action="<%= request.getContextPath() %>/EmployerRegisterServlet" autocomplete="off" onsubmit="return validateEmail();">
+    <form class="register-form"
+      method="post"
+      action="<%= request.getContextPath() %>/EmployerRegisterServlet"
+      autocomplete="off"
+      onsubmit="return validateEmail();">
 
-                <h1>Register as Employer</h1>
+<h1>Register as Employer</h1>
 
-                <div class="form-grid">
+<div class="form-grid">
 
-            <div class="form-group">
-                <label for="first_name">First Name *</label>
-                <input type="text" id="first_name" name="firstname"
-       value="${param.firstname}"
-       placeholder="Enter your first name" required>
+<div class="form-group">
+<label for="first_name">First Name *</label>
+<input type="text"
+       id="first_name"
+       name="efirstname"
+       value="${param.efirstname}"
+       placeholder="Enter your first name"
+       required>
+</div>
 
-            </div>
+<div class="form-group">
+<label for="last_name">Last Name *</label>
+<input type="text"
+       id="last_name"
+       name="elastname"
+       value="${param.elastname}"
+       placeholder="Enter your last name"
+       required>
+</div>
 
-            <div class="form-group">
-                <label for="last_name">Last Name *</label>
-                <input type="text" id="last_name" name="lastname"
-       value="${param.lastname}"
-       placeholder="Enter your last name" required>
+<div class="form-group">
+<label for="phone">Phone Number *</label>
+<input type="tel"
+       id="phone"
+       name="ephone"
+       value="${param.ephone}"
+       pattern="[6-9][0-9]{9}"
+       title="Enter a valid 10-digit Indian mobile number"
+       required>
 
-            </div>
-
-       <div class="form-group">
-    <label for="phone">Phone Number *</label>
-    <input type="tel" id="phone" name="phone" value="${param.phone}" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" required>
 <span style="color:red;">
-    ${phoneError}
+${phoneError}
 </span>
-
-</div>
-      <div class="form-group">
-      <label for="email">Email ID *</label>
-      <input type="email" id="email" name="email"
-           value="${param.email}" autocomplete="off" required>
-
-    <span class="error-msg">${emailError}</span>
 </div>
 
-      <div class="form-group">
-    <label for="password">Password *</label>
-    <div class="password-container">
-        <input type="password"
-               id="password"
-               name="password"
-               autocomplete="new-password"
-               pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
-               title="Password must contain letters and numbers (min 6 characters)"
-               required>
-        <i class="fa-regular fa-eye password-toggle" onclick="togglePassword()"></i>
+<div class="form-group">
+<label for="email">Email ID *</label>
+<input type="email"
+       id="email"
+       name="email"
+       value="${param.email}"
+       autocomplete="off"
+       required>
 
-    </div>
-    <span style="color:red;">
-        ${passwordError}
-    </span>
+<span class="error-msg">${emailError}</span>
 </div>
 
-            <div class="form-group">
-                <label for="company_name">Company Name</label>
-                <input type="text" id="company_name" name="companyname"
-       value="${param.companyname}"
-       placeholder="Enter your company name">
+<div class="form-group">
+<label for="password">Password *</label>
 
-            </div>
+<div class="password-container">
+<input type="password"
+       id="password"
+       name="epwd"
+       autocomplete="new-password"
+       pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
+       title="Password must contain letters and numbers (min 6 characters)"
+       required>
 
-            <div class="form-group">
-                <label for="website">Company Website</label>
-                <input type="url" id="website" name="companywebsite"
+<i class="fa-regular fa-eye password-toggle"
+   onclick="togglePassword()"></i>
+</div>
+
+<span style="color:red;">
+${passwordError}
+</span>
+</div>
+
+<div class="form-group">
+<label for="company_name">Company Name *</label>
+
+<input type="text"
+       id="company_name"
+       name="ecompanyname"
+       value="${param.ecompanyname}"
+       placeholder="Enter your company name"
+       required>
+</div>
+
+<div class="form-group">
+<label for="website">Company Website</label>
+
+<input type="url"
+       id="website"
+       name="companywebsite"
        value="${param.companywebsite}"
        placeholder="Enter company website">
+</div>
 
-            </div>
-            <div class="form-group">
-                <label for="zipcode">Zipcode *</label>
-                <input type="text" id="zipcode" name="zip"
+<div class="form-group">
+<label for="zipcode">Zipcode *</label>
+
+<input type="text"
+       id="zipcode"
+       name="zip"
        value="${param.zip}"
-       maxlength="6" pattern="\d{6}" required>
+       maxlength="6"
+       pattern="\d{6}"
+       required>
+</div>
 
-            </div>
-    
-            <div class="form-group">
-                <label for="country">Country *</label>
-                <input type="text" id="country" name="country" required readonly>
-            </div>
+<div class="form-group">
+<label for="country">Country *</label>
+<input type="text" id="country" name="country" required readonly>
+</div>
 
-            <div class="form-group">
-                <label for="state">State *</label>
-                <input type="text" id="state" name="state" required readonly>
-            </div>
+<div class="form-group">
+<label for="state">State *</label>
+<input type="text" id="state" name="state" required readonly>
+</div>
 
-            <div class="form-group">
-                <label for="district">District (City) *</label>
-                <input type="text" id="district" name="district" required readonly>
-            </div>
-    
-            <div class="form-group">
-                <label for="area">Locality/Area *</label>
-                <select id="area" name="area" required>
-    <option value="">Select area</option>
-    <c:if test="${not empty param.area}">
-        <option value="${param.area}" selected>
-            ${param.area}
-        </option>
-    </c:if>
+<div class="form-group">
+<label for="district">District (City) *</label>
+<input type="text" id="district" name="district" required readonly>
+</div>
+
+<div class="form-group">
+<label for="area">Locality/Area *</label>
+
+<select id="area" name="area" required>
+<option value="">Select area</option>
+
+<c:if test="${not empty param.area}">
+<option value="${param.area}" selected>
+${param.area}
+</option>
+</c:if>
+
 </select>
+</div>
 
-            </div>
+</div>
 
+<button type="submit" class="register-btn">
+Create Account
+</button>
 
-            
+<div class="form-footer">
+or<br><br>
+Already have an account?
+<a href="login.jsp">Sign In</a>
+</div>
 
-
-        </div>
-
-        <button type="submit" class="register-btn">Create Account</button>
-
-        <div class="form-footer">
-            or<br><br>
-            Already have an account? <a href="login.jsp">Sign In</a>
-        </div>
-
-    </form>
+</form>
 
     </div>
 

@@ -19,7 +19,7 @@ OTP expires in:
 
 <form action="VerifyOtpServlet" method="post">
 Enter OTP:
-<input type="text" name="otp" required>
+<input type="text" name="otp" maxlength="6" required>
 <button type="submit">Verify OTP</button>
 </form>
 
