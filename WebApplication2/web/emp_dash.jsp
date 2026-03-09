@@ -495,83 +495,85 @@ if(employerId2 != null){
             <p>Candidates you've accepted for positions</p>
         </div>
     </div>
+<%
+Integer employerId3 = (Integer) session.getAttribute("eid");
+
+if(employerId3 != null){
+
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
+
+        Connection con4 = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra",
+            "root",
+            ""
+        );
+
+        PreparedStatement ps4 = con4.prepareStatement(
+            "SELECT a.application_id, a.applied_at, j.title, " +
+            "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+            "FROM applications a " +
+            "JOIN jobs j ON a.job_id = j.job_id " +
+            "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+            "WHERE j.eid = ? AND a.status = 'Accepted' " +
+            "ORDER BY a.applied_at DESC"
+        );
+
+        ps4.setInt(1, employerId3);
+
+        ResultSet rs4 = ps4.executeQuery();
+
+        boolean hasAccepted = false;
+
+        while(rs4.next()){
+            hasAccepted = true;
+%>
+
 <div class="review-card" style="border:1.5px solid #b9f5c8;">
-    <div class="worker-info"
-         style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
 
-       
-        <div style="display:flex; gap:16px;">
-            <div class="avatar">RK</div>
+<div class="worker-info">
 
-            <div class="worker-details">
-                <h3>
-                    Rakesh Kumar
-                    <span style="color:#1dbf73; font-size:14px; margin-left:8px;">
-                        ✔ Accepted
-                    </span>
-                </h3>
-
-                <p>rakesh@example.com</p>
-
-                <div class="meta" style="margin-top:6px;">
-                    <div><b>Skill:</b> Electrician</div>
-                    <div><b>Location:</b> Delhi</div>
-                </div>
-            </div>
-        </div>
-
-       
-        <div style="text-align:right;">
-            <div style="font-weight:600; font-size:15px;">
-                ₹800 / day
-            </div>
-
-            <div style="font-size:13px; color:#555; margin-top:6px;">
-                Hired Date : <b>15 Jan 2026</b>
-            </div>
-        </div>
-
-    </div>
-</div>
-<div class="review-card" style="border:1.5px solid #b9f5c8;">
-    <div class="worker-info"
-         style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
-
-        
-        <div style="display:flex; gap:16px;">
-            <div class="avatar">SD</div>
-
-            <div class="worker-details">
-                <h3>
-                    Sunita Devi
-                    <span style="color:#1dbf73; font-size:14px; margin-left:8px;">
-                        ✔ Accepted
-                    </span>
-                </h3>
-
-                <p>sunita@example.com</p>
-
-                <div class="meta" style="margin-top:6px;">
-                    <div><b>Skill:</b> House Maid</div>
-                    <div><b>Location:</b> Noida</div>
-                </div>
-            </div>
-        </div>
-
-       
-        <div style="text-align:right;">
-            <div style="font-weight:600; font-size:15px;">
-                ₹600 / day
-            </div>
-
-            <div style="font-size:13px; color:#555; margin-top:6px;">
-                Hired Date : <b>18 Jan 2026</b>
-            </div>
-        </div>
-
-    </div>
+<div class="avatar">
+<%= rs4.getString("jfirstname").charAt(0) %>
+<%= rs4.getString("jlastname").charAt(0) %>
 </div>
 
+<div class="worker-details">
+
+<h3>
+<%= rs4.getString("jfirstname") %>
+<%= rs4.getString("jlastname") %>
+<span style="color:#1dbf73;">✔ Accepted</span>
+</h3>
+
+<p><%= rs4.getString("jemail") %></p>
+
+<div class="meta">
+<span>Applied For: <%= rs4.getString("title") %></span>
+<span>Location: <%= rs4.getString("jdistrict") %></span>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<%
+        }
+
+        if(!hasAccepted){
+%>
+<p>No accepted applications.</p>
+<%
+        }
+
+        con4.close();
+
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+}
+%>
 
 </div>
 <!-- REJECTED APPLICATIONS SECTION -->
@@ -585,99 +587,85 @@ if(employerId2 != null){
         </div>
     </div>
 
-    <div class="review-card" style="
-    border: 2px solid rgba(229,57,53,0.5); /* light red transparent */
-    border-radius:14px;
-    padding:18px 20px;
-    box-shadow:0 8px 18px rgba(0,0,0,0.08);
-    margin-bottom:16px;
-    width:100%;
-    max-width:900px;
-">
+    <%
+Integer employerId4 = (Integer) session.getAttribute("eid");
 
-    <div class="worker-info"
-         style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
+if(employerId4 != null){
 
-        <div style="display:flex; gap:16px;">
-            <div class="avatar">MR</div>
+    try{
+        Class.forName("com.mysql.jdbc.Driver");
 
-            <div class="worker-details">
-                <h3>
-                    Mohan Ram
-                    <span style="color:#e53935; font-size:14px; margin-left:8px;">
-                        ✖ Rejected
-                    </span>
-                </h3>
+        Connection con5 = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra",
+            "root",
+            ""
+        );
 
-                <p>mohan@example.com</p>
+        PreparedStatement ps5 = con5.prepareStatement(
+            "SELECT a.application_id, a.applied_at, j.title, " +
+            "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+            "FROM applications a " +
+            "JOIN jobs j ON a.job_id = j.job_id " +
+            "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+            "WHERE j.eid = ? AND a.status = 'Rejected' " +
+            "ORDER BY a.applied_at DESC"
+        );
 
-                <div class="meta" style="margin-top:6px;">
-                    <div><b>Skill:</b> Construction Helper</div>
-                    <div><b>Location:</b> Ghaziabad</div>
-                </div>
-            </div>
-        </div>
+        ps5.setInt(1, employerId4);
 
-        <!-- RIGHT BOTTOM -->
-        <div style="text-align:right;">
-            <div style="font-weight:600; font-size:15px;">
-                ₹550 / day
-            </div>
+        ResultSet rs5 = ps5.executeQuery();
 
-            <div style="font-size:13px; color:#555; margin-top:6px;">
-                Rejected Date : <b>20 Jan 2026</b>
-            </div>
-        </div>
+        boolean hasRejected = false;
 
-    </div>
+        while(rs5.next()){
+            hasRejected = true;
+%>
+
+<div class="review-card" style="border:2px solid rgba(229,57,53,0.5);">
+
+<div class="worker-info">
+
+<div class="avatar">
+<%= rs5.getString("jfirstname").charAt(0) %>
+<%= rs5.getString("jlastname").charAt(0) %>
 </div>
-<div class="review-card" style="
-    border: 2px solid rgba(229,57,53,0.5); /* light red transparent */
-    border-radius:14px;
-    padding:18px 20px;
-    box-shadow:0 8px 18px rgba(0,0,0,0.08);
-    margin-bottom:16px;
-    width:100%;
-    max-width:900px;
-">
 
-    <div class="worker-info"
-         style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
+<div class="worker-details">
 
-       
-        <div style="display:flex; gap:16px;">
-            <div class="avatar">KS</div>
+<h3>
+<%= rs5.getString("jfirstname") %>
+<%= rs5.getString("jlastname") %>
+<span style="color:#e53935;">✖ Rejected</span>
+</h3>
 
-            <div class="worker-details">
-                <h3>
-                    Kamla Singh
-                    <span style="color:#e53935; font-size:14px; margin-left:8px;">
-                        ✖ Rejected
-                    </span>
-                </h3>
+<p><%= rs5.getString("jemail") %></p>
 
-                <p>kamla@example.com</p>
-
-                <div class="meta" style="margin-top:6px;">
-                    <div><b>Skill:</b> Street Food Helper</div>
-                    <div><b>Location:</b> Faridabad</div>
-                </div>
-            </div>
-        </div>
-
-       
-        <div style="text-align:right;">
-            <div style="font-weight:600; font-size:15px;">
-                ₹500 / day
-            </div>
-
-            <div style="font-size:13px; color:#555; margin-top:6px;">
-                Rejected Date : <b>21 Jan 2026</b>
-            </div>
-        </div>
-
-    </div>
+<div class="meta">
+<span>Applied For: <%= rs5.getString("title") %></span>
+<span>Location: <%= rs5.getString("jdistrict") %></span>
 </div>
+
+</div>
+</div>
+
+</div>
+
+<%
+        }
+
+        if(!hasRejected){
+%>
+<p>No rejected applications.</p>
+<%
+        }
+
+        con5.close();
+
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+}
+%>
 
 </div>
 

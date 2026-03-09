@@ -127,9 +127,10 @@ try {
                      "FROM jobs j " +
                      "JOIN job_skills jk ON jk.job_id = j.job_id " +
                      "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
-                     "AND js.subskill_id = jk.subskill_id " +
+                     
                      "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
-                     "WHERE js.jid = ? ";
+                     "WHERE js.jid = ? "+
+                "AND j.expiry_date >= CURDATE()";
 
         if (cityFilter != null && !cityFilter.isEmpty()) sql += " AND LOWER(j.city) LIKE LOWER(?) ";
         if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) sql += " AND j.min_salary >= ? ";
