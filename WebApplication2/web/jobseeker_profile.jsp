@@ -432,7 +432,8 @@ Click photo to change
 </p>
 
 </div>
-<form method="post" action="jobseeker_profile.jsp?action=update">
+<form method="post" action="jobseeker_profile.jsp">
+<input type="hidden" name="action" value="update">
 
 <div class="form-grid">
 
