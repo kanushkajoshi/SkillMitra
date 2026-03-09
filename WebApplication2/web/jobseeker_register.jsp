@@ -5,7 +5,20 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
 
+<%
+/* Prevent browser caching */
+response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+response.setHeader("Pragma","no-cache");
+response.setDateHeader("Expires", 0);
+
+/* Optional: clear old registration session if exists */
+if(session.getAttribute("user") != null){
+    response.sendRedirect("dashboard.jsp");
+    return;
+}
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

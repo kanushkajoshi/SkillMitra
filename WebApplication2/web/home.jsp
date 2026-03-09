@@ -12,6 +12,7 @@
         <header class="header-flex">
 
             <div class="logo-container">
+                <a href="emp_dash.jsp"></a>
                 <img src="skillmitralogo.jpg" alt="SkillMitra Logo" class="logo">
                 <h1>SkillMitra</h1>
             </div>

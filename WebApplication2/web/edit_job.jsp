@@ -1,6 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*" %>
+<%
+/* 🔒 Prevent browser caching */
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+response.setHeader("Pragma", "no-cache");
+response.setDateHeader("Expires", 0);
 
+/* 🔒 SESSION CHECK */
+HttpSession currentSession = request.getSession(false);
+
+if (currentSession == null || currentSession.getAttribute("eemail") == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+%>
 <!DOCTYPE html>
 <html>
 <head>

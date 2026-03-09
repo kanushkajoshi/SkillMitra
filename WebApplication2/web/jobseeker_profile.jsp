@@ -7,12 +7,20 @@ pageEncoding="UTF-8"%>
 
 <%
 
-if (session.getAttribute("jobseekerId") == null) {
-response.sendRedirect("login.jsp");
-return;
+/* 🔒 Prevent browser caching */
+response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+response.setHeader("Pragma","no-cache");
+response.setDateHeader("Expires",0);
+
+/* 🔒 SESSION CHECK */
+HttpSession currentSession = request.getSession(false);
+
+if(currentSession == null || currentSession.getAttribute("jobseekerId") == null){
+    response.sendRedirect("login.jsp");
+    return;
 }
 
-int jid = (Integer) session.getAttribute("jobseekerId");
+int jid = (Integer) currentSession.getAttribute("jobseekerId");
 String action = request.getParameter("action");
 
 String fname="", lname="", email="", phone="";

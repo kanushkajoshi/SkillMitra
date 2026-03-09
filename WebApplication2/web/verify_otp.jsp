@@ -1,4 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+
+<%
+/* Prevent browser cache */
+response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+response.setHeader("Pragma","no-cache");
+response.setDateHeader("Expires", 0);
+
+/* Check OTP session */
+if(session.getAttribute("otp")==null){
+    response.sendRedirect("jobseeker_register.jsp");
+    return;
+}
+%>
 <html>
 <head>
 <title>Email Verification</title>
