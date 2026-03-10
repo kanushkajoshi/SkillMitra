@@ -14,6 +14,24 @@ if (currentSession == null || currentSession.getAttribute("jobseekerId") == null
 }
 
 int jobseekerId = (Integer) currentSession.getAttribute("jobseekerId");
+Connection conName = DBConnection.getConnection();
+
+PreparedStatement psName =
+conName.prepareStatement(
+"SELECT jfirstname, jlastname FROM jobseeker WHERE jid=?");
+
+psName.setInt(1, jobseekerId);
+
+ResultSet rsName = psName.executeQuery();
+
+if(rsName.next()){
+
+currentSession.setAttribute("jfirstname", rsName.getString("jfirstname"));
+currentSession.setAttribute("jlastname", rsName.getString("jlastname"));
+
+}
+
+conName.close();
 String cityFilter = request.getParameter("city");
 String minSalaryFilter = request.getParameter("min_salary");
 String section = request.getParameter("section"); // 🔹 Added to detect Applied Jobs section
