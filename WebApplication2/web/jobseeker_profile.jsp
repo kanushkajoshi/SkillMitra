@@ -309,7 +309,7 @@ imgPath = "uploads/" + photo;
 <%= (dob==null || dob.equals("")) ? "Not Added" : dob %>
 </div>
 
-<hr> 
+<hr>
 <div class="row">
 <span class="label">Skill:</span>
 
@@ -411,7 +411,7 @@ imgPath = "uploads/" + photo;
 
 <label for="photoUpload">
 
-<img src="<%=request.getContextPath()%>/<%=imgPath%>" 
+<img src="<%=request.getContextPath()%>/<%=imgPath%>"
      class="profile-photo"
      style="cursor:pointer"
      title="Click to change photo">
@@ -432,7 +432,7 @@ Click photo to change
 </p>
 
 </div>
-<form method="post" action="jobseeker_profile.jsp">
+<form method="post" action="UpdateJobseekerProfileServlet">
 <input type="hidden" name="action" value="update">
 
 <div class="form-grid">
@@ -548,6 +548,15 @@ con2.close();
 
 </div>
 <div>
+<label>Education</label>
+<input name="education" value="<%=education%>">
+</div>
+
+<div>
+<label>Date of Birth</label>
+<input type="date" name="dob" value="<%=dob%>">
+</div>
+<div>
 <label>ZIP</label>
 <input name="zip" id="zip" value="<%=zip%>" onkeyup="fetchLocation()">
 </div>
@@ -635,6 +644,52 @@ if(box.style.display === "block")
 box.style.display = "none";
 else
 box.style.display = "block";
+
+}
+function fetchLocation(){
+
+let pincode = document.getElementById("zip").value;
+
+if(pincode.length === 6){
+
+fetch("https://api.postalpincode.in/pincode/"+pincode)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+if(data[0].Status==="Success"){
+
+let po = data[0].PostOffice;
+
+document.getElementById("district").value = po[0].District;
+document.getElementById("state").value = po[0].State;
+document.getElementById("country").value = po[0].Country;
+
+let areaSelect = document.getElementById("area");
+
+areaSelect.innerHTML="";
+
+po.forEach(p=>{
+
+let opt = document.createElement("option");
+
+opt.value = p.Name;
+opt.textContent = p.Name;
+
+areaSelect.appendChild(opt);
+
+});
+
+}else{
+
+alert("Invalid Pincode");
+
+}
+
+});
+
+}
 
 }
 </script>

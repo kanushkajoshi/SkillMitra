@@ -125,7 +125,9 @@ try {
                      "a.status, " +
                      "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
                      "FROM jobs j " +
+                
                      "JOIN job_skills jk ON jk.job_id = j.job_id " +
+                
                      "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
                      
                      "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
