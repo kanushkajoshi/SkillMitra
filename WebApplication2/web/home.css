@@ -48,7 +48,23 @@ header {
     font-size: 20px;
     margin: 0;
 }
+/* Hide Google Translate Top Bar */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
 
+body {
+    top: 0px !important;
+}
+
+/* Hide Google logo and extra UI */
+.goog-te-banner-frame.skiptranslate {
+display:none !important;
+}
+
+body{
+top:0 !important;
+}
 /* Navbar */
 nav {
     display: flex;

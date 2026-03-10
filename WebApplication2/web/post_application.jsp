@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.*" %>
+<%@ include file="header.jsp" %>
 <%
 /* 🔒 Prevent browser caching */
 response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");

@@ -1,7 +1,7 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="db.DBConnection" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
+<%@ include file="header.jsp" %>
 <%
  
 /* 🔒 Prevent browser caching */
