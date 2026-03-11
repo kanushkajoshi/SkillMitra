@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
+<%@ include file="header.jsp" %>
 <%
 /* 🔒 Prevent browser caching */
 response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");

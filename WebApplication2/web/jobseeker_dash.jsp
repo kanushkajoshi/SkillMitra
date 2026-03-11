@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="db.DBConnection" %>
+<%@ include file="header.jsp" %>
 
 <%
 response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -14,6 +15,24 @@ if (currentSession == null || currentSession.getAttribute("jobseekerId") == null
 }
 
 int jobseekerId = (Integer) currentSession.getAttribute("jobseekerId");
+Connection conName = DBConnection.getConnection();
+
+PreparedStatement psName =
+conName.prepareStatement(
+"SELECT jfirstname, jlastname FROM jobseeker WHERE jid=?");
+
+psName.setInt(1, jobseekerId);
+
+ResultSet rsName = psName.executeQuery();
+
+if(rsName.next()){
+
+currentSession.setAttribute("jfirstname", rsName.getString("jfirstname"));
+currentSession.setAttribute("jlastname", rsName.getString("jlastname"));
+
+}
+
+conName.close();
 String cityFilter = request.getParameter("city");
 String minSalaryFilter = request.getParameter("min_salary");
 String section = request.getParameter("section"); // 🔹 Added to detect Applied Jobs section
@@ -125,7 +144,9 @@ try {
                      "a.status, " +
                      "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
                      "FROM jobs j " +
+                
                      "JOIN job_skills jk ON jk.job_id = j.job_id " +
+                
                      "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
                      
                      "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +

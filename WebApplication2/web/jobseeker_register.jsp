@@ -6,7 +6,7 @@
 <%@ page import="java.util.Map" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
-
+<%@ include file="header.jsp" %>
 <%
 /* Prevent browser caching */
 response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");

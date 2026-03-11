@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ include file="header.jsp" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,6 +23,8 @@
                 <a href="#features">Features</a>
                 <a href="#contact">Contact</a>
                 <a href="#faqs">FAQs</a>
+                <a href="#" onclick="setLanguage('en')">English</a> |
+<a href="#" onclick="setLanguage('hi')">हिंदी</a>
             </nav>
 
         </header>
