@@ -196,6 +196,7 @@ if(photo != null && !photo.trim().isEmpty()){
 
 <!-- MANAGE JOBS SECTION -->
 <div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
+    
 
     <div class="manage-header">
         <h2>Manage Jobs</h2>
@@ -203,7 +204,7 @@ if(photo != null && !photo.trim().isEmpty()){
             <button class="post-job-btn">+ Post Job</button>
         </a>
     </div>
-
+    <div class="cards-grid">
 <%
 Integer employerId = (Integer) session.getAttribute("eid");
 
@@ -353,7 +354,7 @@ if(employerId != null){
 %>
 
 </div>
-
+</div>
 
         
         <!-- REVIEW APPLICATIONS SECTION -->

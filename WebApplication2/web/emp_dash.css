@@ -316,3 +316,21 @@ table th {
         grid-template-columns:1fr;
     }
 }
+.cards-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+gap:20px;
+margin-top:20px;
+}
+
+.job-card{
+background:#ffffff;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+transition:0.2s;
+}
+
+.job-card:hover{
+transform:translateY(-4px);
+}

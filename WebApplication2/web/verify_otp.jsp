@@ -15,38 +15,71 @@ if(session.getAttribute("otp")==null){
 <html>
 <head>
 <title>Email Verification</title>
+<link rel="stylesheet" href="verify_otp.css">
 </head>
 <body>
 
-<h2>Email Verification</h2>
+<!-- HEADER -->
+<div class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+           <img src="skillmitralogo.jpg" alt="SkillMitra Logo">
+            SkillMitra
+        </div>
+    </div>
+</div>
+
+<div class="otp-container">
+
+<div class="otp-card">
+
+<h2 class="title">Email Verification</h2>
+<p class="subtitle">Enter the OTP sent to your email</p>
 
 <% if(request.getAttribute("error")!=null){ %>
-<p style="color:red;font-weight:bold;">
+<p class="error-msg">
 <%=request.getAttribute("error")%>
 </p>
 <% } %>
-<p style="color:blue;">
+
+<p class="timer">
 OTP expires in:
 <span id="timer">05:00</span>
 </p>
 
 <form action="VerifyOtpServlet" method="post">
-Enter OTP:
-<input type="text" name="otp" maxlength="6" required>
-<button type="submit">Verify OTP</button>
-</form>
 
-<br>
+<label>Enter OTP:</label>
+
+<input class="otp-input" type="text" name="otp" maxlength="6" required>
+
+<div class="btn-row">
+
+<button class="verifyBtn" type="submit">
+Verify OTP
+</button>
+
+</form>
 
 <form action="ResendOtpServlet" method="post">
-<button type="submit">Resend OTP</button>
+
+<button class="resendBtn" type="submit">
+Resend OTP
+</button>
+
 </form>
 
-<br>
-<a href="jobseeker_register.jsp">⬅ Back</a>
+</div>
 
+<div class="back-link">
+<a href="jobseeker_register.jsp">⬅ Back</a>
+</div>
+
+</div>
+</div>
 
 </body>
+
 <script>
 let time = 300; // 5 minutes
 
