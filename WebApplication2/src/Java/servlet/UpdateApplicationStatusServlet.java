@@ -18,7 +18,6 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-
             Connection con = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/skillmitra",
                     "root",
@@ -28,12 +27,11 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
             PreparedStatement ps = con.prepareStatement(
                     "UPDATE applications SET status=? WHERE application_id=?"
             );
-
             ps.setString(1, status);
             ps.setInt(2, applicationId);
-
             ps.executeUpdate();
 
+            ps.close();
             con.close();
 
             response.sendRedirect("emp_dash.jsp?section=reviewApplications");

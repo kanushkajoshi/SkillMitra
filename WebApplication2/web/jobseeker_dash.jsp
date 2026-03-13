@@ -172,6 +172,26 @@ try {
 <div class="card" style="background:white;padding:20px;margin-bottom:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">
 
 <h3><%= rs.getString("title") %></h3>
+<%
+int jobIdCard = rs.getInt("job_id");
+
+PreparedStatement psBid = con.prepareStatement(
+"SELECT bid_amount,bid_status FROM bids WHERE job_id=? AND job_seeker_id=?"
+);
+
+psBid.setInt(1, jobIdCard);
+psBid.setInt(2, jobseekerId);
+
+ResultSet rsBid = psBid.executeQuery();
+
+int bidAmount = 0;
+String bidStatus = "";
+
+if(rsBid.next()){
+    bidAmount = rsBid.getInt("bid_amount");
+    bidStatus = rsBid.getString("bid_status");
+}
+%>
 
 <p><b>Description:</b> <%= rs.getString("description") %></p>
 
@@ -184,6 +204,7 @@ try {
 </p>
 
 <p><b>Salary:</b> ₹<%= rs.getString("salary") %></p>
+
 
 <p><b>Minimum Salary:</b> ₹<%= rs.getString("min_salary") %></p>
 
@@ -200,6 +221,17 @@ try {
 <p><b>Languages Preferred:</b> <%= rs.getString("languages_preferred") %></p>
 
 <p><b>Expiry Date:</b> <%= rs.getString("expiry_date") %></p>
+<%
+if(bidAmount > 0){
+%>
+
+<p style="color:green;">
+<b>Your Bid:</b> ₹<%= bidAmount %> (<%= bidStatus %>)
+</p>
+
+<%
+}
+%>
 
 <p>
 <span style="background:#eef2ff;padding:4px 12px;border-radius:15px;font-size:13px;">

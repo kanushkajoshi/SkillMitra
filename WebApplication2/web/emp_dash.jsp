@@ -118,6 +118,7 @@ if(photo != null && !photo.trim().isEmpty()){
         <a class="active" href="#" onclick="showSection('dashboard')">Dashboard</a>
         <a href="#" onclick="showSection('manageJobs')">Manage Jobs</a>
         <a href="#" onclick="showSection('reviewApplications')">Review Applications</a>
+        <a href="#" onclick="showSection('reviewBids')">Review Bids</a>
         <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
         <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
         <a href="#">Payments</a>
@@ -355,6 +356,159 @@ if(employerId != null){
 
 </div>
 </div>
+<!-- REVIEW BIDS SECTION -->
+<div id="reviewBidsSection" style="display:none; width:100%; max-width:900px;">
+
+<div class="manage-header">
+<div>
+<h2>Review Bids</h2>
+<p>Workers who placed bids on your jobs</p>
+</div>
+</div>
+
+<%
+
+Integer employerBidId = (Integer) session.getAttribute("eid");
+
+if(employerBidId != null){
+
+try{
+
+Class.forName("com.mysql.jdbc.Driver");
+
+Connection conBid = DriverManager.getConnection(
+"jdbc:mysql://localhost:3306/skillmitra",
+"root",
+""
+);
+
+PreparedStatement psBid = conBid.prepareStatement(
+
+"SELECT b.bid_id, b.bid_amount, b.bid_status, b.created_at," +
+"j.title," +
+"js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+
+"FROM bids b " +
+"JOIN jobs j ON b.job_id = j.job_id " +
+"JOIN jobseeker js ON b.job_seeker_id = js.jid " +
+"WHERE j.eid = ? AND b.bid_status='Pending' " +
+"ORDER BY b.bid_amount ASC"
+
+);
+
+psBid.setInt(1, employerBidId);
+
+ResultSet rsBid = psBid.executeQuery();
+
+boolean hasBids = false;
+
+while(rsBid.next()){
+
+hasBids = true;
+
+%>
+
+<div class="review-card">
+
+<div class="worker-info">
+
+<div class="avatar">
+<%= rsBid.getString("jfirstname").substring(0,1) %>
+<%= rsBid.getString("jlastname").substring(0,1) %>
+</div>
+
+<div class="worker-details">
+
+<h3>
+
+<%= rsBid.getString("jfirstname") %>
+<%= rsBid.getString("jlastname") %>
+
+</h3>
+
+<p><%= rsBid.getString("jemail") %></p>
+
+<div class="meta">
+
+<span>
+Job: <%= rsBid.getString("title") %>
+</span>
+
+<span>
+📍 Location: <%= rsBid.getString("jdistrict") %>
+</span>
+
+<span>
+💰 Bid: ₹<%= rsBid.getInt("bid_amount") %>
+</span>
+
+</div>
+
+<div style="font-size:13px; margin-top:6px;">
+
+Bid Placed On:
+
+<%
+
+Timestamp ts = rsBid.getTimestamp("created_at");
+
+if(ts != null){
+
+out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
+
+}
+
+%>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Accepted"
+class="accept-btn">
+Accept
+</a>
+
+<a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Rejected"
+class="reject-btn">
+Reject
+</a>
+
+</div>
+
+</div>
+
+<%
+
+}
+
+if(!hasBids){
+
+%>
+
+<p>No bids received yet.</p>
+
+<%
+
+}
+
+conBid.close();
+
+}catch(Exception e){
+
+e.printStackTrace();
+
+}
+
+}
+
+%>
+
+</div>
 
         
         <!-- REVIEW APPLICATIONS SECTION -->
@@ -387,6 +541,8 @@ if(employerId2 != null){
             "JOIN jobs j ON a.job_id = j.job_id " +
             "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
             "WHERE j.eid = ? AND a.status = 'Pending' " +
+            "AND a.application_id NOT IN ("+
+            "SELECT application_id FROM applications WHERE status='Bid Placed')"+
             "ORDER BY a.applied_at DESC"
         );
 
@@ -690,9 +846,9 @@ function applyFilters() {
 
 <script>
 function showSection(section) {
-    const sections = [
-        "dashboardSection","manageJobsSection","reviewApplicationsSection",
-        "acceptedApplicationsSection","rejectedApplicationsSection"
+   const sections = [
+    "dashboardSection","manageJobsSection","reviewBidsSection","reviewApplicationsSection",
+    "acceptedApplicationsSection","rejectedApplicationsSection"
     ];
     sections.forEach(id => {
         const el = document.getElementById(id);
@@ -700,6 +856,7 @@ function showSection(section) {
     });
     if(section === "dashboard") dashboardSection.style.display = "block";
     else if(section === "manageJobs") manageJobsSection.style.display = "block";
+    else if(section === "reviewBids") reviewBidsSection.style.display = "block";
     else if(section === "reviewApplications") reviewApplicationsSection.style.display = "block";
     else if(section === "acceptedApplications") acceptedApplicationsSection.style.display = "block";
     else if(section === "rejectedApplications") rejectedApplicationsSection.style.display = "block";
@@ -716,6 +873,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (section === "manageJobs") {
         showSection("manageJobs");
+    }
+    else if(section === "reviewBids"){
+        showSection("reviewBids");
     }
 
 });
