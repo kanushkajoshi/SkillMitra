@@ -354,7 +354,7 @@ required>
 
 <label>Expiry Date *</label>
 
-<input type="date" name="expiry_date" required>
+<input type="date" name="expiry_date" id="expiryDate" required>
 
 
 <button type="submit">Post Job</button>
@@ -376,7 +376,13 @@ function closeLanguage(){
     document.getElementById("languageDropdown").style.display="none";
     updateLanguageText();
 }
+document.addEventListener("DOMContentLoaded", function () {
 
+    let today = new Date().toISOString().split("T")[0];
+
+    document.getElementById("expiryDate").setAttribute("min", today);
+
+});
 function updateLanguageText(){
 
     let checks =

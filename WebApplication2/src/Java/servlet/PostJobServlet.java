@@ -57,6 +57,14 @@ public class PostJobServlet extends HttpServlet {
         String genderPreference = request.getParameter("gender_preference");
         String expiryDate = request.getParameter("expiry_date");
 
+// ✅ Prevent past expiry dates
+java.time.LocalDate today = java.time.LocalDate.now();
+java.time.LocalDate expDate = java.time.LocalDate.parse(expiryDate);
+
+if (expDate.isBefore(today)) {
+    response.getWriter().println("Expiry date cannot be in the past.");
+    return;
+}
         Connection con = null;
 
         try {
@@ -65,8 +73,8 @@ public class PostJobServlet extends HttpServlet {
 
             // 🔥 INSERT INTO jobs
             String jobSql = "INSERT INTO jobs " +
-                    "(eid, title, description, locality, city, state, country, zip, salary, min_salary, job_type, experience_required, languages_preferred, workers_required, working_hours, gender_preference, expiry_date) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+"(eid, title, description, locality, city, state, country, zip, salary, min_salary, job_type, experience_required, languages_preferred, workers_required, working_hours, gender_preference, expiry_date, status) " +
+"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement psJob = con.prepareStatement(jobSql, Statement.RETURN_GENERATED_KEYS);
 
@@ -92,6 +100,7 @@ public class PostJobServlet extends HttpServlet {
             psJob.setString(15, workingHours);
             psJob.setString(16, genderPreference);
             psJob.setDate(17, Date.valueOf(expiryDate));
+            psJob.setString(18, "ACTIVE");
 
             psJob.executeUpdate();
 

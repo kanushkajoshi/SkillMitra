@@ -139,7 +139,7 @@ try {
         // 🔹 Normal Skill matched jobs fetch (existing logic)
         String sql = "SELECT DISTINCT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
                      "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-                     "j.experience_level, j.experience_level, j.workers_required, " +
+                     "j.experience_level, j.workers_required, " +
                      "j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
                      "a.status, " +
                      "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
@@ -151,7 +151,7 @@ try {
                      
                      "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
                      "WHERE js.jid = ? "+
-                "AND j.expiry_date >= CURDATE()";
+                     "AND j.status='ACTIVE'";
 
         if (cityFilter != null && !cityFilter.isEmpty()) sql += " AND LOWER(j.city) LIKE LOWER(?) ";
         if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) sql += " AND j.min_salary >= ? ";

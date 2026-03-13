@@ -299,6 +299,21 @@ if(employerId != null){
             <p><strong>Expiry Date:</strong>
                 <%= rs2.getDate("expiry_date") %>
             </p>
+            <p><strong>Status:</strong>
+<%
+String status = rs2.getString("status");
+String color = "#6c757d";
+
+if("ACTIVE".equals(status)){
+    color = "#28a745";
+}else if("EXPIRED".equals(status)){
+    color = "#dc3545";
+}
+%>
+
+<span style="padding:4px 10px;border-radius:12px;font-size:13px;color:white;background:<%= color %>;">
+<%= status %>
+</span>
 
             <p><strong>Job Type:</strong>
                 <%= rs2.getString("job_type") %>
