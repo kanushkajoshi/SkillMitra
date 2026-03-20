@@ -5,6 +5,8 @@
  */
 
 
+/* global lang */
+
 function setLanguage(lang){
     localStorage.setItem("siteLang", lang);
     document.cookie = "googtrans=/en/" + lang;

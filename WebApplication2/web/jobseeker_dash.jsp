@@ -19,7 +19,7 @@ Connection conName = DBConnection.getConnection();
 
 PreparedStatement psName =
 conName.prepareStatement(
-"SELECT jfirstname, jlastname FROM jobseeker WHERE jid=?");
+"SELECT jfirstname, jlastname, jdistrict, jzip FROM jobseeker WHERE jid=?");
 
 psName.setInt(1, jobseekerId);
 
@@ -29,7 +29,11 @@ if(rsName.next()){
 
 currentSession.setAttribute("jfirstname", rsName.getString("jfirstname"));
 currentSession.setAttribute("jlastname", rsName.getString("jlastname"));
-
+currentSession.setAttribute("jdistrict", rsName.getString("jdistrict"));
+String zip = rsName.getString("jzip");
+if(zip != null){
+    currentSession.setAttribute("jzip", zip);
+}
 }
 
 conName.close();
@@ -54,6 +58,7 @@ if (currentSession.getAttribute("jfirstname") == null) {
         if (rsTemp.next()) {
             currentSession.setAttribute("jfirstname", rsTemp.getString("jfirstname"));
             currentSession.setAttribute("jlastname", rsTemp.getString("jlastname"));
+            currentSession.setAttribute("jdistrict", rsTemp.getString("jdistrict"));
         }
     } catch (Exception e) {
         e.printStackTrace();
@@ -107,11 +112,37 @@ if (currentSession.getAttribute("jfirstname") == null) {
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
 
-<form class="search-box" method="get">
-<input type="text" name="city" placeholder="City" value="<%= cityFilter!=null?cityFilter:"" %>">
-<input type="number" name="min_salary" placeholder="Minimum Salary" value="<%= minSalaryFilter!=null?minSalaryFilter:"" %>">
+<form class="search-box" method="get" action="search_results.jsp">
+
+<div style="position:relative;width:100%;">
+<input type="text" id="searchInput" name="q" placeholder="Search subskill or area">
+<div id="suggestionBox"></div>
+</div>
+<button type="button" id="filterBtn">Filters ▼</button>
+
 <button type="submit">Search</button>
+
+<div id="filterContainer" class="filter-container">
+
+<label>District:</label>
+<input type="text" name="district"
+value="<%= currentSession.getAttribute("jdistrict") %>" readonly>
+
+<label>Area:</label>
+<div id="areaContainer"></div>
+
+<label>Minimum salary:</label>
+<input type="number" name="min_salary">
+
+<label>Maximum salary:</label>
+<input type="number" name="max_salary">
+
+<button type="button" id="applyFilter">Apply</button>
+
+</div>
+
 </form>
+
 
 <div class="cards">
 <%
@@ -246,7 +277,10 @@ finally {
 %>
 
 </div>
-
+<script>
+const jobseekerZip = "<%= currentSession.getAttribute("jzip") %>";
+console.log("ZIP CODE:", jobseekerZip);
+</script>
 <script>
 const profileIcon = document.getElementById("profileIcon");
 const profileMenu = document.getElementById("profileMenu");
@@ -257,8 +291,130 @@ profileIcon.addEventListener("click", function(e){
 document.addEventListener("click", function(){
     profileMenu.style.display="none";
 });
-</script>
 
+const filterBtn = document.getElementById("filterBtn");
+const filterBox = document.getElementById("filterContainer");
+const applyBtn = document.getElementById("applyFilter");
+
+/* Apply button just closes filter */
+
+if (applyBtn) {
+    applyBtn.addEventListener("click", function () {
+        filterBox.style.display = "none";
+    });
+}
+
+/* Filter button toggles filter box */
+
+if (filterBtn) {
+    filterBtn.addEventListener("click", function (e) {
+
+        e.preventDefault();
+
+        if (filterBox.style.display === "block") {
+            filterBox.style.display = "none";
+        } else {
+            filterBox.style.display = "block";
+        }
+
+    });
+}
+</script>
+<script>
+function loadAreas(){
+
+console.log("Fetching areas for:", jobseekerZip);
+
+fetch("https://api.postalpincode.in/pincode/" + jobseekerZip)
+
+.then(response => response.json())
+
+.then(data => {
+
+const container = document.getElementById("areaContainer");
+
+container.innerHTML = "";
+
+if(data && data[0] && data[0].Status === "Success"){
+
+const postOffices = data[0].PostOffice;
+
+postOffices.forEach(function(post){
+
+const area = post.Name;
+
+const label = document.createElement("label");
+
+label.innerHTML =
+'<input type="checkbox" name="area" value="'+area+'"> ' + area;
+
+container.appendChild(label);
+
+});
+
+}else{
+
+container.innerHTML = "No areas found";
+
+}
+
+})
+
+.catch(error => {
+
+console.error("API error:", error);
+
+document.getElementById("areaContainer").innerHTML = "Error loading areas";
+
+});
+
+}
+
+loadAreas();
+</script>
+<script>
+const searchInput = document.getElementById("searchInput");
+const suggestionBox = document.getElementById("suggestionBox");
+
+searchInput.addEventListener("keyup", function(){
+
+const q = this.value;
+
+if(q.length < 1){
+suggestionBox.innerHTML="";
+return;
+}
+
+fetch("SearchSuggestionServlet?q="+q)
+
+.then(res=>res.json())
+
+.then(data=>{
+
+suggestionBox.innerHTML="";
+
+data.forEach(function(item){
+
+const div = document.createElement("div");
+
+div.className="suggestion-item";
+
+div.textContent=item;
+
+div.onclick=function(){
+
+searchInput.value=item;
+suggestionBox.innerHTML="";
+
+};
+
+suggestionBox.appendChild(div);
+
+});
+
+});
+});
+</script>
 </div>
 </body>
 </html>
