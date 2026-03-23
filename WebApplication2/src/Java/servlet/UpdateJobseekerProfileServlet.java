@@ -120,7 +120,7 @@ psUpdate.setInt(11, jid);
 psUpdate.executeUpdate();
 session.setAttribute("jfirstname", request.getParameter("fname"));
 session.setAttribute("jlastname", request.getParameter("lname"));
-
+session.setAttribute("jdistrict", request.getParameter("district"));
             // delete old skills
             PreparedStatement deleteSkills = con.prepareStatement(
                     "DELETE FROM jobseeker_skills WHERE jid=?");
@@ -146,7 +146,7 @@ session.setAttribute("jlastname", request.getParameter("lname"));
 
             con.close();
 
-            response.sendRedirect("jobseeker_profile.jsp");
+            response.sendRedirect("MatchedJobsServlet");
 
         } catch (Exception e) {
             e.printStackTrace();

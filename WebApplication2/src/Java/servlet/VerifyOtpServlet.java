@@ -218,11 +218,10 @@ ps.executeUpdate();
             return;
         }
 
-    } catch (Exception e) {
+    }catch (Exception e) {
+    e.printStackTrace();
 
-        e.printStackTrace();
-
-        request.setAttribute("error", "Registration failed");
+    request.setAttribute("error", e.getMessage());
         request.getRequestDispatcher("verify_otp.jsp")
                .forward(request, response);
     }

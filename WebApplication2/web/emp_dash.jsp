@@ -114,16 +114,15 @@ if(photo != null && !photo.trim().isEmpty()){
 
 <div class="dashboard">
     <aside class="sidebar">
-        <h2>Employer Dashboard</h2>
-        <a class="active" href="#" onclick="showSection('dashboard')">Dashboard</a>
-        <a href="#" onclick="showSection('manageJobs')">Manage Jobs</a>
-        <a href="#" onclick="showSection('reviewApplications')">Review Applications</a>
-        <a href="#" onclick="showSection('reviewBids')">Review Bids</a>
-        <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
-        <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
-        <a href="#">Payments</a>
-        <a href="#">Rate & Review</a>
-    </aside>
+    <h2>Employer Dashboard</h2>
+    <a class="active" href="#" onclick="showSection('dashboard')">Dashboard</a>
+    <a href="#" onclick="showSection('manageJobs')">Manage Jobs</a>
+    <a href="#" onclick="showSection('reviewApplications')">Review Applications</a>
+    <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
+    <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
+    <a href="#">Payments</a>
+    <a href="#">Rate & Review</a>
+</aside>
 
     <main class="content">
 
@@ -372,170 +371,21 @@ if("ACTIVE".equals(status)){
 </div>
 </div>
 <!-- REVIEW BIDS SECTION -->
-<div id="reviewBidsSection" style="display:none; width:100%; max-width:900px;">
 
-<div class="manage-header">
-<div>
-<h2>Review Bids</h2>
-<p>Workers who placed bids on your jobs</p>
-</div>
-</div>
-
-<%
-
-Integer employerBidId = (Integer) session.getAttribute("eid");
-
-if(employerBidId != null){
-
-try{
-
-Class.forName("com.mysql.jdbc.Driver");
-
-Connection conBid = DriverManager.getConnection(
-"jdbc:mysql://localhost:3306/skillmitra",
-"root",
-""
-);
-
-PreparedStatement psBid = conBid.prepareStatement(
-
-"SELECT b.bid_id, b.bid_amount, b.bid_status, b.created_at," +
-"j.title," +
-"js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
-
-"FROM bids b " +
-"JOIN jobs j ON b.job_id = j.job_id " +
-"JOIN jobseeker js ON b.job_seeker_id = js.jid " +
-"WHERE j.eid = ? AND b.bid_status='Pending' " +
-"ORDER BY b.bid_amount ASC"
-
-);
-
-psBid.setInt(1, employerBidId);
-
-ResultSet rsBid = psBid.executeQuery();
-
-boolean hasBids = false;
-
-while(rsBid.next()){
-
-hasBids = true;
-
-%>
-
-<div class="review-card">
-
-<div class="worker-info">
-
-<div class="avatar">
-<%= rsBid.getString("jfirstname").substring(0,1) %>
-<%= rsBid.getString("jlastname").substring(0,1) %>
-</div>
-
-<div class="worker-details">
-
-<h3>
-
-<%= rsBid.getString("jfirstname") %>
-<%= rsBid.getString("jlastname") %>
-
-</h3>
-
-<p><%= rsBid.getString("jemail") %></p>
-
-<div class="meta">
-
-<span>
-Job: <%= rsBid.getString("title") %>
-</span>
-
-<span>
-📍 Location: <%= rsBid.getString("jdistrict") %>
-</span>
-
-<span>
-💰 Bid: ₹<%= rsBid.getInt("bid_amount") %>
-</span>
-
-</div>
-
-<div style="font-size:13px; margin-top:6px;">
-
-Bid Placed On:
-
-<%
-
-Timestamp ts = rsBid.getTimestamp("created_at");
-
-if(ts != null){
-
-out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
-
-}
-
-%>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="actions">
-
-<a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Accepted"
-class="accept-btn">
-Accept
-</a>
-
-<a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Rejected"
-class="reject-btn">
-Reject
-</a>
-
-</div>
-
-</div>
-
-<%
-
-}
-
-if(!hasBids){
-
-%>
-
-<p>No bids received yet.</p>
-
-<%
-
-}
-
-conBid.close();
-
-}catch(Exception e){
-
-e.printStackTrace();
-
-}
-
-}
-
-%>
-
-</div>
 
         
         <!-- REVIEW APPLICATIONS SECTION -->
+
 <div id="reviewApplicationsSection" style="display:none; width:100%; max-width:900px;">
 
     <div class="manage-header">
         <div>
             <h2>Review Applications</h2>
-            <p>Review and manage candidate applications</p>
+            <p>Review applications and bids together</p>
         </div>
     </div>
-    <%
+
+<%
 Integer employerId2 = (Integer) session.getAttribute("eid");
 
 if(employerId2 != null){
@@ -544,14 +394,13 @@ if(employerId2 != null){
         Class.forName("com.mysql.jdbc.Driver");
 
         Connection con3 = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/skillmitra",
-            "root",
-            ""
+            "jdbc:mysql://localhost:3306/skillmitra","root",""
         );
 
+        // ================= NORMAL APPLICATIONS =================
         PreparedStatement ps3 = con3.prepareStatement(
             "SELECT a.application_id, a.applied_at, j.title, " +
-            "js.jid, js.jfirstname, js.jlastname, js.jemail, js.jdistrict, js.jeducation " +
+            "js.jfirstname, js.jlastname, js.jemail, js.jdistrict, js.jeducation " +
             "FROM applications a " +
             "JOIN jobs j ON a.job_id = j.job_id " +
             "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
@@ -562,7 +411,6 @@ if(employerId2 != null){
         );
 
         ps3.setInt(1, employerId2);
-
         ResultSet rs3 = ps3.executeQuery();
 
         boolean hasApps = false;
@@ -571,6 +419,7 @@ if(employerId2 != null){
             hasApps = true;
 %>
 
+<!-- 🔵 NORMAL APPLICATION -->
 <div class="review-card">
 
     <div class="worker-info">
@@ -583,30 +432,18 @@ if(employerId2 != null){
             <h3>
                 <%= rs3.getString("jfirstname") %>
                 <%= rs3.getString("jlastname") %>
+                <span style="color:#2196f3;">📄 Application</span>
             </h3>
 
             <p><%= rs3.getString("jemail") %></p>
 
             <div class="meta">
-
-                <span>
-                    Applied For:
-                    <%= rs3.getString("title") %>
-                </span>
-
-                <span>
-                    📍 Worker District:
-                    <%= rs3.getString("jdistrict") %>
-                </span>
-
-                <span>
-                    🎓 Education:
-                    <%= rs3.getString("jeducation") %>
-                </span>
-
+                <span>Applied For: <%= rs3.getString("title") %></span>
+                <span>📍 <%= rs3.getString("jdistrict") %></span>
+                <span>🎓 <%= rs3.getString("jeducation") %></span>
             </div>
 
-            <div style="font-size:13px; margin-top:6px;">
+            <div style="font-size:13px;">
                 Applied On:
                 <%
                 Timestamp ts = rs3.getTimestamp("applied_at");
@@ -619,17 +456,11 @@ if(employerId2 != null){
     </div>
 
     <div class="actions">
-
         <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Accepted"
-           class="accept-btn">
-           Accept
-        </a>
+           class="accept-btn">Accept</a>
 
         <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Rejected"
-           class="reject-btn">
-           Reject
-        </a>
-
+           class="reject-btn">Reject</a>
     </div>
 
 </div>
@@ -643,6 +474,89 @@ if(employerId2 != null){
 <%
         }
 
+        // ================= BIDS SECTION (MERGED HERE) =================
+
+        PreparedStatement psBid = con3.prepareStatement(
+            "SELECT b.bid_id, b.bid_amount, b.bid_status, b.created_at," +
+            "j.title," +
+            "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+            "FROM bids b " +
+            "JOIN jobs j ON b.job_id = j.job_id " +
+            "JOIN jobseeker js ON b.job_seeker_id = js.jid " +
+            "WHERE j.eid = ? AND b.bid_status='Pending' " +
+            "ORDER BY b.bid_amount ASC"
+        );
+
+        psBid.setInt(1, employerId2);
+        ResultSet rsBid = psBid.executeQuery();
+
+        boolean hasBids = false;
+%>
+
+<hr style="margin:30px 0;">
+<h3>💰 Bid Requests</h3>
+
+<%
+        while(rsBid.next()){
+            hasBids = true;
+%>
+
+<div class="review-card">
+
+    <div class="worker-info">
+        <div class="avatar">
+            <%= rsBid.getString("jfirstname").charAt(0) %>
+            <%= rsBid.getString("jlastname").charAt(0) %>
+        </div>
+
+        <div class="worker-details">
+
+            <h3>
+                <%= rsBid.getString("jfirstname") %>
+                <%= rsBid.getString("jlastname") %>
+                <span style="color:#ff9800;">💰 Bid</span>
+            </h3>
+
+            <p><%= rsBid.getString("jemail") %></p>
+
+            <div class="meta">
+                <span>Job: <%= rsBid.getString("title") %></span>
+                <span>📍 <%= rsBid.getString("jdistrict") %></span>
+                <span>💰 ₹<%= rsBid.getInt("bid_amount") %></span>
+            </div>
+
+            <div style="font-size:13px;">
+                Bid On:
+                <%
+                Timestamp ts = rsBid.getTimestamp("created_at");
+                if(ts != null){
+                    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
+                }
+                %>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Accepted"
+           class="accept-btn">Accept</a>
+
+        <a href="UpdateBidStatusServlet?bid_id=<%= rsBid.getInt("bid_id") %>&status=Rejected"
+           class="reject-btn">Reject</a>
+    </div>
+
+</div>
+
+<%
+        }
+
+        if(!hasBids){
+%>
+<p>No bids received.</p>
+<%
+        }
+
         con3.close();
 
     } catch(Exception e){
@@ -651,11 +565,8 @@ if(employerId2 != null){
 }
 %>
 
-   
-
-
-
 </div>
+
 
 <!-- ACCEPTED APPLICATIONS SECTION -->
 <div id="acceptedApplicationsSection"
@@ -862,16 +773,17 @@ function applyFilters() {
 <script>
 function showSection(section) {
    const sections = [
-    "dashboardSection","manageJobsSection","reviewBidsSection","reviewApplicationsSection",
+    "dashboardSection","manageJobsSection","reviewApplicationsSection",
     "acceptedApplicationsSection","rejectedApplicationsSection"
-    ];
+   ];
+
     sections.forEach(id => {
         const el = document.getElementById(id);
         if(el) el.style.display = "none";
     });
+
     if(section === "dashboard") dashboardSection.style.display = "block";
     else if(section === "manageJobs") manageJobsSection.style.display = "block";
-    else if(section === "reviewBids") reviewBidsSection.style.display = "block";
     else if(section === "reviewApplications") reviewApplicationsSection.style.display = "block";
     else if(section === "acceptedApplications") acceptedApplicationsSection.style.display = "block";
     else if(section === "rejectedApplications") rejectedApplicationsSection.style.display = "block";

@@ -82,67 +82,9 @@ selectedSubskills.add(rsSkill.getInt("subskill_id"));
 
 /* UPDATE */
 
-if("update".equals(action)){
-
-PreparedStatement psUpdate =
-con.prepareStatement(
-"UPDATE jobseeker SET "+
-"jfirstname=?, jlastname=?, jphone=?, "+
-"jcountry=?, jstate=?, jdistrict=?, jarea=?, "+
-"jzip=?, jeducation=?, jdob=? "+
-"WHERE jid=?"
-);
-
-psUpdate.setString(1,request.getParameter("fname"));
-psUpdate.setString(2,request.getParameter("lname"));
-psUpdate.setString(3,request.getParameter("phone"));
-psUpdate.setString(4,request.getParameter("country"));
-psUpdate.setString(5,request.getParameter("state"));
-psUpdate.setString(6,request.getParameter("district"));
-psUpdate.setString(7,request.getParameter("area"));
-psUpdate.setString(8,request.getParameter("zip"));
-psUpdate.setString(9,request.getParameter("education"));
-psUpdate.setString(10,request.getParameter("dob"));
-psUpdate.setInt(11,jid);
-
-psUpdate.executeUpdate();
-
-/* UPDATE SUBSKILLS */
-
-String skillParam = request.getParameter("skill");
-String[] subs = request.getParameterValues("subskills");
-
-PreparedStatement del =
-con.prepareStatement("DELETE FROM jobseeker_skills WHERE jid=?");
-
-del.setInt(1,jid);
-del.executeUpdate();
-
-if(skillParam!=null && subs!=null){
-
-PreparedStatement ins =
-con.prepareStatement(
-"INSERT INTO jobseeker_skills(jid,skill_id,subskill_id) VALUES(?,?,?)"
-);
-
-for(int i=0;i<subs.length;i++){
-
-ins.setInt(1,jid);
-ins.setInt(2,Integer.parseInt(skillParam));
-ins.setInt(3,Integer.parseInt(subs[i]));
-
-ins.executeUpdate();
-
-}
-
-}
-
-response.sendRedirect("jobseeker_profile.jsp");
-return;
-
-}
 
 con.close();
+
 
 }catch(Exception e){
 out.println("ERROR: "+e);

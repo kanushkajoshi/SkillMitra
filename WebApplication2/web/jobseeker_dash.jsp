@@ -182,7 +182,9 @@ try {
                      
                      "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
                      "WHERE js.jid = ? "+
-                     "AND j.status='ACTIVE'";
+                    "AND j.status='ACTIVE' " +   // 🔥 SPACE ADDED
+"ORDER BY (LOWER(j.city) = LOWER(?)) DESC";
+                
 
         if (cityFilter != null && !cityFilter.isEmpty()) sql += " AND LOWER(j.city) LIKE LOWER(?) ";
         if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) sql += " AND j.min_salary >= ? ";
@@ -191,6 +193,7 @@ try {
         int idx = 1;
         ps.setInt(idx++, jobseekerId);
         ps.setInt(idx++, jobseekerId);
+        ps.setString(idx++, (String) currentSession.getAttribute("jdistrict"));
         if (cityFilter != null && !cityFilter.isEmpty()) ps.setString(idx++, "%" + cityFilter + "%");
         if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) ps.setInt(idx++, Integer.parseInt(minSalaryFilter));
     }
