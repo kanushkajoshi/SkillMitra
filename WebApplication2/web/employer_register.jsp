@@ -1,140 +1,143 @@
-<%-- 
-    Document   : employee_register
-    Created on : 21 Nov, 2025, 11:53:56 PM
-    Author     : hp
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ include file="header.jsp" %>
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+    <meta charset="UTF-8">
+    <title>Employer Registration - SkillMitra</title>
+    <link rel="icon" href="skillmitralogo.jpg">
+    <link rel="stylesheet" href="employer_register.css">
+</head>
 
-        <title>Employer Registration - SkillMitra</title>
-        <link rel="icon" href="skillmitralogo.jpg" type="image/x-icon">
-        <link rel="stylesheet" href="employer_register.css">
-    </head>
+<body>
 
-   <body>
-    <header class="header">
-        <div class="logo">
-            <img src="skillmitralogo.jpg" alt="SkillMitra Logo">
-            SkillMitra
-        </div>
-        <button class="back-btn" onclick="window.location.href='home.jsp'">Back to Home</button>
-    </header>
+<header class="header">
+    <div class="logo">
+        <img src="skillmitralogo.jpg">
+        SkillMitra
+    </div>
+    <button class="back-btn" onclick="window.location.href='home.jsp'">Back to Home</button>
+</header>
 
-<% if (request.getAttribute("error") != null) { %>
-    <p style="color:red;"><%= request.getAttribute("error") %></p>
-<% } %>
+<div class="container">
 
-    <div class="container">
-    <form class="register-form"
+<form class="register-form"
       method="post"
       action="<%= request.getContextPath() %>/EmployerRegisterServlet"
-      autocomplete="off"
-      onsubmit="return validateEmail();">
+      autocomplete="off">
 
 <h1>Register as Employer</h1>
 
 <div class="form-grid">
 
+<!-- FIRST NAME -->
 <div class="form-group">
-<label for="first_name">First Name *</label>
+<label>First Name *</label>
 <input type="text"
        id="first_name"
        name="efirstname"
        value="${param.efirstname}"
-       placeholder="Enter your first name"
+       pattern="[A-Za-z ]+"
        required>
+
+<span id="fnameError" style="color:red;font-size:13px;"></span>
 </div>
 
+<!-- LAST NAME -->
 <div class="form-group">
-<label for="last_name">Last Name *</label>
+<label>Last Name *</label>
 <input type="text"
        id="last_name"
        name="elastname"
        value="${param.elastname}"
-       placeholder="Enter your last name"
+       pattern="[A-Za-z ]+"
        required>
+
+<span id="lnameError" style="color:red;font-size:13px;"></span>
 </div>
 
+<!-- DOB -->
 <div class="form-group">
-<label for="phone">Phone Number *</label>
-<input type="tel"
-       id="phone"
-       name="ephone"
-       value="${param.ephone}"
-       pattern="[6-9][0-9]{9}"
-       title="Enter a valid 10-digit Indian mobile number"
+<label>DOB *</label>
+
+<input type="date"
+       id="dob"
+       name="edob"
+       value="${param.edob}"
+       max="<%= java.time.LocalDate.now() %>"
        required>
 
-<span style="color:red;">
-${phoneError}
+<span id="dobErrorMsg" style="color:red;font-size:13px;">
+${dobError}
 </span>
 </div>
 
+<!-- PHONE -->
 <div class="form-group">
-<label for="email">Email ID *</label>
-<input type="email"
-       id="email"
-       name="email"
-       value="${param.email}"
-       autocomplete="off"
+<label>Phone *</label>
+<input type="tel"
+       name="ephone"
+       value="${param.ephone}"
+       pattern="[6-9][0-9]{9}"
        required>
-
-<span class="error-msg">${emailError}</span>
+<span style="color:red;">${phoneError}</span>
 </div>
 
+<!-- EMAIL -->
 <div class="form-group">
-<label for="password">Password *</label>
+<label>Email *</label>
+
+<input type="email"
+       id="eemail"
+       name="eemail"
+       value="${not empty oldEmail ? oldEmail : param.eemail}"
+       required>
+
+<span style="color:red;font-size:13px;">
+${emailError}
+</span>
+</div>
+
+<!-- PASSWORD -->
+<div class="form-group">
+<label>Password *</label>
 
 <div class="password-container">
 <input type="password"
        id="password"
        name="epwd"
-       autocomplete="new-password"
        pattern="(?=.*[A-Za-z])(?=.*[0-9]).{6,}"
-       title="Password must contain letters and numbers (min 6 characters)"
        required>
 
 <i class="fa-regular fa-eye password-toggle"
    onclick="togglePassword()"></i>
 </div>
 
-<span style="color:red;">
-${passwordError}
-</span>
+<span style="color:red;">${passwordError}</span>
 </div>
 
+<!-- COMPANY -->
 <div class="form-group">
-<label for="company_name">Company Name *</label>
-
+<label>Company Name *</label>
 <input type="text"
-       id="company_name"
        name="ecompanyname"
        value="${param.ecompanyname}"
-       placeholder="Enter your company name"
        required>
 </div>
 
+<!-- WEBSITE -->
 <div class="form-group">
-<label for="website">Company Website</label>
-
+<label>Website</label>
 <input type="url"
-       id="website"
        name="companywebsite"
-       value="${param.companywebsite}"
-       placeholder="Enter company website">
+       value="${param.companywebsite}">
 </div>
 
+<!-- ZIP -->
 <div class="form-group">
-<label for="zipcode">Zipcode *</label>
-
+<label>Zip *</label>
 <input type="text"
        id="zipcode"
        name="zip"
@@ -144,157 +147,135 @@ ${passwordError}
        required>
 </div>
 
+<!-- LOCATION -->
 <div class="form-group">
-<label for="country">Country *</label>
-<input type="text" id="country" name="country" required readonly>
+<label>Country *</label>
+<input type="text" id="country" name="country" readonly required>
 </div>
 
 <div class="form-group">
-<label for="state">State *</label>
-<input type="text" id="state" name="state" required readonly>
+<label>State *</label>
+<input type="text" id="state" name="state" readonly required>
 </div>
 
 <div class="form-group">
-<label for="district">District (City) *</label>
-<input type="text" id="district" name="district" required readonly>
+<label>District *</label>
+<input type="text" id="district" name="district" readonly required>
 </div>
 
 <div class="form-group">
-<label for="area">Locality/Area *</label>
-
+<label>Area *</label>
 <select id="area" name="area" required>
-<option value="">Select area</option>
-
-<c:if test="${not empty param.area}">
-<option value="${param.area}" selected>
-${param.area}
-</option>
-</c:if>
-
+<option value="">Select</option>
 </select>
 </div>
 
 </div>
 
-<button type="submit" class="register-btn">
-Create Account
-</button>
+<button class="register-btn">Create Account</button>
 
 <div class="form-footer">
-or<br><br>
-Already have an account?
-<a href="login.jsp">Sign In</a>
+Already have an account? <a href="login.jsp">Sign In</a>
 </div>
 
 </form>
+</div>
 
-    </div>
+<script>
 
-    <script>
-//       
+// PASSWORD TOGGLE
+function togglePassword(){
+    let p = document.getElementById("password");
+    p.type = (p.type === "password") ? "text" : "password";
+}
 
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
-        }
+// NAME VALIDATION
+document.getElementById("first_name").addEventListener("input", function(){
+    let v = this.value;
+    let e = document.getElementById("fnameError");
 
-        // Remove or update the input focus effects
-        document.addEventListener("DOMContentLoaded", function () {
-
-            document.querySelectorAll('input, textarea, select').forEach(field => {field.addEventListener('focus', function() {
-                    this.style.transform = 'none';
-                });
-
-                field.addEventListener('blur', function() { this.style.transform = 'none';});
-            });
-        });
-        //Zipcode
-        document.addEventListener("DOMContentLoaded", function () {
-
-    const zipInput = document.getElementById("zipcode");
-    const district = document.getElementById("district");
-    const state = document.getElementById("state");
-    const country = document.getElementById("country");
-    const areaSelect = document.getElementById("area");
-
-    zipInput.addEventListener("input", function () {
-
-        let pincode = this.value.trim();
-
-        if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
-
-            fetch("https://api.postalpincode.in/pincode/" + pincode)
-            .then(res => res.json())
-            .then(data => {
-
-                console.log(data); // debug
-
-                if (data[0].Status === "Success") {
-
-                    let po = data[0].PostOffice;
-
-                    // Fill fields
-                    district.value = po[0].District;
-                    state.value = po[0].State;
-                    country.value = po[0].Country;
-
-                    // Fill area dropdown
-                    areaSelect.innerHTML = "";
-
-                    po.forEach(p => {
-                        let opt = document.createElement("option");
-                        opt.value = p.Name;
-                        opt.textContent = p.Name;
-                        areaSelect.appendChild(opt);
-                    });
-
-                } else {
-                    alert("Invalid Pincode");
-
-                    district.value = "";
-                    state.value = "";
-                    country.value = "";
-                    areaSelect.innerHTML =
-                        "<option value=''>Select area</option>";
-                }
-            })
-            .catch(err => console.log(err));
-        }
-    });
-
+    if(!/^[A-Za-z ]*$/.test(v)){
+        e.innerText = "Only alphabets allowed";
+        this.style.border = "2px solid red";
+    } else {
+        e.innerText = "";
+        this.style.border = "";
+    }
 });
 
+document.getElementById("last_name").addEventListener("input", function(){
+    let v = this.value;
+    let e = document.getElementById("lnameError");
 
-    //VALID EMAIL
-    function validateEmail() 
-    {
-        const email = document.getElementById("email").value;
-        const errorSpan = document.getElementById("emailError");
-
-        // Strong email regex 
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        if (!emailPattern.test(email)) {
-            errorSpan.innerText = "❌ Invalid email address. Please enter a valid email (example@gmail.com)";
-            return false;
-        } else {
-            errorSpan.innerText = "";
-            return true;
-        }
+    if(!/^[A-Za-z ]*$/.test(v)){
+        e.innerText = "Only alphabets allowed";
+        this.style.border = "2px solid red";
+    } else {
+        e.innerText = "";
+        this.style.border = "";
     }
-    </script>
-    
-    
+});
 
+// DOB VALIDATION
+document.getElementById("dob").addEventListener("change", function(){
 
+    let dob = new Date(this.value);
+    let today = new Date();
 
-  
-    
+    let age = today.getFullYear() - dob.getFullYear();
+    let m = today.getMonth() - dob.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+
+    let err = document.getElementById("dobErrorMsg");
+
+    if(age < 18){
+        err.innerText = "You must be at least 18 years old.";
+        this.style.border = "2px solid red";
+    } else {
+        err.innerText = "";
+        this.style.border = "";
+    }
+});
+
+// ZIPCODE AUTO
+document.getElementById("zipcode").addEventListener("input", function(){
+
+    let pin = this.value;
+
+    if(pin.length === 6){
+
+        fetch("https://api.postalpincode.in/pincode/" + pin)
+        .then(r => r.json())
+        .then(d => {
+
+            if(d[0].Status === "Success"){
+
+                let po = d[0].PostOffice;
+
+                document.getElementById("district").value = po[0].District;
+                document.getElementById("state").value = po[0].State;
+                document.getElementById("country").value = po[0].Country;
+
+                let area = document.getElementById("area");
+                area.innerHTML = "";
+
+                po.forEach(p=>{
+                    let opt = document.createElement("option");
+                    opt.value = p.Name;
+                    opt.textContent = p.Name;
+                    area.appendChild(opt);
+                });
+
+            } else {
+                alert("Invalid Pincode");
+            }
+
+        });
+    }
+});
+
+</script>
+
 </body>
 </html>
-
-

@@ -43,18 +43,7 @@ if(session.getAttribute("user") != null){
     </button>
 </header>
 
-<!-- Error Messages -->
-<% if (request.getAttribute("emailError") != null) { %>
-    <p style="color:red;text-align:center;">
-        <%= request.getAttribute("emailError") %>
-    </p>
-<% } %>
 
-<% if (request.getAttribute("dobError") != null) { %>
-    <p style="color:red;text-align:center;">
-        <%= request.getAttribute("dobError") %>
-    </p>
-<% } %>
 
 <div class="container">
 
@@ -94,22 +83,28 @@ setTimeout(function(){
 <div class="form-grid">
 
     <!-- First Name -->
-    <div class="form-group">
-        <label>First Name *</label>
-        <input type="text"
-               name="jfirstname"
-               value="${param.jfirstname}"
-               required>
-    </div>
+<div class="form-group">
+    <label>First Name *</label>
+    <input type="text"
+           id="jfirstname"
+           name="jfirstname"
+           value="${param.jfirstname}"
+           pattern="[A-Za-z ]+"
+           required>
+    <span id="fnameError" style="color:red;font-size:13px;"></span>
+</div>
 
-    <!-- Last Name -->
-    <div class="form-group">
-        <label>Last Name *</label>
-        <input type="text"
-               name="jlastname"
-               value="${param.jlastname}"
-               required>
-    </div>
+   <!-- Last Name -->
+<div class="form-group">
+    <label>Last Name *</label>
+    <input type="text"
+           id="jlastname"
+           name="jlastname"
+           value="${param.jlastname}"
+           pattern="[A-Za-z ]+"
+           required>
+    <span id="lnameError" style="color:red;font-size:13px;"></span>
+</div>
 
     <!-- Phone -->
     <div class="form-group">
@@ -121,14 +116,19 @@ setTimeout(function(){
                required>
     </div>
 
-    <!-- Email -->
-    <div class="form-group">
-        <label>Email *</label>
-        <input type="email"
-               name="jemail"
-               value="${param.jemail}"
-               required>
-    </div>
+   <div class="form-group">
+    <label>Email *</label>
+
+    <input type="email"
+           id="jemail"
+           name="jemail"
+           value="${param.jemail != null ? param.jemail : oldEmail}"
+           required>
+
+    <span style="color:red; font-size:13px;">
+        ${emailError}
+    </span>
+</div>
 
 
 
@@ -146,32 +146,51 @@ setTimeout(function(){
         <select name="jeducation" required>
             <option value="">Select</option>
 
+            <option value="10th Pass"
+                ${param.jeducation=="10th Pass"?"selected":""}>
+               10th Pass
+            </option>
+
+            <option value="12th Pass"
+                ${param.jeducation=="12th Pass"?"selected":""}>
+                12th Pass
+            </option>
+            
             <option value="Graduate"
                 ${param.jeducation=="Graduate"?"selected":""}>
                 Graduate
             </option>
-
-            <option value="Diploma"
-                ${param.jeducation=="Diploma"?"selected":""}>
-                Diploma
-            </option>
-
-            <option value="ITI"
-                ${param.jeducation=="ITI"?"selected":""}>
-                ITI
+            <option value="Masters"
+                ${param.jeducation=="Masters"?"selected":""}>
+                Master
             </option>
         </select>
     </div>
 
     <!-- DOB -->
-    <div class="form-group">
-        <label>DOB *</label>
-        <input type="date"
-               name="jdob"
-               value="${param.jdob}"
-               required>
-    </div>
+<div class="form-group">
+    <label>DOB *</label>
+    <input type="date"
+           id="jdob"
+           name="jdob"
+           value="${param.jdob}"
+           max="<%= java.time.LocalDate.now() %>"
+           required>
 
+    <span id="dobErrorMsg" style="color:red;font-size:13px;">
+        ${dobError}
+    </span>
+</div>
+    <!-- Gender -->
+<!-- Gender -->
+<div class="form-group">
+    <label>Gender *</label>
+    <select name="jgender" required>
+        <option value="">Select</option>
+        <option value="Male" ${param.jgender=="Male"?"selected":""}>Male</option>
+        <option value="Female" ${param.jgender=="Female"?"selected":""}>Female</option>
+    </select>
+</div>
     <!-- Skill -->
     <div class="form-group">
         <label>Skill *</label>
@@ -387,6 +406,59 @@ function loadSubskills(){
 
     });
 }
+ 
+ // FIRST NAME VALIDATION
+document.getElementById("jfirstname").addEventListener("input", function(){
+    let value = this.value;
+    let error = document.getElementById("fnameError");
+
+    if(!/^[A-Za-z ]*$/.test(value)){
+        error.innerText = "Only alphabets allowed";
+        this.style.border = "2px solid red";
+    } else {
+        error.innerText = "";
+        this.style.border = "";
+    }
+});
+
+// LAST NAME VALIDATION
+document.getElementById("jlastname").addEventListener("input", function(){
+    let value = this.value;
+    let error = document.getElementById("lnameError");
+
+    if(!/^[A-Za-z ]*$/.test(value)){
+        error.innerText = "Only alphabets allowed";
+        this.style.border = "2px solid red";
+    } else {
+        error.innerText = "";
+        this.style.border = "";
+    }
+});
+
+// DOB VALIDATION (PROFESSIONAL)
+document.getElementById("jdob").addEventListener("change", function(){
+
+    let dob = new Date(this.value);
+    let today = new Date();
+
+    let age = today.getFullYear() - dob.getFullYear();
+    let m = today.getMonth() - dob.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    let errorSpan = document.getElementById("dobErrorMsg");
+
+    if(age < 18){
+        errorSpan.innerText = "You must be at least 18 years old.";
+        this.style.border = "2px solid red";
+    } else {
+        errorSpan.innerText = "";
+        this.style.border = "";
+    }
+
+});
 
     //Zipcode
 document.getElementById("jzip")
