@@ -8,7 +8,7 @@ import javax.servlet.http.*;
 import java.time.LocalDate;
 import java.time.Period;
 
-// 🔥 ADD THESE IMPORTS
+// DB IMPORTS
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +17,39 @@ import db.DBConnection;
 @WebServlet("/JobSeekerRegisterServlet")
 public class JobSeekerRegisterServlet extends HttpServlet {
 
+    // 🔥 NEW: EMAIL CHECK (AJAX)
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        String email = request.getParameter("email");
+
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM jobseeker WHERE jemail=?"
+            );
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                response.getWriter().write("exists");
+            } else {
+                response.getWriter().write("notexists");
+            }
+
+            rs.close();
+            ps.close();
+            con.close();
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    // ================= EXISTING CODE =================
+    @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
                           throws ServletException, IOException {
@@ -37,12 +70,12 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         String zip        = request.getParameter("jzip");
         String dob        = request.getParameter("jdob");
 
-        // ===== NEW: GENDER =====
+        // ===== GENDER =====
         String gender = request.getParameter("jgender");
 
-        // ===================================================
-        // 🔥 NAME VALIDATION
-        // ===================================================
+        // ============================
+        // NAME VALIDATION
+        // ============================
         if(firstname == null || !firstname.matches("^[A-Za-z ]+$")){
             request.setAttribute("error", "First name must contain only alphabets.");
             request.getRequestDispatcher("jobseeker_register.jsp")
@@ -57,9 +90,9 @@ public class JobSeekerRegisterServlet extends HttpServlet {
             return;
         }
 
-        // ===================================================
-        // 🔥 DOB VALIDATION (18+)
-        // ===================================================
+        // ============================
+        // DOB VALIDATION (18+)
+        // ============================
         try {
             LocalDate birthDate = LocalDate.parse(dob);
             LocalDate today = LocalDate.now();
@@ -80,9 +113,9 @@ public class JobSeekerRegisterServlet extends HttpServlet {
             return;
         }
 
-        // ===================================================
-        // 🔥 EMAIL EXISTS CHECK (ADDED HERE)
-        // ===================================================
+        // ============================
+        // EMAIL EXISTS CHECK
+        // ============================
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -116,7 +149,9 @@ public class JobSeekerRegisterServlet extends HttpServlet {
             }
         }
 
-        // ===== SAVE DATA IN SESSION =====
+        // ============================
+        // SAVE DATA IN SESSION
+        // ============================
         session.setAttribute("jfirstname", firstname);
         session.setAttribute("jlastname", lastname);
         session.setAttribute("jemail", email);
@@ -130,17 +165,20 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         session.setAttribute("jzip", zip);
         session.setAttribute("jdob", dob);
 
-        // ===== SAVE GENDER =====
         session.setAttribute("jgender", gender);
 
-        // ===== SKILLS =====
+        // ============================
+        // SKILLS
+        // ============================
         String skill = request.getParameter("skill");
         String[] subskills = request.getParameterValues("subskills");
 
         session.setAttribute("skill", skill);
         session.setAttribute("subskills", subskills);
 
-        // ===== OTP GENERATION =====
+        // ============================
+        // OTP GENERATION
+        // ============================
         String otp = String.valueOf((int)(Math.random()*900000)+100000);
 
         session.setAttribute("otp", otp);
@@ -149,16 +187,20 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         session.setAttribute("otpExpiry", expiryTime);
 
         session.setAttribute("role", "jobseeker");
+        session.setAttribute("userEmail", email);
 
         System.out.println("OTP = " + otp);
 
-        // Save entire form data
         session.setAttribute("regData", request.getParameterMap());
 
-        // ===== SEND EMAIL OTP =====
+        // ============================
+        // SEND OTP
+        // ============================
         EmailUtility.sendOTP(email, otp);
 
-        // ===== REDIRECT =====
+        // ============================
+        // REDIRECT
+        // ============================
         response.sendRedirect("verify_otp.jsp?email=" + email);
     }
 }

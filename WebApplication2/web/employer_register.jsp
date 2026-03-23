@@ -26,7 +26,8 @@
 <form class="register-form"
       method="post"
       action="<%= request.getContextPath() %>/EmployerRegisterServlet"
-      autocomplete="off">
+      autocomplete="off"
+      onsubmit="return validateForm()">
 
 <h1>Register as Employer</h1>
 
@@ -91,10 +92,14 @@ ${dobError}
 
 <input type="email"
        id="eemail"
-       name="eemail"
-       value="${not empty oldEmail ? oldEmail : param.eemail}"
+       name="email"
+       onkeyup="checkEmail()"
        required>
 
+<!-- Real-time message -->
+<span id="emailMsg" style="color:red;font-size:13px;"></span>
+
+<!-- Backend error (already existing) -->
 <span style="color:red;font-size:13px;">
 ${emailError}
 </span>
@@ -275,6 +280,53 @@ document.getElementById("zipcode").addEventListener("input", function(){
     }
 });
 
+</script>
+<script>
+let emailValid = false;
+
+function checkEmail() {
+    let email = document.getElementById("eemail").value;
+    let msg = document.getElementById("emailMsg");
+
+    let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+    if(email.length === 0){
+        msg.innerHTML = "";
+        emailValid = false;
+        return;
+    }
+
+    // ❌ Invalid format
+    if(!emailPattern.test(email)){
+        msg.innerHTML = "Invalid email format!";
+        msg.style.color = "red";
+        emailValid = false;
+        return;
+    }
+
+    // ✅ YAHI FETCH HAI (IMPORTANT 🔥)
+    fetch("<%= request.getContextPath() %>/EmployerRegisterServlet?email=" + email)
+    .then(res => res.text())
+    .then(data => {
+        if(data === "exists"){
+            msg.innerHTML = "Email already registered!";
+            msg.style.color = "red";
+            emailValid = false;
+        } else {
+            msg.innerHTML = "✓ Email available";
+            msg.style.color = "green";
+            emailValid = true;
+        }
+    });
+}
+
+function validateForm(){
+    if(!emailValid){
+        alert("Please enter a valid and unique email!");
+        return false;
+    }
+    return true;
+}
 </script>
 
 </body>

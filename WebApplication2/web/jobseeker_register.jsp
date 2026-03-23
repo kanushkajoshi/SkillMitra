@@ -49,7 +49,8 @@ if(session.getAttribute("user") != null){
 
 <form class="register-form"
       method="post"
-      action="<%= request.getContextPath() %>/JobSeekerRegisterServlet">
+      action="<%= request.getContextPath() %>/JobSeekerRegisterServlet"
+      onsubmit="return validateForm()">
 <% if(request.getAttribute("error")!=null){ %>
 <p style="color:red;text-align:center;font-weight:600;">
     <%=request.getAttribute("error")%>
@@ -116,15 +117,21 @@ setTimeout(function(){
                required>
     </div>
 
-   <div class="form-group">
+  <!-- EMAIL -->
+<div class="form-group">
     <label>Email *</label>
 
     <input type="email"
            id="jemail"
            name="jemail"
+           onkeyup="checkEmail()"
            value="${param.jemail != null ? param.jemail : oldEmail}"
            required>
 
+    <!-- Real-time message -->
+    <span id="emailMsg" style="font-size:13px;"></span>
+
+    <!-- Backend error -->
     <span style="color:red; font-size:13px;">
         ${emailError}
     </span>
@@ -526,6 +533,53 @@ document.getElementById("jzip")
 });
 
 
+</script>
+<script>
+let emailValid = false;
+
+function checkEmail() {
+    let email = document.getElementById("jemail").value;
+    let msg = document.getElementById("emailMsg");
+
+    let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+    if(email.length === 0){
+        msg.innerHTML = "";
+        emailValid = false;
+        return;
+    }
+
+    // ❌ Invalid format
+    if(!emailPattern.test(email)){
+        msg.innerHTML = "Invalid email format!";
+        msg.style.color = "red";
+        emailValid = false;
+        return;
+    }
+
+    // ✅ DB CHECK
+    fetch("<%= request.getContextPath() %>/JobSeekerRegisterServlet?email=" + email)
+    .then(res => res.text())
+    .then(data => {
+        if(data === "exists"){
+            msg.innerHTML = "Email already registered!";
+            msg.style.color = "red";
+            emailValid = false;
+        } else {
+            msg.innerHTML = "✓ Email available";
+            msg.style.color = "green";
+            emailValid = true;
+        }
+    });
+}
+
+function validateForm(){
+    if(!emailValid){
+        alert("Please enter a valid and unique email!");
+        return false;
+    }
+    return true;
+}
 </script>
 
 </body>
