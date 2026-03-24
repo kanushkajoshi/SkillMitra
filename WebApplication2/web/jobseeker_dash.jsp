@@ -210,7 +210,7 @@ try {
 int jobIdCard = rs.getInt("job_id");
 
 PreparedStatement psBid = con.prepareStatement(
-"SELECT bid_amount,bid_status FROM bids WHERE job_id=? AND job_seeker_id=?"
+"SELECT bid_id,bid_amount, bid_status, counter_bid FROM bids WHERE job_id=? AND job_seeker_id=?"
 );
 
 psBid.setInt(1, jobIdCard);
@@ -220,10 +220,14 @@ ResultSet rsBid = psBid.executeQuery();
 
 int bidAmount = 0;
 String bidStatus = "";
+int counterBid = 0;
+int bidId = 0;
 
 if(rsBid.next()){
+     bidId = rsBid.getInt("bid_id");
     bidAmount = rsBid.getInt("bid_amount");
     bidStatus = rsBid.getString("bid_status");
+    counterBid = rsBid.getInt("counter_bid");
 }
 %>
 
@@ -264,6 +268,27 @@ if(bidAmount > 0){
 </p>
 
 <%
+    if("Countered".equals(bidStatus)){
+%>
+
+<p style="color:red;">
+💸 Employer Countered: ₹<%= counterBid %>
+</p>
+
+<a href="RespondCounterServlet?bid_id=<%= bidId %>&action=accept">
+    <button style="background:#28a745;color:white;padding:6px 12px;border:none;border-radius:5px;">
+        Accept Counter
+    </button>
+</a>
+
+<a href="RespondCounterServlet?bid_id=<%= bidId %>&action=reject">
+    <button style="background:#dc3545;color:white;padding:6px 12px;border:none;border-radius:5px;">
+        Reject Counter
+    </button>
+</a>
+
+<%
+    }
 }
 %>
 

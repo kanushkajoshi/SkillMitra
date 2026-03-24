@@ -221,7 +221,9 @@ ps.executeUpdate();
     }catch (Exception e) {
     e.printStackTrace();
 
-    request.setAttribute("error", e.getMessage());
+        e.printStackTrace();
+
+        request.setAttribute("error", e.getMessage());
         request.getRequestDispatcher("verify_otp.jsp")
                .forward(request, response);
     }

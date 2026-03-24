@@ -369,11 +369,169 @@ if("ACTIVE".equals(status)){
 %>
 
 </div>
-</div>
+ </div>
 <!-- REVIEW BIDS SECTION -->
 
+<div class="manage-header">
+<div>
+<h2>Review Bids</h2>
+<p>Workers who placed bids on your jobs</p>
+</div>
+</div>
 
-        
+<%
+
+Integer employerBidId = (Integer) session.getAttribute("eid");
+
+if(employerBidId != null){
+
+try{
+
+Class.forName("com.mysql.jdbc.Driver");
+
+Connection conBid = DriverManager.getConnection(
+"jdbc:mysql://localhost:3306/skillmitra",
+"root",
+""
+);
+
+PreparedStatement psBid = conBid.prepareStatement(
+
+"SELECT b.bid_id, b.bid_amount, b.bid_status, b.created_at," +
+"j.title," +
+"js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+
+"FROM bids b " +
+"JOIN jobs j ON b.job_id = j.job_id " +
+"JOIN jobseeker js ON b.job_seeker_id = js.jid " +
+"WHERE j.eid = ? AND (b.bid_status='Pending' OR b.bid_status='Countered' OR b.bid_status='Rejected') " +
+"ORDER BY b.bid_amount ASC"
+
+);
+
+psBid.setInt(1, employerBidId);
+
+ResultSet rsBid = psBid.executeQuery();
+
+boolean hasBids = false;
+
+while(rsBid.next()){
+
+hasBids = true;
+
+%>
+
+<div class="review-card">
+
+<div class="worker-info">
+
+<div class="avatar">
+<%= rsBid.getString("jfirstname").substring(0,1) %>
+<%= rsBid.getString("jlastname").substring(0,1) %>
+</div>
+
+<div class="worker-details">
+
+<h3>
+<%= rsBid.getString("jfirstname") %>
+<%= rsBid.getString("jlastname") %>
+</h3>
+
+<p><%= rsBid.getString("jemail") %></p>
+
+<div class="meta">
+
+<span>
+Job: <%= rsBid.getString("title") %>
+</span>
+
+<span>
+📍 Location: <%= rsBid.getString("jdistrict") %>
+</span>
+
+<span>
+💰 Bid: ₹<%= rsBid.getInt("bid_amount") %>
+</span>
+
+</div>
+
+<div style="font-size:13px; margin-top:6px;">
+Bid Placed On:
+<%
+Timestamp ts = rsBid.getTimestamp("created_at");
+if(ts != null){
+out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
+}
+%>
+</div>
+
+</div>
+</div>
+
+<div class="actions">
+<% String bidStatus = rsBid.getString("bid_status"); %>
+<% if("Pending".equals(bidStatus)) { %>
+    <a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept" class="accept-btn">Accept</a>
+    <a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject" class="reject-btn">Reject</a>
+<% } else if("Countered".equals(bidStatus)) { %>
+    <p>💸 Countered: ₹<%= rsBid.getInt("counter_bid") %></p>
+<% } else if("Rejected".equals(bidStatus)) { %>
+    <p style="color:red;">❌ Rejected by Jobseeker</p>
+<% } else if("Accepted".equals(bidStatus)) { %>
+    <p style="color:green;">✔ Accepted</p>
+<% } %>
+</div>
+
+<!-- 🔥 NEW: COUNTER BID FORM -->
+<div style="margin-top:10px;">
+
+<form action="CounterBidServlet" method="post" style="display:flex; gap:8px;">
+
+<input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
+
+<input type="number" name="counter_amount" 
+       placeholder="Enter counter bid" 
+       required 
+       style="padding:6px; width:150px;">
+
+<button type="submit" class="counter-btn"
+        style="background:#ff9800; color:#fff; border:none; padding:6px 10px; border-radius:5px;">
+    Counter
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<%
+
+}
+
+if(!hasBids){
+
+%>
+
+<p>No bids received yet.</p>
+
+<%
+
+}
+
+conBid.close();
+
+}catch(Exception e){
+
+e.printStackTrace();
+
+}
+
+}
+
+%>
+
+</div>
         <!-- REVIEW APPLICATIONS SECTION -->
 
 <div id="reviewApplicationsSection" style="display:none; width:100%; max-width:900px;">
@@ -404,9 +562,9 @@ if(employerId2 != null){
             "FROM applications a " +
             "JOIN jobs j ON a.job_id = j.job_id " +
             "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
-            "WHERE j.eid = ? AND a.status = 'Pending' " +
+            "WHERE j.eid = ? AND (a.status = 'Pending' OR a.status = 'Accepted') " +
             "AND a.application_id NOT IN ("+
-            "SELECT application_id FROM applications WHERE status='Bid Placed')"+
+           // "SELECT application_id FROM applications WHERE status='Bid Placed')"+//
             "ORDER BY a.applied_at DESC"
         );
 
