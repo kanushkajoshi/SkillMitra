@@ -30,8 +30,29 @@ public class UpdateBidStatusServlet extends HttpServlet {
             PreparedStatement ps = con.prepareStatement(
                     "UPDATE bids SET bid_status=? WHERE bid_id=?"
             );
+            // 🔥 CUSTOM NEGOTIATION LOGIC
 
-            ps.setString(1, status);
+// If jobseeker rejects → keep loop alive
+if("Rejected".equals(status)){
+    status = "Pending";  // allow re-counter
+}
+           // 🔥 APPLICATION STATUS CONTROL
+
+String appStatus;
+
+if("Accepted".equals(status)){
+    // ✅ Move to Review Applications
+    appStatus = "Pending";
+}
+else if("Pending".equals(status)){
+    // ❌ Rejected case → still pending (loop)
+    appStatus = "Pending";
+}
+else{
+    appStatus = status;
+}
+
+ps.setString(1, appStatus);
             ps.setInt(2, bidId);
             ps.executeUpdate();
 

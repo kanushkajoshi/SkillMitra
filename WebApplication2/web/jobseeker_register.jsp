@@ -188,7 +188,7 @@ setTimeout(function(){
         ${dobError}
     </span>
 </div>
-    <!-- Gender -->
+    
 
     <!-- Skill -->
     <div class="form-group">

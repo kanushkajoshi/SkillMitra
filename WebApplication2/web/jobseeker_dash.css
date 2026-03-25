@@ -380,3 +380,32 @@ cursor:pointer;
 .suggestion-item:hover{
 background:#f2f2f2;
 }
+.filter-container {
+    display: none;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.filter-container label {
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+}
+
+.filter-container input,
+.filter-container select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#subskillContainer label,
+#areaContainer label {
+    display: block;
+    margin-top: 5px;
+}

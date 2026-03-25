@@ -71,7 +71,7 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         String dob        = request.getParameter("jdob");
 
         // ===== GENDER =====
-        String gender = request.getParameter("jgender");
+//        String gender = request.getParameter("jgender");
 
         // ============================
         // NAME VALIDATION
@@ -165,7 +165,7 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         session.setAttribute("jzip", zip);
         session.setAttribute("jdob", dob);
 
-        session.setAttribute("jgender", gender);
+//        session.setAttribute("jgender", gender);
 
         // ============================
         // SKILLS

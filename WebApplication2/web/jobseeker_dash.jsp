@@ -112,35 +112,58 @@ if (currentSession.getAttribute("jfirstname") == null) {
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
 
-<form class="search-box" method="get" action="search_results.jsp">
+<form class="search-box" method="get" action="jobseeker_dash.jsp">
 
-<div style="position:relative;width:100%;">
-<input type="text" id="searchInput" name="q" placeholder="Search subskill or area">
-<div id="suggestionBox"></div>
-</div>
+<input type="text" name="q" placeholder="Search jobs...">
+
 <button type="button" id="filterBtn">Filters ▼</button>
 
 <button type="submit">Search</button>
 
 <div id="filterContainer" class="filter-container">
 
+<!-- Skill -->
+<label>Skill:</label>
+<select id="skillSelect">
+    <option value="">-- Select Skill --</option>
+    <%
+    Connection conSkill = DBConnection.getConnection();
+    PreparedStatement psSkill = conSkill.prepareStatement("SELECT skill_id, skill_name FROM skill");
+    ResultSet rsSkill = psSkill.executeQuery();
+    while(rsSkill.next()){
+    %>
+        <option value="<%= rsSkill.getInt("skill_id") %>">
+            <%= rsSkill.getString("skill_name") %>
+        </option>
+    <%
+    }
+    conSkill.close();
+    %>
+</select>
+
+<!-- Subskills -->
+<label>Subskills:</label>
+<div id="subskillContainer">Select skill first</div>
+
+<!-- District -->
 <label>District:</label>
 <input type="text" name="district"
 value="<%= currentSession.getAttribute("jdistrict") %>" readonly>
 
+<!-- Area -->
 <label>Area:</label>
 <div id="areaContainer"></div>
 
-<label>Minimum salary:</label>
+<!-- Salary -->
+<label>Min Salary:</label>
 <input type="number" name="min_salary">
 
-<label>Maximum salary:</label>
+<label>Max Salary:</label>
 <input type="number" name="max_salary">
 
-<button type="button" id="applyFilter">Apply</button>
+<button type="submit">Apply Filters</button>
 
 </div>
-
 </form>
 
 
@@ -167,37 +190,93 @@ try {
         ps.setInt(1, jobseekerId);
 
     } else {
-        // 🔹 Normal Skill matched jobs fetch (existing logic)
-        String sql = "SELECT DISTINCT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
-                     "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-                     "j.experience_level, j.workers_required, " +
-                     "j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
-                     "a.status, " +
-                     "CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
-                     "FROM jobs j " +
-                
-                     "JOIN job_skills jk ON jk.job_id = j.job_id " +
-                
-                     "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
-                     
-                     "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
-                     "WHERE js.jid = ? "+
-                    "AND j.status='ACTIVE' " +   // 🔥 SPACE ADDED
-"ORDER BY (LOWER(j.city) = LOWER(?)) DESC";
-                
 
-        if (cityFilter != null && !cityFilter.isEmpty()) sql += " AND LOWER(j.city) LIKE LOWER(?) ";
-        if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) sql += " AND j.min_salary >= ? ";
+    String districtFilter = request.getParameter("district");
+    String[] areaFilter = request.getParameterValues("area");
+    String[] subskillFilter = request.getParameterValues("subskill");
+    String minSalary = request.getParameter("min_salary");
+    String maxSalary = request.getParameter("max_salary");
 
-        ps = con.prepareStatement(sql);
-        int idx = 1;
-        ps.setInt(idx++, jobseekerId);
-        ps.setInt(idx++, jobseekerId);
-        ps.setString(idx++, (String) currentSession.getAttribute("jdistrict"));
-        if (cityFilter != null && !cityFilter.isEmpty()) ps.setString(idx++, "%" + cityFilter + "%");
-        if (minSalaryFilter != null && !minSalaryFilter.isEmpty()) ps.setInt(idx++, Integer.parseInt(minSalaryFilter));
+    StringBuilder sql = new StringBuilder(
+    "SELECT DISTINCT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
+    "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
+    "j.experience_level, j.workers_required, j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
+    "a.status, CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
+    "FROM jobs j " +
+    "JOIN job_skills jk ON jk.job_id = j.job_id " +
+    "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
+    "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
+    "WHERE js.jid = ? AND j.status='ACTIVE' "
+    );
+
+    // FILTERS
+
+    if (districtFilter != null && !districtFilter.isEmpty()) {
+        sql.append(" AND LOWER(j.city)=LOWER(?) ");
     }
 
+    if (areaFilter != null && areaFilter.length > 0) {
+        sql.append(" AND j.locality IN (");
+        for(int i=0;i<areaFilter.length;i++){
+            sql.append("?");
+            if(i<areaFilter.length-1) sql.append(",");
+        }
+        sql.append(") ");
+    }
+
+    if (subskillFilter != null && subskillFilter.length > 0) {
+        sql.append(" AND jk.subskill_id IN (");
+        for(int i=0;i<subskillFilter.length;i++){
+            sql.append("?");
+            if(i<subskillFilter.length-1) sql.append(",");
+        }
+        sql.append(") ");
+    }
+
+    if (minSalary != null && !minSalary.isEmpty()) {
+        sql.append(" AND j.min_salary >= ? ");
+    }
+
+    if (maxSalary != null && !maxSalary.isEmpty()) {
+        sql.append(" AND j.salary <= ? ");
+    }
+
+    // ALWAYS LAST
+    sql.append(" ORDER BY (LOWER(j.city)=LOWER(?)) DESC ");
+
+    ps = con.prepareStatement(sql.toString());
+
+    int idx = 1;
+
+    ps.setInt(idx++, jobseekerId);
+    ps.setInt(idx++, jobseekerId);
+
+    if (districtFilter != null && !districtFilter.isEmpty()) {
+        ps.setString(idx++, districtFilter);
+    }
+
+    if (areaFilter != null) {
+        for(String area : areaFilter){
+            ps.setString(idx++, area);
+        }
+    }
+
+    if (subskillFilter != null) {
+        for(String sub : subskillFilter){
+            ps.setInt(idx++, Integer.parseInt(sub));
+        }
+    }
+
+    if (minSalary != null && !minSalary.isEmpty()) {
+        ps.setInt(idx++, Integer.parseInt(minSalary));
+    }
+
+    if (maxSalary != null && !maxSalary.isEmpty()) {
+        ps.setInt(idx++, Integer.parseInt(maxSalary));
+    }
+
+    ps.setString(idx++, (String) currentSession.getAttribute("jdistrict"));
+}
     rs = ps.executeQuery();
 
     while(rs.next()){
@@ -341,45 +420,7 @@ finally {
 const jobseekerZip = "<%= currentSession.getAttribute("jzip") %>";
 console.log("ZIP CODE:", jobseekerZip);
 </script>
-<script>
-const profileIcon = document.getElementById("profileIcon");
-const profileMenu = document.getElementById("profileMenu");
-profileIcon.addEventListener("click", function(e){
-    e.stopPropagation();
-    profileMenu.style.display = profileMenu.style.display==="block"?"none":"block";
-});
-document.addEventListener("click", function(){
-    profileMenu.style.display="none";
-});
 
-const filterBtn = document.getElementById("filterBtn");
-const filterBox = document.getElementById("filterContainer");
-const applyBtn = document.getElementById("applyFilter");
-
-/* Apply button just closes filter */
-
-if (applyBtn) {
-    applyBtn.addEventListener("click", function () {
-        filterBox.style.display = "none";
-    });
-}
-
-/* Filter button toggles filter box */
-
-if (filterBtn) {
-    filterBtn.addEventListener("click", function (e) {
-
-        e.preventDefault();
-
-        if (filterBox.style.display === "block") {
-            filterBox.style.display = "none";
-        } else {
-            filterBox.style.display = "block";
-        }
-
-    });
-}
-</script>
 <script>
 function loadAreas(){
 
@@ -473,6 +514,70 @@ suggestionBox.appendChild(div);
 });
 
 });
+});
+</script>
+<script>
+// FILTER TOGGLE
+const filterBtn = document.getElementById("filterBtn");
+const filterBox = document.getElementById("filterContainer");
+
+filterBtn.addEventListener("click", function () {
+    filterBox.style.display =
+        filterBox.style.display === "block" ? "none" : "block";
+});
+
+// LOAD SUBSKILLS
+const skillSelect = document.getElementById("skillSelect");
+const subskillContainer = document.getElementById("subskillContainer");
+
+skillSelect.addEventListener("change", function () {
+
+    const skillId = this.value;
+
+    if (!skillId) {
+        subskillContainer.innerHTML = "Select skill first";
+        return;
+    }
+
+    fetch("GetSubskillsServlet?skillId=" + skillId)
+    .then(res => res.json())
+    .then(data => {
+
+        subskillContainer.innerHTML = "";
+
+        data.forEach(sub => {
+            const label = document.createElement("label");
+            label.innerHTML =
+                `<input type="checkbox" name="subskill" value="${sub.id}"> ${sub.name}`;
+            subskillContainer.appendChild(label);
+        });
+    });
+});
+
+// LOAD AREAS FROM PINCODE
+
+
+
+</script>
+<script>
+const profileIcon = document.getElementById("profileIcon");
+const profileMenu = document.getElementById("profileMenu");
+
+/* OPEN / CLOSE */
+profileIcon.addEventListener("click", function(e){
+    e.stopPropagation();
+    profileMenu.style.display =
+        profileMenu.style.display === "block" ? "none" : "block";
+});
+
+/* 🔥 FIX: prevent closing when clicking inside menu */
+profileMenu.addEventListener("click", function(e){
+    e.stopPropagation();
+});
+
+/* CLOSE when clicking outside */
+document.addEventListener("click", function(){
+    profileMenu.style.display = "none";
 });
 </script>
 </div>

@@ -62,7 +62,7 @@ public class PlaceBidServlet extends HttpServlet {
 
             if (rsCheckApp.next()) {
 
-             String updateAppSql = "UPDATE applications SET status='Bid Placed' WHERE job_id=? AND jobseeker_id=?";
+             String updateAppSql = "UPDATE applications SET status='Pending' WHERE job_id=? AND jobseeker_id=?";
              PreparedStatement psUpdateApp = con.prepareStatement(updateAppSql);
              psUpdateApp.setInt(1, jobId);
              psUpdateApp.setInt(2, jobseekerId);
@@ -70,7 +70,7 @@ public class PlaceBidServlet extends HttpServlet {
 
             } else {
 
-           String insertAppSql = "INSERT INTO applications (job_id, jobseeker_id, status) VALUES (?, ?, 'Bid Placed')";
+           String insertAppSql = "INSERT INTO applications (job_id, jobseeker_id, status) VALUES (?, ?, 'Pending')";
            PreparedStatement psInsertApp = con.prepareStatement(insertAppSql);
            psInsertApp.setInt(1, jobId);
            psInsertApp.setInt(2, jobseekerId);
