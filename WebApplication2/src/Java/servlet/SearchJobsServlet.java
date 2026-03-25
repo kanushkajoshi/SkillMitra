@@ -15,13 +15,12 @@ public class SearchJobsServlet extends HttpServlet {
 
         String q        = req.getParameter("q");
         String district = req.getParameter("district");
-        String area     = req.getParameter("area");
+        String[] areas  = req.getParameterValues("area");
+        String[] subskills = req.getParameterValues("subskill");
         String minSal   = req.getParameter("min_salary");
         String maxSal   = req.getParameter("max_salary");
 
         int jid = Integer.parseInt(req.getParameter("jid"));
-
-        if(q == null) q = "";
 
         StringBuilder json = new StringBuilder("[");
         boolean first = true;
@@ -30,44 +29,46 @@ public class SearchJobsServlet extends HttpServlet {
 
             StringBuilder sql = new StringBuilder(
 
-            "SELECT \n" +
-"j.job_id,\n" +
-"j.title,\n" +
-"j.city,\n" +
-"j.locality,\n" +
-"j.salary,\n" +
-"s.skill_name,\n" +
-"GROUP_CONCAT(ss.subskill_name) AS subskill_name\n" +
-"\n" +
-"FROM jobs j\n" +
-"\n" +
-"JOIN job_skills jk ON jk.job_id = j.job_id\n" +
-"JOIN skill s ON s.skill_id = jk.skill_id\n" +
-"LEFT JOIN subskill ss ON ss.subskill_id = jk.subskill_id\n" +
-"\n" +
-"GROUP BY j.job_id"
+                "SELECT DISTINCT j.job_id, j.title, j.city, j.locality, j.salary " +
+                "FROM jobs j " +
+
+                "JOIN job_skills jk ON jk.job_id = j.job_id " +
+                "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
+
+                "WHERE js.jid = ? AND j.status='ACTIVE' "
             );
 
-            if(!q.isEmpty()){
+            // 🔍 SEARCH
+            if(q != null && !q.isEmpty()){
                 sql.append("AND LOWER(j.title) LIKE ? ");
             }
 
+            // 📍 DISTRICT
             if(district != null && !district.isEmpty()){
-                sql.append("AND j.city = ? ");
+                sql.append("AND LOWER(j.city) = LOWER(?) ");
             }
 
-            if(area != null && !area.isEmpty()){
-                String[] areas = area.split(",");
+            // 🏠 AREA
+            if(areas != null && areas.length > 0){
                 sql.append("AND j.locality IN (");
-
                 for(int i=0;i<areas.length;i++){
                     sql.append("?");
-                    if(i<areas.length-1) sql.append(",");
+                    if(i < areas.length-1) sql.append(",");
                 }
-
                 sql.append(") ");
             }
 
+            // 🧠 SUBSKILL FILTER (IMPORTANT)
+            if(subskills != null && subskills.length > 0){
+                sql.append("AND jk.subskill_id IN (");
+                for(int i=0;i<subskills.length;i++){
+                    sql.append("?");
+                    if(i < subskills.length-1) sql.append(",");
+                }
+                sql.append(") ");
+            }
+
+            // 💰 SALARY
             if(minSal != null && !minSal.isEmpty()){
                 sql.append("AND j.salary >= ? ");
             }
@@ -76,7 +77,7 @@ public class SearchJobsServlet extends HttpServlet {
                 sql.append("AND j.salary <= ? ");
             }
 
-            sql.append("GROUP BY j.job_id LIMIT 20");
+            sql.append("ORDER BY j.created_at DESC LIMIT 20");
 
             PreparedStatement ps = con.prepareStatement(sql.toString());
 
@@ -84,18 +85,23 @@ public class SearchJobsServlet extends HttpServlet {
 
             ps.setInt(idx++, jid);
 
-            if(!q.isEmpty()){
-                ps.setString(idx++, "%"+q.toLowerCase()+"%");
+            if(q != null && !q.isEmpty()){
+                ps.setString(idx++, "%" + q.toLowerCase() + "%");
             }
 
             if(district != null && !district.isEmpty()){
                 ps.setString(idx++, district);
             }
 
-            if(area != null && !area.isEmpty()){
-                String[] areas = area.split(",");
+            if(areas != null){
                 for(String a : areas){
-                    ps.setString(idx++, a.trim());
+                    ps.setString(idx++, a);
+                }
+            }
+
+            if(subskills != null){
+                for(String s : subskills){
+                    ps.setInt(idx++, Integer.parseInt(s));
                 }
             }
 
@@ -114,29 +120,19 @@ public class SearchJobsServlet extends HttpServlet {
                 if(!first) json.append(",");
                 first = false;
 
-                String title    = safe(rs.getString("title"));
-                String city     = safe(rs.getString("city"));
-                String locality = safe(rs.getString("locality"));
-                String skill    = safe(rs.getString("skill_name"));
-                String subskill = safe(rs.getString("subskill_name"));
-
-                int salary = rs.getInt("salary");
-
                 json.append("{")
-                .append("\"jobId\":").append(rs.getInt("job_id")).append(",")
-                .append("\"title\":\"").append(escape(title)).append("\",")
-                .append("\"city\":\"").append(escape(city)).append("\",")
-                .append("\"locality\":\"").append(escape(locality)).append("\",")
-                .append("\"salary\":").append(salary).append(",")
-                .append("\"skill\":\"").append(escape(skill)).append("\",")
-                .append("\"subskill\":\"").append(escape(subskill)).append("\"")
-                .append("}");
+                    .append("\"jobId\":").append(rs.getInt("job_id")).append(",")
+                    .append("\"title\":\"").append(escape(rs.getString("title"))).append("\",")
+                    .append("\"city\":\"").append(escape(rs.getString("city"))).append("\",")
+                    .append("\"locality\":\"").append(escape(rs.getString("locality"))).append("\",")
+                    .append("\"salary\":").append(rs.getInt("salary"))
+                    .append("}");
             }
 
             rs.close();
             ps.close();
 
-        }catch(Exception e){
+        } catch(Exception e){
             e.printStackTrace();
         }
 
@@ -144,15 +140,8 @@ public class SearchJobsServlet extends HttpServlet {
         res.getWriter().write(json.toString());
     }
 
-    private String safe(String s){
-        if(s == null) return "";
-        return s;
-    }
-
     private String escape(String s){
-
         if(s == null) return "";
-
         return s.replace("\\","\\\\")
                 .replace("\"","\\\"")
                 .replace("\n","\\n")
