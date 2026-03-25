@@ -112,13 +112,13 @@ if (currentSession.getAttribute("jfirstname") == null) {
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
 
-<form class="search-box" method="get" action="jobseeker_dash.jsp">
-
+<form class="search-box" onsubmit="return false;"> 
+    <input type="hidden" name="jid" value="<%= session.getAttribute("jobseekerId") %>">
 <input type="text" name="q" placeholder="Search jobs...">
 
 <button type="button" id="filterBtn">Filters ▼</button>
 
-<button type="submit">Search</button>
+<button type="button" onclick="applyFilters()">Search</button>
 
 <div id="filterContainer" class="filter-container">
 
@@ -579,6 +579,84 @@ profileMenu.addEventListener("click", function(e){
 document.addEventListener("click", function(){
     profileMenu.style.display = "none";
 });
+</script>
+<script>function applyFilters(){
+
+    const q = document.querySelector("input[name='q']").value;
+    const district = document.querySelector("input[name='district']").value;
+    const min_salary = document.querySelector("input[name='min_salary']").value;
+    const max_salary = document.querySelector("input[name='max_salary']").value;
+
+    const jid = "<%= session.getAttribute("jobseekerId") %>";
+
+    // ✅ GET SELECTED AREAS
+    let areas = [];
+    document.querySelectorAll("input[name='area']:checked").forEach(cb=>{
+        areas.push(cb.value);
+    });
+
+    // ✅ GET SELECTED SUBSKILLS
+    let subskills = [];
+    document.querySelectorAll("input[name='subskill']:checked").forEach(cb=>{
+        subskills.push(cb.value);
+    });
+
+    // 🔥 BUILD QUERY STRING
+    let url = "SearchJobsServlet?";
+    url += "jid=" + jid;
+    url += "&q=" + encodeURIComponent(q);
+    url += "&district=" + encodeURIComponent(district);
+
+    areas.forEach(a => url += "&area=" + encodeURIComponent(a));
+    subskills.forEach(s => url += "&subskill=" + s);
+
+    if(min_salary) url += "&min_salary=" + min_salary;
+    if(max_salary) url += "&max_salary=" + max_salary;
+
+    console.log("Fetching:", url);
+
+    // 🚀 FETCH DATA
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+        renderJobs(data);
+    })
+    .catch(err => console.error(err));
+}
+function renderJobs(jobs){
+
+    const container = document.querySelector(".cards");
+
+    container.innerHTML = ""; // clear old jobs
+
+    if(jobs.length === 0){
+        container.innerHTML = "<h3>No jobs found</h3>";
+        return;
+    }
+
+    jobs.forEach(job => {
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+        card.style = "background:white;padding:20px;margin-bottom:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);";
+
+        card.innerHTML = `
+            <h3>${job.title}</h3>
+
+            <p><b>Location:</b> ${job.locality}, ${job.city}</p>
+
+            <p><b>Salary:</b> ₹${job.salary}</p>
+
+            <button onclick="viewJob(${job.jobId})"
+                style="background:#007bff;color:white;padding:8px 16px;border:none;border-radius:6px;">
+                View Job
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
 </script>
 </div>
 </body>

@@ -178,7 +178,7 @@ body {
 
 .filter-container{
 
-    position: fixed;
+    position: sticky;
 
     top: 130px;          /* below navbar */
     right: 25px;         /* stick to extreme right of screen */
@@ -193,7 +193,7 @@ body {
     box-shadow: 0 12px 30px rgba(0,0,0,0.25);
 
     display: none;       /* hidden initially */
-
+flex: 1;
     z-index: 99999;      /* above job cards */
 }
 
@@ -385,10 +385,15 @@ background:#f2f2f2;
     background: white;
     padding: 15px;
     border-radius: 10px;
+     max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
     margin-top: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
+.filter-container::-webkit-scrollbar {
+    width: 6px;
+}
 .filter-container label {
     font-weight: 600;
     display: block;
