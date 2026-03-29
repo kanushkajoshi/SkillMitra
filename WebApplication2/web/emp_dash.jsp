@@ -300,7 +300,14 @@ if(employerId != null){
             </p>
             <p><strong>Status:</strong>
 <%
-String status = rs2.getString("status");
+java.sql.Date expiry = rs2.getDate("expiry_date");
+java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+
+String status = "ACTIVE";
+
+if(expiry != null && expiry.before(today)){
+    status = "EXPIRED";
+}
 String color = "#6c757d";
 
 if("ACTIVE".equals(status)){
