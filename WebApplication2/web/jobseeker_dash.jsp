@@ -412,14 +412,21 @@ try {
 
     boolean found = false;
 
-    String sqlApp = "SELECT j.*, a.status FROM applications a " +
-                "JOIN jobs j ON j.job_id = a.job_id " +
-                "WHERE a.jobseeker_id=? " +
-                "AND a.status!='Accepted' " +
-                "AND j.status='ACTIVE'";
+    String sqlApp =  "SELECT j.*, " +
+"CASE " +
+"WHEN a.application_id IS NOT NULL THEN a.status " +
+"ELSE b.bid_status " +
+"END AS final_status " +
+"FROM jobs j " +
+"LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
+"LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
+"AND a.application_id IS NULL " +   // 🔥 MAIN FIX
+"WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
+"AND j.status='ACTIVE'";
 
     ps = con.prepareStatement(sqlApp);
     ps.setInt(1, jobseekerId);
+    ps.setInt(2, jobseekerId);
     rs = ps.executeQuery();
 
     while(rs.next()){

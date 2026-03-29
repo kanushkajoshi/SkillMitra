@@ -53,29 +53,8 @@ public class PlaceBidServlet extends HttpServlet {
                 psInsertBid.executeUpdate();
             }
 
-            // 🔹 Check if application already exists
-            String checkAppSql = "SELECT application_id FROM applications WHERE job_id=? AND jobseeker_id=?";
-            PreparedStatement psCheckApp = con.prepareStatement(checkAppSql);
-            psCheckApp.setInt(1, jobId);
-            psCheckApp.setInt(2, jobseekerId);
-            ResultSet rsCheckApp = psCheckApp.executeQuery();
-
-            if (rsCheckApp.next()) {
-
-             String updateAppSql = "UPDATE applications SET status='Pending' WHERE job_id=? AND jobseeker_id=?";
-             PreparedStatement psUpdateApp = con.prepareStatement(updateAppSql);
-             psUpdateApp.setInt(1, jobId);
-             psUpdateApp.setInt(2, jobseekerId);
-             psUpdateApp.executeUpdate();
-
-            } else {
-
-           String insertAppSql = "INSERT INTO applications (job_id, jobseeker_id, status) VALUES (?, ?, 'Pending')";
-           PreparedStatement psInsertApp = con.prepareStatement(insertAppSql);
-           psInsertApp.setInt(1, jobId);
-           psInsertApp.setInt(2, jobseekerId);
-           psInsertApp.executeUpdate();
-          }
+            // 🔹 ✅ IMPORTANT: Remove any application insert/update here
+            // Review Applications section will only show normal applications (is_bid=0)
 
             // 🔹 Redirect to Applied section so user sees job
             response.sendRedirect("jobseeker_dash.jsp?section=applied&msg=bidPlaced");

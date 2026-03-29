@@ -39,11 +39,12 @@ public class ApplyJobServlet extends HttpServlet {
             }
 
             // 🔹 Insert application
-            String insertSql = "INSERT INTO applications (job_id, jobseeker_id, status) VALUES (?, ?, 'Pending')";
-            PreparedStatement insertPs = con.prepareStatement(insertSql);
-            insertPs.setInt(1, jobId);
-            insertPs.setInt(2, jobseekerId);
-            insertPs.executeUpdate();
+            // Normal application insert
+               String insertSql = "INSERT INTO applications (job_id, jobseeker_id, status, is_bid) VALUES (?, ?, 'Pending', 0)";
+               PreparedStatement insertPs = con.prepareStatement(insertSql);
+               insertPs.setInt(1, jobId);
+               insertPs.setInt(2, jobseekerId);
+               insertPs.executeUpdate();
 
             // 🔹 Redirect to dashboard's Applied section
             response.sendRedirect("jobseeker_dash.jsp?section=applied&msg=success");
