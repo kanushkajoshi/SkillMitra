@@ -516,131 +516,105 @@ if(employerId2 != null){
 <%
 Integer employerBidId = (Integer) session.getAttribute("eid");
 
-if(employerBidId != null){
-
+if(employerId != null){
     try{
         Class.forName("com.mysql.jdbc.Driver");
         Connection conBid = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/skillmitra",
-            "root",
-            ""
+            "jdbc:mysql://localhost:3306/skillmitra", "root", ""
         );
 
         PreparedStatement psBid = conBid.prepareStatement(
             "SELECT j.job_id, j.title, "
-+ "b.bid_id, b.bid_amount, b.bid_status, b.created_at, b.counter_bid, "
-+ "js.jfirstname, js.jlastname, js.jemail, js.jdistrict "
-+ "FROM jobs j "
-+ "LEFT JOIN bids b ON j.job_id = b.job_id "
-+ "    AND (b.bid_status='Pending' OR b.bid_status='Countered' OR b.bid_status='Rejected') "
-+ "LEFT JOIN jobseeker js ON b.job_seeker_id = js.jid "
-+ "WHERE j.eid = ? "
-+ "ORDER BY j.job_id DESC, b.bid_amount ASC"
+          + "b.bid_id, b.bid_amount, b.bid_status, b.created_at, b.counter_bid, "
+          + "js.jfirstname, js.jlastname, js.jemail, js.jdistrict "
+          + "FROM jobs j "
+          + "LEFT JOIN bids b ON j.job_id = b.job_id "
+          + "LEFT JOIN jobseeker js ON b.job_seeker_id = js.jid "
+          + "WHERE j.eid = ? "
+          + "ORDER BY j.job_id DESC, b.bid_amount ASC"
         );
-
-        psBid.setInt(1, employerBidId);
+        psBid.setInt(1, employerId);
         ResultSet rsBid = psBid.executeQuery();
 
         int currentJobId = -1;
         boolean hasBidsOverall = false;
-%>
 
-<%
-        while(rsBid.next()) {
+        while(rsBid.next()){
             int jobId = rsBid.getInt("job_id");
 
-            if(jobId != currentJobId) {
-                // Close previous job group
-                if(currentJobId != -1) {
+            // 🔹 New Job Group
+            if(jobId != currentJobId){
+                if(currentJobId != -1){
 %>
         </div> <!-- applications-list -->
     </div> <!-- job-group -->
 <%
                 }
-
                 currentJobId = jobId;
                 hasBidsOverall = true;
 %>
-
     <div class="job-group" style="margin-top:30px; border:2px solid #ddd; padding:15px; border-radius:10px;">
-        <h2>
-            🛠 Job: <%= rsBid.getString("title") %> (ID: <%= jobId %>)
-        </h2>
-
+        <h2>🛠 Job: <%= rsBid.getString("title") %> (ID: <%= jobId %>)</h2>
         <div class="applications-list">
 <%
             }
 
-            if(rsBid.getInt("bid_id") != 0) {
+            // 🔹 Check if bid exists
+            if(rsBid.getObject("bid_id") != null){
+                String bidStatus = rsBid.getString("bid_status");
 %>
-        <div class="review-card">
+        <div class="review-card" style="border:1px solid #ccc; padding:10px; margin-bottom:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
             <div class="worker-info">
-                <div class="avatar">
-                    <%= rsBid.getString("jfirstname").substring(0,1) %>
-                    <%= rsBid.getString("jlastname").substring(0,1) %>
+                <div class="avatar" style="width:40px; height:40px; border-radius:50%; background:#666; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:10px; float:left;">
+                    <%= rsBid.getString("jfirstname").substring(0,1) %><%= rsBid.getString("jlastname").substring(0,1) %>
                 </div>
-
-                <div class="worker-details">
-                    <h3>
-                        <%= rsBid.getString("jfirstname") %>
-                        <%= rsBid.getString("jlastname") %>
-                    </h3>
-
-                    <p><%= rsBid.getString("jemail") %></p>
-
-                    <div class="meta">
-                        <span>💰 Bid: ₹<%= rsBid.getInt("bid_amount") %></span>
+                <div class="worker-details" style="margin-left:50px;">
+                    <h3 style="margin:0;"><%= rsBid.getString("jfirstname") %> <%= rsBid.getString("jlastname") %></h3>
+                    <p style="margin:2px 0;"><%= rsBid.getString("jemail") %></p>
+                    <div class="meta" style="font-size:13px;">
+                        <span>💰 Bid: ₹<%= rsBid.getInt("bid_amount") %></span> |
                         <span>📍 <%= rsBid.getString("jdistrict") %></span>
                     </div>
-
-                    <div style="font-size:13px; margin-top:6px;">
-                        Bid Placed On:
-                        <%
-                            Timestamp ts = rsBid.getTimestamp("created_at");
-                            if(ts != null){
-                                out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(ts));
-                            }
-                        %>
+                    <div style="font-size:12px; color:#555;">
+                        Placed On: <%= new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a").format(rsBid.getTimestamp("created_at")) %>
+                        <% if(rsBid.getInt("counter_bid") > 0){ %> | Counter: ₹<%= rsBid.getInt("counter_bid") %><% } %>
                     </div>
                 </div>
             </div>
 
-            <div class="actions">
+            <div class="actions" style="text-align:right;">
 <%
-                String bidStatus = rsBid.getString("bid_status");
+                // 🔹 Conditional Buttons / Status
+                if("Pending".equals(bidStatus)){
+%>
+                <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept" class="accept-btn" style="margin-right:5px; color:white; background:green; padding:6px 10px; border-radius:5px; text-decoration:none;">Accept</a>
+                <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject" class="reject-btn" style="margin-right:5px; color:white; background:red; padding:6px 10px; border-radius:5px; text-decoration:none;">Reject</a>
 
-                if("Pending".equals(bidStatus)) {
-%>
-                <a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
-                   class="accept-btn">Accept</a>
-                <a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
-                   class="reject-btn">Reject</a>
-
-                <div style="margin-top:10px;">
-                    <form action="CounterBidServlet" method="post" style="display:flex; gap:8px;">
-                        <input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
-                        <input type="number" name="counter_amount" placeholder="Enter counter bid" required style="padding:6px; width:150px;">
-                        <button type="submit" class="counter-btn" style="background:#ff9800; color:#fff; border:none; padding:6px 10px; border-radius:5px;">
-                            Counter
-                        </button>
-                    </form>
-                </div>
+                <form action="CounterBidServlet" method="post" style="margin-top:5px; display:flex; gap:5px; justify-content:flex-end;">
+                    <input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
+                    <input type="number" name="counter_amount" placeholder="Counter bid" required style="padding:5px; width:120px;">
+                    <button type="submit" style="background:#ff9800; color:white; border:none; padding:6px 10px; border-radius:5px;">Counter</button>
+                </form>
 <%
-                } else if("Countered".equals(bidStatus)) {
+                } else if("Countered".equals(bidStatus)){
 %>
-                <p>💸 Countered: ₹<%= rsBid.getInt("counter_bid") %></p>
+                <span style="color:#ff9800; font-weight:bold;">💸 Countered: ₹<%= rsBid.getInt("counter_bid") %></span>
 <%
-                } else if("Rejected".equals(bidStatus)) {
-%>
-                <p style="color:red;">❌ Rejected by Jobseeker</p>
-<%
-                } else if("Accepted".equals(bidStatus)) {
-%>
-                <p style="color:green;">✔ Accepted</p>
-<%
-                }
-%>
-            </div>
+                } else if("Accepted".equals(bidStatus)) { %>
+        <!-- ✅ Jobseeker accepted → Employer can still Accept/Reject -->
+        <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
+           class="accept-btn">Accept</a>
+        <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
+           class="reject-btn">Reject</a>
+        <p>💸 Bid Accepted by Jobseeker</p>
+    <% } else if("Rejected".equals(bidStatus)) { %>
+        <p style="color:red;">❌ Rejected by Jobseeker</p>
+    <% } else if("AcceptedByEmployer".equals(bidStatus)) { %>
+        <p style="color:green;">✅ Accepted by Employer</p>
+    <% } else if("RejectedByEmployer".equals(bidStatus)) { %>
+        <p style="color:red;">❌ Rejected by Employer</p>
+    <% } %>
+</div>
         </div>
 <%
             } else {
@@ -650,23 +624,22 @@ if(employerBidId != null){
             }
         }
 
-        // Close last job group
-        if(currentJobId != -1) {
+        // 🔹 Close last job group
+        if(currentJobId != -1){
 %>
         </div> <!-- applications-list -->
     </div> <!-- job-group -->
 <%
         }
 
-        if(!hasBidsOverall) {
+        if(!hasBidsOverall){
 %>
 <p>No bids received yet.</p>
 <%
         }
 
         conBid.close();
-
-    } catch(Exception e) {
+    } catch(Exception e){
         e.printStackTrace();
     }
 }
@@ -674,97 +647,78 @@ if(employerBidId != null){
 </div> <!-- ✅ IMPORTANT: closes reviewApplicationsSection -->
 
 <!-- ACCEPTED APPLICATIONS SECTION -->
-<div id="acceptedApplicationsSection"
-     style="display:none; width:100%; max-width:900px;">
-
+<div id="acceptedApplicationsSection" style="display:none; width:100%; max-width:900px;">
     <div class="manage-header">
         <div>
             <h2>Accepted Applications</h2>
             <p>Candidates you've accepted for positions</p>
         </div>
     </div>
+
 <%
 Integer employerId3 = (Integer) session.getAttribute("eid");
 
-if(employerId3 != null){
-
-    try{
+if (employerId != null) {
+    try {
         Class.forName("com.mysql.jdbc.Driver");
-
-        Connection con4 = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/skillmitra",
-            "root",
-            ""
+        Connection con = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/skillmitra", "root", ""
         );
 
-       PreparedStatement ps4 = con4.prepareStatement(
-    "SELECT a.application_id, a.applied_at, j.title, " +
-    "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
-    "FROM applications a " +
-    "JOIN jobs j ON a.job_id = j.job_id " +
-    "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
-    "WHERE j.eid = ? AND a.status = 'Accepted' " +
-    "ORDER BY a.applied_at DESC"
-);
+        // Fetch only applications that are accepted
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT a.application_id, a.applied_at, j.title, " +
+            "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+            "FROM applications a " +
+            "JOIN jobs j ON a.job_id = j.job_id " +
+            "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+            "WHERE j.eid = ? AND a.status = 'Accepted' " +
+            "ORDER BY a.applied_at DESC"
+        );
 
-ps4.setInt(1, employerId3);
-ResultSet rs4 = ps4.executeQuery();
-
-
-        
+        ps.setInt(1, employerId3);
+        ResultSet rs = ps.executeQuery();
 
         boolean hasAccepted = false;
 
-        while(rs4.next()){
+        while (rs.next()) {
             hasAccepted = true;
 %>
 
-<div class="review-card" style="border:1.5px solid #b9f5c8;">
-
-<div class="worker-info">
-
-<div class="avatar">
-<%= rs4.getString("jfirstname").charAt(0) %>
-<%= rs4.getString("jlastname").charAt(0) %>
-</div>
-
-<div class="worker-details">
-
-<h3>
-<%= rs4.getString("jfirstname") %>
-<%= rs4.getString("jlastname") %>
-<span style="color:#1dbf73;">✔ Accepted</span>
-</h3>
-
-<p><%= rs4.getString("jemail") %></p>
-
-<div class="meta">
-<span>Applied For: <%= rs4.getString("title") %></span>
-<span>Location: <%= rs4.getString("jdistrict") %></span>
-</div>
-
-</div>
-</div>
-
+<div class="review-card" style="border:1.5px solid #b9f5c8; margin-bottom:15px; padding:10px; border-radius:8px;">
+    <div class="worker-info" style="display:flex; align-items:center; gap:10px;">
+        <div class="avatar" style="width:40px; height:40px; border-radius:50%; background:#1dbf73; color:#fff; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:16px;">
+            <%= rs.getString("jfirstname").charAt(0) %>
+            <%= rs.getString("jlastname").charAt(0) %>
+        </div>
+        <div class="worker-details">
+            <h3 style="margin:0;">
+                <%= rs.getString("jfirstname") %> <%= rs.getString("jlastname") %>
+                <span style="color:#1dbf73; font-weight:600;">✔ Accepted</span>
+            </h3>
+            <p style="margin:2px 0;"><%= rs.getString("jemail") %></p>
+            <div class="meta" style="font-size:13px; color:#555;">
+                <span>Applied For: <%= rs.getString("title") %></span> |
+                <span>Location: <%= rs.getString("jdistrict") %></span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <%
         }
-
-        if(!hasAccepted){
+        if (!hasAccepted) {
 %>
 <p>No accepted applications.</p>
 <%
         }
 
-        con4.close();
-
-    }catch(Exception e){
+        con.close();
+    } catch (Exception e) {
         e.printStackTrace();
     }
 }
 %>
-
 </div>
 <!-- REJECTED APPLICATIONS SECTION -->
 <div id="rejectedApplicationsSection"
@@ -933,6 +887,53 @@ setTimeout(() => {
 
 </script>
 
+<script>
+window.onload = function() {
+    // Check if there are any accepted applications
+    var acceptedSection = document.getElementById('acceptedApplicationsSection');
+    var rejectedSection = document.getElementById('rejectedApplicationsSection');
 
+    if(acceptedSection.querySelectorAll('.review-card').length > 0){
+        acceptedSection.style.display = 'block';
+    }
+
+    if(rejectedSection.querySelectorAll('.review-card').length > 0){
+        rejectedSection.style.display = 'block';
+    }
+};
+</script>
+<script>
+document.querySelectorAll(".respondBidBtn").forEach(function(button) {
+    button.addEventListener("click", function() {
+        const bidId = this.dataset.bidid;
+        const action = this.dataset.action;
+        const card = document.getElementById("bidCard_" + bidId);
+
+        fetch(`RespondBidByEmployerServlet?bid_id=${bidId}&action=${action}`)
+            .then(response => response.text())
+            .then(data => {
+                // Remove card from review section
+                card.remove();
+
+                // Create new card for Accepted/Rejected section
+                const newCard = card.cloneNode(true);
+                newCard.querySelectorAll("button").forEach(b => b.remove()); // remove buttons
+
+                if(action === "accept") {
+                    newCard.querySelector("h3").innerHTML += ' <span style="color:#1dbf73;">✔ Accepted</span>';
+                    const acceptedSection = document.getElementById("acceptedApplicationsSection");
+                    acceptedSection.style.display = "block";
+                    acceptedSection.appendChild(newCard);
+                } else {
+                    newCard.querySelector("h3").innerHTML += ' <span style="color:#e53935;">✖ Rejected</span>';
+                    const rejectedSection = document.getElementById("rejectedApplicationsSection");
+                    rejectedSection.style.display = "block";
+                    rejectedSection.appendChild(newCard);
+                }
+            })
+            .catch(err => console.error(err));
+    });
+});
+</script>
 </body>
 </html> 
