@@ -37,19 +37,24 @@ body {
     color: #e8eef3;
     text-decoration: none;
     font-size: 15px;
-    transition: background 0.3s;
+    transition: all 0.25s ease;
 }
 
-.sidebar a:hover,
-.sidebar a.active {
+.sidebar a:hover {
     background-color: #3e5a70;
+}
+
+/* 🔥 ACTIVE LINK */
+.sidebar a.active {
+    background-color: #2f4658;
+    font-weight: 600;
 }
 
 /* ================= NAVBAR ================= */
 .navbar {
     position: fixed;
     top: 0;
-    left: 230px; /* start after sidebar */
+    left: 230px;
     width: calc(100% - 230px);
     height: 60px;
     background-color: #4f6d84;
@@ -62,20 +67,8 @@ body {
 }
 
 .nav-left {
-    color: #ffffff;
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.nav-right {
-    display: flex;
-    align-items: center;
-}
-
-/* ================= PROFILE DROPDOWN ================= */
-.profile-dropdown {
-    position: relative;
 }
 
 .profile-icon {
@@ -91,72 +84,40 @@ body {
     position: absolute;
     right: 0;
     top: 55px;
-    background: #ffffff;
+    background: #fff;
     width: 200px;
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    z-index: 2000;
 }
 
-.profile-name {
-    padding: 12px 14px;
-    font-weight: 700;
-    font-size: 15px;
-    background: #f4f6fa;
-    border-bottom: 1px solid #e0e0e0;
-    color: #000000 !important;
-}
-
-.profile-menu a {
-    display: block;
-    padding: 10px 14px;
-    font-size: 14px;
-    color: #333;
-    text-decoration: none;
-}
-
-.profile-menu a:hover {
-    background: #f0f5ff;
-}
-
-/* ================= MAIN CONTENT ================= */
+/* ================= MAIN ================= */
 .main {
-    margin-left: 230px; /* sidebar width */
-    margin-top: 60px;   /* navbar height */
+    margin-left: 230px;
+    margin-top: 60px;
     padding: 25px;
     width: calc(100% - 230px);
     display: flex;
     flex-direction: column;
-    gap: 25px;
-}
-
-/* ================= WELCOME BOX ================= */
-.welcome-box {
-    background-color: #ffffff;
-    padding: 20px 25px;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    font-size: 16px;
-    color: #333;
+    gap: 20px;
 }
 
 /* ================= SEARCH BOX ================= */
-
 .search-box {
     background-color: #fff;
-    padding: 15px;
-    border-radius: 6px;
+    padding: 18px 20px;
+    border-radius: 12px;
     display: flex;
     gap: 15px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     align-items: center;
+    margin-bottom: 10px; /* 🔥 spacing added */
 }
 
 .search-box input {
-    padding: 10px;
+    padding: 12px;
     flex: 1;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .search-box button {
@@ -164,253 +125,115 @@ body {
     background-color: #4f6d84;
     border: none;
     color: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
 }
 
 .search-box button:hover {
     background-color: #3e5a70;
 }
 
-
-/* ================= FILTER PANEL ================= */
-
-.filter-container{
-
-    position: sticky;
-
-    top: 130px;          /* below navbar */
-    right: 25px;         /* stick to extreme right of screen */
-
-    width: 260px;
-
-    background: #ffffff;
-    padding: 20px;
-
-    border-radius: 10px;
-
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-
-    display: none;       /* hidden initially */
-flex: 1;
-    z-index: 99999;      /* above job cards */
-}
-
-/* FILTER INPUTS */
-
-.filter-container label{
-    display:block;
-    font-weight:600;
-    margin-top:10px;
-    font-size:14px;
-}
-
-.filter-container input,
-.filter-container select{
-    width:100%;
-    padding:8px;
-    border:1px solid #ccc;
-    border-radius:4px;
-    margin-top:4px;
-}
-
-/* APPLY BUTTON */
-
-#applyFilter{
-    margin-top:14px;
-    background:#4f6d84;
-    color:white;
-    border:none;
-    padding:8px 14px;
-    border-radius:5px;
-    cursor:pointer;
-}
-
-#applyFilter:hover{
-    background:#3e5a70;
-}
-/* ================= AREA CHECKBOX CONTAINER ================= */
-
-#areaContainer{
-    max-height:150px;
-    overflow-y:auto;
-    border:1px solid #ccc;
-    padding:8px;
-    border-radius:4px;
-    background:#ffffff;
-}
-
-#areaContainer label{
-    display:block;
-    color:#000 !important;
-    font-size:14px;
-    font-weight:500;
-    margin-bottom:6px;
-    cursor:pointer;
-}
-
-#areaContainer input{
-    margin-right:6px;
-}
-/* ================= JOB CARDS ================= */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.card {
-    background-color: #fff;
-    padding: 18px;
-    border-radius: 8px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-4px);
-}
-
-.card h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.card p {
-    font-size: 14px;
-    color: #555;
-}
-
-/* ================= MODALS ================= */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.modal-box {
-    background: #ffffff;
-    padding: 25px 30px;
-    width: 350px;
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    animation: popup 0.3s ease;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
-    cursor: pointer;
-    color: #555;
-}
-
-.close-btn:hover {
-    color: red;
-}
-
-@keyframes popup {
-    from { transform: scale(0.8); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-    .navbar {
-        left: 0;
-        width: 100%;
-    }
-    .main {
-        margin-left: 0;
-        width: 100%;
-        margin-top: 120px; /* navbar + top spacing */
-    }
-    .cards {
-        grid-template-columns: 1fr;
-    }
-}
-#areaContainer label{
-    display:block;
-    color:#222 !important;
-    font-size:14px;
-    font-weight:500;
-}
-
-#areaContainer label input{
-    margin-right:8px;
-}
-#areaContainer label{
-display:flex;
-align-items:center;
-gap:6px;
-padding:3px 2px;
-}
-#suggestionBox{
-position:absolute;
-background:white;
-border:1px solid #ccc;
-width:100%;
-max-height:200px;
-overflow-y:auto;
-z-index:9999;
-}
-
-.suggestion-item{
-padding:8px;
-cursor:pointer;
-}
-
-.suggestion-item:hover{
-background:#f2f2f2;
-}
+/* ================= FILTER ================= */
 .filter-container {
     display: none;
     background: white;
     padding: 15px;
     border-radius: 10px;
-     max-height: 500px;
+    max-height: 500px;
     overflow-y: auto;
-    padding: 10px;
     margin-top: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.filter-container::-webkit-scrollbar {
-    width: 6px;
+
+/* ================= CARDS GRID ================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px; /* 🔥 spacing increased */
+    margin-top: 15px; /* 🔥 spacing from search */
 }
-.filter-container label {
+
+/* ================= CARD ================= */
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* TITLE */
+.job-title {
+    font-size: 18px;
     font-weight: 600;
-    display: block;
-    margin-top: 10px;
+    color: #222;
 }
 
-.filter-container input,
-.filter-container select {
-    width: 100%;
-    padding: 6px;
-    margin-top: 5px;
-    border-radius: 6px;
+/* DESCRIPTION */
+.desc {
+    font-size: 14px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* INFO ROW */
+.card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOCATION */
+.location {
+    font-size: 13px;
+    color: #555;
+}
+
+/* SALARY */
+.salary {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* BUTTON */
+button {
+    border-radius: 10px;
+}
+
+/* ================= AREA ================= */
+#areaContainer {
+    max-height: 150px;
+    overflow-y: auto;
     border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 6px;
 }
 
-#subskillContainer label,
 #areaContainer label {
-    display: block;
-    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+/* ================= SECTIONS ================= */
+#appliedSection,
+#assignedSection,
+#paymentsSection,
+#reviewsSection {
+    display: none;
 }

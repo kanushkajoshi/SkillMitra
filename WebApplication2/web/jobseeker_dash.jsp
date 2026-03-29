@@ -79,14 +79,13 @@ if (currentSession.getAttribute("jfirstname") == null) {
 </head>
 
 <body>
-
 <div class="sidebar">
-<h2>JobSeeker</h2>
-<a href="jobseeker_dash.jsp">Dashboard</a>
-<a href="jobseeker_dash.jsp?section=applied">Applied Jobs</a>
-<a href="#">Assigned Job</a>
-<a href="#">Payment History</a>
-<a href="#">Ratings & Reviews</a>
+<h2>JobSeeker Dashboard</h2>
+<a class="active" onclick="showSection('dashboard', this)">Dashboard</a>
+<a onclick="showSection('applied', this)">Applied Jobs</a>
+<a onclick="showSection('assigned', this)">Assigned Job</a>
+<a onclick="showSection('payments', this)">Payment History</a>
+<a onclick="showSection('reviews', this)">Ratings & Reviews</a>
 </div>
 
 <div class="main">
@@ -107,7 +106,7 @@ if (currentSession.getAttribute("jfirstname") == null) {
 </div>
 </div>
 </div>
-
+<div id="dashboardSection">
 <div class="topbar">
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
@@ -206,7 +205,7 @@ try {
     "JOIN job_skills jk ON jk.job_id = j.job_id " +
     "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
     "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
-    "WHERE js.jid = ? AND j.status='ACTIVE' "
+    "WHERE js.jid = ? AND (j.status='ACTIVE' OR a.application_id IS NOT NULL) "
     );
 
     // FILTERS
@@ -282,9 +281,9 @@ try {
     while(rs.next()){
 %>
 
-<div class="card" style="background:white;padding:20px;margin-bottom:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">
+<div class="card" >
 
-<h3><%= rs.getString("title") %></h3>
+<h3 class="job-title"><%= rs.getString("title") %></h3>
 <%
 int jobIdCard = rs.getInt("job_id");
 
@@ -310,34 +309,20 @@ if(rsBid.next()){
 }
 %>
 
-<p><b>Description:</b> <%= rs.getString("description") %></p>
+<p class="desc"><b>Description:</b> <%= rs.getString("description") %></p>
+ <div class="card-info">
+  <span class="location">
 
-<p><b>Location:</b> 
-<%= rs.getString("locality") %>, 
+📍 <%= rs.getString("locality") %>, 
 <%= rs.getString("city") %>, 
 <%= rs.getString("state") %>, 
-<%= rs.getString("country") %> - 
-<%= rs.getString("zip") %>
-</p>
+  </span>
 
-<p><b>Salary:</b> ₹<%= rs.getString("salary") %></p>
+<span class="salary">
+            ₹<%= rs.getString("salary") %>
+</span>
+ </div>
 
-
-<p><b>Minimum Salary:</b> ₹<%= rs.getString("min_salary") %></p>
-
-<p><b>Experience Required:</b> <%= rs.getString("experience_level") %></p>
-
-<p><b>Experience Level:</b> <%= rs.getString("experience_level") %></p>
-
-<p><b>Workers Required:</b> <%= rs.getString("workers_required") %></p>
-
-<p><b>Working Hours:</b> <%= rs.getString("working_hours") %></p>
-
-<p><b>Gender Preference:</b> <%= rs.getString("gender_preference") %></p>
-
-<p><b>Languages Preferred:</b> <%= rs.getString("languages_preferred") %></p>
-
-<p><b>Expiry Date:</b> <%= rs.getString("expiry_date") %></p>
 <%
 if(bidAmount > 0){
 %>
@@ -415,6 +400,144 @@ finally {
 }
 %>
 
+</div>
+</div>
+<!-- ================= APPLIED SECTION ================= -->
+
+<div id="appliedSection" style="display:none;">
+<div class="cards">
+<%
+try {
+    con = DBConnection.getConnection();
+
+    boolean found = false;
+
+    String sqlApp = "SELECT j.*, a.status FROM applications a " +
+                "JOIN jobs j ON j.job_id = a.job_id " +
+                "WHERE a.jobseeker_id=? " +
+                "AND a.status!='Accepted' " +
+                "AND j.status='ACTIVE'";
+
+    ps = con.prepareStatement(sqlApp);
+    ps.setInt(1, jobseekerId);
+    rs = ps.executeQuery();
+
+    while(rs.next()){
+        found = true;
+%>
+<div class="card">
+    <h3><%= rs.getString("title") %></h3>
+    <p>Description: <%= rs.getString("description") %></p>
+    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
+    <p>₹<%= rs.getString("salary") %></p>
+
+    <button disabled>✓ <%= rs.getString("status") %></button>
+</div>
+<%
+    }
+
+    // BIDS (NOT ACCEPTED)
+    String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
+                    "JOIN jobs j ON j.job_id = b.job_id " +
+                    "WHERE b.job_seeker_id=? AND b.bid_status!='Accepted'";
+
+    ps = con.prepareStatement(sqlBid);
+    ps.setInt(1, jobseekerId);
+    rs = ps.executeQuery();
+
+    while(rs.next()){
+        found = true;
+%>
+<div class="card">
+    <h3><%= rs.getString("title") %></h3>
+    <p>Description: <%= rs.getString("description") %></p>
+    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
+    <p>₹<%= rs.getString("salary") %></p>
+
+    <button disabled>✓ Bid Placed</button>
+</div>
+<%
+    }
+
+    if(!found){
+%>
+<h3>No Applied Jobs</h3>
+<%
+    }
+
+} catch(Exception e){ e.printStackTrace(); }
+%>
+</div>
+</div>
+<!-- ================= ASSIGNED SECTION ================= -->
+
+<div id="assignedSection" style="display:none;">
+<div class="cards">
+<%
+try {
+    con = DBConnection.getConnection();
+
+    boolean found = false;
+
+    // ACCEPTED APPLICATIONS
+    String sqlApp = "SELECT j.*, a.status FROM applications a " +
+                    "JOIN jobs j ON j.job_id = a.job_id " +
+                    "WHERE a.jobseeker_id=? AND a.status='Accepted'";
+
+    ps = con.prepareStatement(sqlApp);
+    ps.setInt(1, jobseekerId);
+    rs = ps.executeQuery();
+
+    while(rs.next()){
+        found = true;
+%>
+<div class="card">
+    <h3><%= rs.getString("title") %></h3>
+    <p>Description: <%= rs.getString("description") %></p>
+    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
+    <p>₹<%= rs.getString("salary") %></p>
+
+    <button disabled style="background:#28a745;color:white;">
+        ✓ Accepted
+    </button>
+</div>
+<%
+    }
+
+    // ACCEPTED BIDS
+    String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
+                    "JOIN jobs j ON j.job_id = b.job_id " +
+                    "WHERE b.job_seeker_id=? AND b.bid_status='Accepted'";
+
+    ps = con.prepareStatement(sqlBid);
+    ps.setInt(1, jobseekerId);
+    rs = ps.executeQuery();
+
+    while(rs.next()){
+        found = true;
+%>
+<div class="card">
+    <h3><%= rs.getString("title") %></h3>
+    <p>Description: <%= rs.getString("description") %></p>
+    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
+    <p>₹<%= rs.getString("salary") %></p>
+
+    <button disabled style="background:#28a745;color:white;">
+        ✓ Accepted
+    </button>
+</div>
+<%
+    }
+
+    if(!found){
+%>
+<h3>No Assigned Jobs</h3>
+<%
+    }
+
+} catch(Exception e){ e.printStackTrace(); }
+%>
+</div>
 </div>
 <script>
 const jobseekerZip = "<%= currentSession.getAttribute("jzip") %>";
@@ -580,7 +703,8 @@ document.addEventListener("click", function(){
     profileMenu.style.display = "none";
 });
 </script>
-<script>function applyFilters(){
+<script>
+    function applyFilters(){
 
     const q = document.querySelector("input[name='q']").value;
     const district = document.querySelector("input[name='district']").value;
@@ -658,6 +782,35 @@ function renderJobs(jobs){
     });
 }
 </script>
+<script>
+function showSection(section, el) {
+
+   const sections = [
+    "dashboardSection",
+    "appliedSection",
+    "assignedSection",
+    "paymentsSection",
+    "reviewsSection"
+   ];
+
+   // 🔥 hide all
+   sections.forEach(id => {
+        const sec = document.getElementById(id);
+        if(sec) sec.style.display = "none";
+   });
+
+   // 🔥 show selected
+   if(section === "dashboard") document.getElementById("dashboardSection").style.display = "block";
+   else if(section === "applied") document.getElementById("appliedSection").style.display = "block";
+   else if(section === "assigned") document.getElementById("assignedSection").style.display = "block";
+   else if(section === "payments") document.getElementById("paymentsSection").style.display = "block";
+   else if(section === "reviews") document.getElementById("reviewsSection").style.display = "block";
+
+   // 🔥 active highlight fix
+   document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+   el.classList.add("active");
+}
+</script>
 </div>
 </body>
-</html>
+</html>  
