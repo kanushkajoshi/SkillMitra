@@ -111,356 +111,369 @@ if (currentSession.getAttribute("jfirstname") == null) {
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
 
-<form class="search-box" onsubmit="return false;"> 
+<form class="search-box" method="get" action="search_results.jsp">
     <input type="hidden" name="jid" value="<%= session.getAttribute("jobseekerId") %>">
-<input type="text" name="q" placeholder="Search jobs...">
+<input type="text" id="searchInput" name="q" placeholder="Search jobs...">
 
 <button type="button" id="filterBtn">Filters ▼</button>
 
-<button type="button" onclick="applyFilters()">Search</button>
+<button type="submit">Search</button>
 
 <div id="filterContainer" class="filter-container">
 
-<!-- Skill -->
+<!-- SKILL -->
 <label>Skill:</label>
-<select id="skillSelect">
-    <option value="">-- Select Skill --</option>
-    <%
-    Connection conSkill = DBConnection.getConnection();
-    PreparedStatement psSkill = conSkill.prepareStatement("SELECT skill_id, skill_name FROM skill");
-    ResultSet rsSkill = psSkill.executeQuery();
-    while(rsSkill.next()){
-    %>
-        <option value="<%= rsSkill.getInt("skill_id") %>">
-            <%= rsSkill.getString("skill_name") %>
-        </option>
-    <%
+
+<div class="readonly-box">
+<%
+Connection conSkill = DBConnection.getConnection();
+
+PreparedStatement psSkill = conSkill.prepareStatement(
+    "SELECT DISTINCT s.skill_id, s.skill_name " +
+    "FROM skill s " +
+    "JOIN jobseeker_skills js ON js.skill_id = s.skill_id " +
+    "WHERE js.jid = ?"
+);
+
+psSkill.setInt(1, jobseekerId);
+ResultSet rsSkill = psSkill.executeQuery();
+
+// ✅ GET FIRST SKILL ID
+int firstSkillId = 0;
+
+if(rsSkill.next()){
+    firstSkillId = rsSkill.getInt("skill_id");
+}
+
+// ✅ RESET CURSOR
+rsSkill.beforeFirst();
+
+StringBuilder skillNames = new StringBuilder();
+
+// ✅ LOOP START
+while(rsSkill.next()){
+
+    if(skillNames.length() > 0){
+        skillNames.append(", ");
     }
-    conSkill.close();
-    %>
-</select>
 
-<!-- Subskills -->
+    skillNames.append(rsSkill.getString("skill_name"));
+%>
+
+    <input type="checkbox"
+           name="skill"
+           value="<%= rsSkill.getInt("skill_id") %>"
+           checked
+           hidden>
+
+<%
+}
+%>
+
+<!-- ✅ IMPORTANT: ONLY ONE -->
+<input type="hidden" id="selectedSkillId" value="<%= firstSkillId %>">
+
+<%= skillNames.toString() %>
+
+<%
+conSkill.close();
+%>
+
+</div>
+
+<!-- SUBSKILL -->
 <label>Subskills:</label>
-<div id="subskillContainer">Select skill first</div>
 
-<!-- District -->
+<div class="multi-select">
+
+    <div class="select-box" onclick="toggleSubskill()">
+        <span id="subskillText">Select Subskills</span>
+    </div>
+
+    <div id="subskillDropdown" class="dropdown">
+
+        <div id="subskillList">
+            Select skill first
+        </div>
+
+        <button type="button" class="ok-btn" onclick="closeSubskill()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+<!-- DISTRICT -->
 <label>District:</label>
 <input type="text" name="district"
 value="<%= currentSession.getAttribute("jdistrict") %>" readonly>
 
-<!-- Area -->
+<!-- AREA -->
 <label>Area:</label>
-<div id="areaContainer"></div>
+<div class="multi-select">
 
-<!-- Salary -->
+    <div class="select-box" onclick="toggleArea()">
+        <span id="areaText">Select Area</span>
+    </div>
+
+    <div id="areaDropdown" class="dropdown">
+
+        <div id="areaContainer"></div>
+
+        <button type="button" class="ok-btn" onclick="closeArea()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+<!-- SALARY -->
 <label>Min Salary:</label>
 <input type="number" name="min_salary">
 
 <label>Max Salary:</label>
 <input type="number" name="max_salary">
 
-<button type="submit">Apply Filters</button>
+<button type="button" id="applyFilter">Apply Filters</button>
 
 </div>
 </form>
-
-
-<div class="cards">
 <%
-PreparedStatement ps = null;
-ResultSet rs = null;
+Connection conStats = DBConnection.getConnection();
 
-try {
-    con = DBConnection.getConnection();
+PreparedStatement ps1 = conStats.prepareStatement(
+    "SELECT COUNT(*) FROM jobs WHERE status='Active'");
+ResultSet rs1 = ps1.executeQuery();
+rs1.next();
+int totalJobs = rs1.getInt(1);
+rs1.close(); ps1.close();
 
-    if("applied".equals(section)){
-        // 🔹 Fetch Applied Jobs
-        String sqlApplied = "SELECT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
-                            "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-                            "j.experience_level, j.workers_required, " +
-                            "j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
-                            "a.status " +
-                            "FROM applications a " +
-                            "JOIN jobs j ON j.job_id = a.job_id " +
-                            "WHERE a.jobseeker_id = ? " +
-                            "ORDER BY a.applied_at DESC";
-        ps = con.prepareStatement(sqlApplied);
-        ps.setInt(1, jobseekerId);
+PreparedStatement ps2 = conStats.prepareStatement(
+    "SELECT COUNT(*) FROM applications WHERE jobseeker_id=?");
+ps2.setInt(1, jobseekerId);
+ResultSet rs2 = ps2.executeQuery();
+rs2.next();
+int appliedJobs = rs2.getInt(1);
+rs2.close(); ps2.close();
 
-    } else {
+PreparedStatement ps3 = conStats.prepareStatement(
+    "SELECT COUNT(*) FROM applications WHERE jobseeker_id=? AND status='Accepted'");
+ps3.setInt(1, jobseekerId);
+ResultSet rs3 = ps3.executeQuery();
+rs3.next();
+int acceptedJobs = rs3.getInt(1);
+rs3.close(); ps3.close();
 
-    String districtFilter = request.getParameter("district");
-    String[] areaFilter = request.getParameterValues("area");
-    String[] subskillFilter = request.getParameterValues("subskill");
-    String minSalary = request.getParameter("min_salary");
-    String maxSalary = request.getParameter("max_salary");
 
-    StringBuilder sql = new StringBuilder(
-    "SELECT DISTINCT j.job_id, j.title, j.description, j.city, j.state, j.country, " +
-    "j.locality, j.salary, j.min_salary, j.job_type, j.languages_preferred, " +
-    "j.experience_level, j.workers_required, j.expiry_date, j.gender_preference, j.working_hours, j.zip, " +
-    "a.status, CASE WHEN a.application_id IS NOT NULL THEN 1 ELSE 0 END AS applied " +
-    "FROM jobs j " +
-    "JOIN job_skills jk ON jk.job_id = j.job_id " +
-    "JOIN jobseeker_skills js ON js.skill_id = jk.skill_id " +
-    "LEFT JOIN applications a ON a.job_id = j.job_id AND a.jobseeker_id = ? " +
-    "WHERE js.jid = ? AND (j.status='ACTIVE' OR a.application_id IS NOT NULL) "
+conStats.close();
+%>
+<%
+// Bids Placed count
+Connection conBids = DBConnection.getConnection();
+PreparedStatement psBids = conBids.prepareStatement(
+    "SELECT COUNT(*) FROM bids WHERE job_seeker_id=?");
+psBids.setInt(1, jobseekerId);
+ResultSet rsBids = psBids.executeQuery();
+rsBids.next();
+int bidsPlaced = rsBids.getInt(1);
+rsBids.close(); psBids.close();
+conBids.close();
+%>
+
+<%-- ── STATS ── --%>
+<div class="stats-grid">
+    <div class="stat stat-blue">
+        <div class="stat-label">Jobs Available</div>
+        <div class="stat-value"><%= totalJobs %></div>
+    </div>
+    <div class="stat stat-amber">
+        <div class="stat-label">Applied</div>
+        <div class="stat-value"><%= appliedJobs %></div>
+    </div>
+    <div class="stat stat-green">
+        <div class="stat-label">Accepted</div>
+        <div class="stat-value"><%= acceptedJobs %></div>
+    </div>
+    <div class="stat stat-purple">
+    <div class="stat-label">Bids Placed</div>
+    <div class="stat-value"><%= bidsPlaced %></div>
+</div>
+</div>
+
+<%-- ── STATUS + RECOMMENDED ROW ── --%>
+<div class="section-row">
+
+    <%-- Application Status --%>
+    <div class="status-card">
+        <h4>Application Status</h4>
+        <%
+        Connection conStatus = DBConnection.getConnection();
+        PreparedStatement psStatus = conStatus.prepareStatement(
+            "SELECT status, COUNT(*) as count FROM applications WHERE jobseeker_id=? GROUP BY status"
+        );
+        psStatus.setInt(1, jobseekerId);
+        ResultSet rsStatus = psStatus.executeQuery();
+
+        java.util.Map<String,Integer> statusMap = new java.util.HashMap<String,Integer>();
+        while(rsStatus.next()){
+            statusMap.put(rsStatus.getString("status"), rsStatus.getInt("count"));
+        }
+        conStatus.close();
+
+        int pendingCount  = statusMap.getOrDefault("Pending",  0);
+        int acceptedCount = statusMap.getOrDefault("Accepted", 0);
+        int rejectedCount = statusMap.getOrDefault("Rejected", 0);
+        %>
+        <div class="status-item">
+            <span>Pending</span>
+            <span class="badge badge-pending"><%= pendingCount %></span>
+        </div>
+        <div class="status-item">
+            <span>Accepted</span>
+            <span class="badge badge-accepted"><%= acceptedCount %></span>
+        </div>
+        <div class="status-item">
+            <span>Rejected</span>
+            <span class="badge badge-rejected"><%= rejectedCount %></span>
+        </div>
+    </div>
+
+    <%-- Recommended Jobs --%>
+    <div class="rec-section">
+        <h4>Recommended for You</h4>
+        <div class="rec-cards">
+        <%
+        Connection conRec = DBConnection.getConnection();
+        PreparedStatement psRec = conRec.prepareStatement(
+            "SELECT j.job_id, j.title, j.locality, j.city, j.salary, j.job_type, " +
+            "COUNT(DISTINCT js.subskill_id) AS matched, " +
+            "COUNT(DISTINCT jk.subskill_id) AS total " +
+            "FROM jobs j " +
+            "JOIN job_skills jk ON jk.job_id = j.job_id " +
+            "LEFT JOIN jobseeker_skills js ON js.subskill_id = jk.subskill_id AND js.jid = ? " +
+            "WHERE j.status='Active' " +
+            "GROUP BY j.job_id, j.title, j.locality, j.city, j.salary, j.job_type " +
+            "HAVING (COUNT(DISTINCT js.subskill_id) * 100 / COUNT(DISTINCT jk.subskill_id)) >= 50 " +
+            "ORDER BY matched DESC LIMIT 4"
+        );
+        psRec.setInt(1, jobseekerId);
+        ResultSet rsRec = psRec.executeQuery();
+        while(rsRec.next()){
+            int matched = rsRec.getInt("matched");
+            int total   = rsRec.getInt("total");
+            int pct     = (total > 0) ? (matched * 100) / total : 0;
+        %>
+        <div class="rec-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+
+    <div class="job-title">
+        <%= rsRec.getString("title") %>
+    </div>
+
+    <span style="font-size:12px; color:#16a34a; font-weight:600;">
+        <%= pct %>% match
+    </span>
+
+</div>
+            <div class="job-loc">📍 <%= rsRec.getString("locality") %>, <%= rsRec.getString("city") %></div>
+     
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+    <div class="job-salary">₹<%= rsRec.getString("salary") %></div>
+    <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end;">
+    <%
+    Connection conSub = DBConnection.getConnection();
+    PreparedStatement psSub = conSub.prepareStatement(
+        "SELECT ss.subskill_name FROM subskill ss " +
+        "JOIN job_skills jsk ON jsk.subskill_id = ss.subskill_id " +
+        "WHERE jsk.job_id = ?"
     );
-
-    // FILTERS
-
-    if (districtFilter != null && !districtFilter.isEmpty()) {
-        sql.append(" AND LOWER(j.city)=LOWER(?) ");
+    psSub.setInt(1, rsRec.getInt("job_id"));
+    ResultSet rsSub = psSub.executeQuery();
+    while(rsSub.next()){
+    %>
+        <span style="background:#f0f4ff; color:#3b5bdb; font-size:10px; padding:2px 8px; border-radius:20px; white-space:nowrap;">
+            <%= rsSub.getString("subskill_name") %>
+        </span>
+       
+    <%
     }
-
-    if (areaFilter != null && areaFilter.length > 0) {
-        sql.append(" AND j.locality IN (");
-        for(int i=0;i<areaFilter.length;i++){
-            sql.append("?");
-            if(i<areaFilter.length-1) sql.append(",");
-        }
-        sql.append(") ");
-    }
-
-    if (subskillFilter != null && subskillFilter.length > 0) {
-        sql.append(" AND jk.subskill_id IN (");
-        for(int i=0;i<subskillFilter.length;i++){
-            sql.append("?");
-            if(i<subskillFilter.length-1) sql.append(",");
-        }
-        sql.append(") ");
-    }
-
-    if (minSalary != null && !minSalary.isEmpty()) {
-        sql.append(" AND j.min_salary >= ? ");
-    }
-
-    if (maxSalary != null && !maxSalary.isEmpty()) {
-        sql.append(" AND j.salary <= ? ");
-    }
-
-    // ALWAYS LAST
-    sql.append(" ORDER BY (LOWER(j.city)=LOWER(?)) DESC ");
-
-    ps = con.prepareStatement(sql.toString());
-
-    int idx = 1;
-
-    ps.setInt(idx++, jobseekerId);
-    ps.setInt(idx++, jobseekerId);
-
-    if (districtFilter != null && !districtFilter.isEmpty()) {
-        ps.setString(idx++, districtFilter);
-    }
-
-    if (areaFilter != null) {
-        for(String area : areaFilter){
-            ps.setString(idx++, area);
-        }
-    }
-
-    if (subskillFilter != null) {
-        for(String sub : subskillFilter){
-            ps.setInt(idx++, Integer.parseInt(sub));
-        }
-    }
-
-    if (minSalary != null && !minSalary.isEmpty()) {
-        ps.setInt(idx++, Integer.parseInt(minSalary));
-    }
-
-    if (maxSalary != null && !maxSalary.isEmpty()) {
-        ps.setInt(idx++, Integer.parseInt(maxSalary));
-    }
-
-    ps.setString(idx++, (String) currentSession.getAttribute("jdistrict"));
-}
-    rs = ps.executeQuery();
-
-    while(rs.next()){
-%>
-
-<div class="card" >
-
-<h3 class="job-title"><%= rs.getString("title") %></h3>
-<%
-int jobIdCard = rs.getInt("job_id");
-
-PreparedStatement psBid = con.prepareStatement(
-"SELECT bid_id,bid_amount, bid_status, counter_bid FROM bids WHERE job_id=? AND job_seeker_id=?"
-);
-
-psBid.setInt(1, jobIdCard);
-psBid.setInt(2, jobseekerId);
-
-ResultSet rsBid = psBid.executeQuery();
-
-int bidAmount = 0;
-String bidStatus = "";
-int counterBid = 0;
-int bidId = 0;
-
-if(rsBid.next()){
-     bidId = rsBid.getInt("bid_id");
-    bidAmount = rsBid.getInt("bid_amount");
-    bidStatus = rsBid.getString("bid_status");
-    counterBid = rsBid.getInt("counter_bid");
-}
-%>
-
-<p class="desc"><b>Description:</b> <%= rs.getString("description") %></p>
- <div class="card-info">
-  <span class="location">
-
-📍 <%= rs.getString("locality") %>, 
-<%= rs.getString("city") %>, 
-<%= rs.getString("state") %>, 
-  </span>
-
-<span class="salary">
-            ₹<%= rs.getString("salary") %>
-</span>
- </div>
-
-<%
-if(bidAmount > 0){
-%>
-
-<p style="color:green;">
-<b>Your Bid:</b> ₹<%= bidAmount %> (<%= bidStatus %>)
-</p>
-
-<%
-    if("Countered".equals(bidStatus)){
-%>
-
-<p style="color:red;">
-💸 Employer Countered: ₹<%= counterBid %>
-</p>
-
-<a href="RespondCounterServlet?bid_id=<%= bidId %>&action=accept">
-    <button style="background:#28a745;color:white;padding:6px 12px;border:none;border-radius:5px;">
-        Accept Counter
-    </button>
-</a>
-
-<a href="RespondCounterServlet?bid_id=<%= bidId %>&action=reject">
-    <button style="background:#dc3545;color:white;padding:6px 12px;border:none;border-radius:5px;">
-        Reject Counter
-    </button>
-</a>
-
-<%
-    }
-}
-%>
-
-<p>
-<span style="background:#eef2ff;padding:4px 12px;border-radius:15px;font-size:13px;">
-<%= rs.getString("job_type") %>
-</span>
-</p>
-
-<div style="margin-top:15px;">
-<%
-if("applied".equals(section)){
-%>
-    <button disabled style="background:#cccccc;padding:8px 16px;border:none;border-radius:6px;">
-        ✓ <%= rs.getString("status") %>
-    </button>
-<%
-} else {
-    boolean isApplied = rs.getInt("applied") == 1;
-    String status = rs.getString("status");
-    if(isApplied){
-%>
-    <button disabled style="background:#cccccc;padding:8px 16px;border:none;border-radius:6px;">
-        ✓ <%= status %>
-    </button>
-<% } else { %>
-    <a href="job_details.jsp?jobId=<%= rs.getInt("job_id") %>">
-    <button type="button" style="background:#007bff;color:white;padding:8px 16px;border:none;border-radius:6px;">
-        View Job
-    </button>
-    </a>
-<% } } %>
+    rsSub.close(); psSub.close(); conSub.close();
+    %>
+    </div>
 </div>
+            <span class="job-type"><%= rsRec.getString("job_type") %></span>
+            <a href="job_details.jsp?jobId=<%= rsRec.getInt("job_id") %>" class="rec-view-btn">View Job</a>
+        </div>
+        <%
+        }
+        conRec.close();
+        %>
+        </div>
+    </div>
 
 </div>
+</div> <%-- closes dashboardSection --%>
 
-<%
-    }
-
-} catch (Exception e) { e.printStackTrace(); }
-finally {
-    if(rs != null) try{ rs.close(); } catch(Exception e){}
-    if(ps != null) try{ ps.close(); } catch(Exception e){}
-    if(con != null) try{ con.close(); } catch(Exception e){}
-}
-%>
-
-</div>
-</div>
 <!-- ================= APPLIED SECTION ================= -->
-
 <div id="appliedSection" style="display:none;">
 <div class="cards">
 <%
+Connection conApp = null;
+PreparedStatement psApp = null;
+ResultSet rsApp = null;
 try {
-    con = DBConnection.getConnection();
-
+    conApp = DBConnection.getConnection();
     boolean found = false;
 
-    String sqlApp =  "SELECT j.*, " +
-"CASE " +
-"WHEN a.application_id IS NOT NULL THEN a.status " +
-"ELSE b.bid_status " +
-"END AS final_status " +
-"FROM jobs j " +
-"LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
-"LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
-"AND a.application_id IS NULL " +   // 🔥 MAIN FIX
-"WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
-"AND j.status='ACTIVE'";
+    String sqlApp = "SELECT j.*, " +
+        "CASE " +
+        "WHEN a.application_id IS NOT NULL THEN a.status " +
+        "ELSE b.bid_status " +
+        "END AS final_status " +
+        "FROM jobs j " +
+        "LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
+        "LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
+        "AND a.application_id IS NULL " +
+        "WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
+        "AND j.status='ACTIVE'";
 
-    ps = con.prepareStatement(sqlApp);
-    ps.setInt(1, jobseekerId);
-    ps.setInt(2, jobseekerId);
-    rs = ps.executeQuery();
+    psApp = conApp.prepareStatement(sqlApp);
+    psApp.setInt(1, jobseekerId);
+    psApp.setInt(2, jobseekerId);
+    rsApp = psApp.executeQuery();
 
-    while(rs.next()){
+    while(rsApp.next()){
         found = true;
 %>
 <div class="card">
-    <h3><%= rs.getString("title") %></h3>
-    <p>Description: <%= rs.getString("description") %></p>
-    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
-    <p>₹<%= rs.getString("salary") %></p>
-
-    <button disabled>✓ <%= rs.getString("status") %></button>
+    <h3><%= rsApp.getString("title") %></h3>
+    <p>Description: <%= rsApp.getString("description") %></p>
+    <p>📍 <%= rsApp.getString("locality") %>, <%= rsApp.getString("city") %></p>
+    <p>₹<%= rsApp.getString("salary") %></p>
+    <button disabled>✓ <%= rsApp.getString("status") %></button>
 </div>
 <%
     }
+    rsApp.close(); psApp.close();
 
     // BIDS (NOT ACCEPTED)
     String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
                     "JOIN jobs j ON j.job_id = b.job_id " +
                     "WHERE b.job_seeker_id=? AND b.bid_status!='Accepted'";
+    psApp = conApp.prepareStatement(sqlBid);
+    psApp.setInt(1, jobseekerId);
+    rsApp = psApp.executeQuery();
 
-    ps = con.prepareStatement(sqlBid);
-    ps.setInt(1, jobseekerId);
-    rs = ps.executeQuery();
-
-    while(rs.next()){
+    while(rsApp.next()){
         found = true;
 %>
 <div class="card">
-    <h3><%= rs.getString("title") %></h3>
-    <p>Description: <%= rs.getString("description") %></p>
-    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
-    <p>₹<%= rs.getString("salary") %></p>
-
+    <h3><%= rsApp.getString("title") %></h3>
+    <p>Description: <%= rsApp.getString("description") %></p>
+    <p>📍 <%= rsApp.getString("locality") %>, <%= rsApp.getString("city") %></p>
+    <p>₹<%= rsApp.getString("salary") %></p>
     <button disabled>✓ Bid Placed</button>
 </div>
 <%
@@ -473,17 +486,24 @@ try {
     }
 
 } catch(Exception e){ e.printStackTrace(); }
+finally {
+    if(rsApp != null) try{ rsApp.close(); } catch(Exception e){}
+    if(psApp != null) try{ psApp.close(); } catch(Exception e){}
+    if(conApp != null) try{ conApp.close(); } catch(Exception e){}
+}
 %>
 </div>
 </div>
-<!-- ================= ASSIGNED SECTION ================= -->
 
+<!-- ================= ASSIGNED SECTION ================= -->
 <div id="assignedSection" style="display:none;">
 <div class="cards">
 <%
+Connection conAss = null;
+PreparedStatement psAss = null;
+ResultSet rsAss = null;
 try {
-    con = DBConnection.getConnection();
-
+    conAss = DBConnection.getConnection();
     boolean found = false;
 
     // ACCEPTED APPLICATIONS
@@ -491,44 +511,43 @@ try {
                     "JOIN jobs j ON j.job_id = a.job_id " +
                     "WHERE a.jobseeker_id=? AND a.status='Accepted'";
 
-    ps = con.prepareStatement(sqlApp);
-    ps.setInt(1, jobseekerId);
-    rs = ps.executeQuery();
+    psAss = conAss.prepareStatement(sqlApp);
+    psAss.setInt(1, jobseekerId);
+    rsAss = psAss.executeQuery();
 
-    while(rs.next()){
+    while(rsAss.next()){
         found = true;
 %>
 <div class="card">
-    <h3><%= rs.getString("title") %></h3>
-    <p>Description: <%= rs.getString("description") %></p>
-    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
-    <p>₹<%= rs.getString("salary") %></p>
-
+    <h3><%= rsAss.getString("title") %></h3>
+    <p>Description: <%= rsAss.getString("description") %></p>
+    <p>📍 <%= rsAss.getString("locality") %>, <%= rsAss.getString("city") %></p>
+    <p>₹<%= rsAss.getString("salary") %></p>
     <button disabled style="background:#28a745;color:white;">
         ✓ Accepted
     </button>
 </div>
 <%
     }
+    rsAss.close(); psAss.close();
 
     // ACCEPTED BIDS
     String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
                     "JOIN jobs j ON j.job_id = b.job_id " +
                     "WHERE b.job_seeker_id=? AND b.bid_status='Accepted'";
 
-    ps = con.prepareStatement(sqlBid);
-    ps.setInt(1, jobseekerId);
-    rs = ps.executeQuery();
+    psAss = conAss.prepareStatement(sqlBid);
+    psAss.setInt(1, jobseekerId);
+    rsAss = psAss.executeQuery();
 
-    while(rs.next()){
+    while(rsAss.next()){
         found = true;
 %>
 <div class="card">
-    <h3><%= rs.getString("title") %></h3>
-    <p>Description: <%= rs.getString("description") %></p>
-    <p>📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %></p>
-    <p>₹<%= rs.getString("salary") %></p>
-
+    <h3><%= rsAss.getString("title") %></h3>
+    <p>Description: <%= rsAss.getString("description") %></p>
+    <p>📍 <%= rsAss.getString("locality") %>, <%= rsAss.getString("city") %></p>
+    <p>₹<%= rsAss.getString("salary") %></p>
     <button disabled style="background:#28a745;color:white;">
         ✓ Accepted
     </button>
@@ -543,27 +562,164 @@ try {
     }
 
 } catch(Exception e){ e.printStackTrace(); }
+finally {
+    if(rsAss != null) try{ rsAss.close(); } catch(Exception e){}
+    if(psAss != null) try{ psAss.close(); } catch(Exception e){}
+    if(conAss != null) try{ conAss.close(); } catch(Exception e){}
+}
 %>
 </div>
 </div>
+<!-- ================= PAYMENTS SECTION (JOBSEEKER) ================= -->
+
+<div id="paymentsSection" style="display:none;">
+<div class="cards">
+
+<%
+Connection conPay = null;
+PreparedStatement psPay = null;
+ResultSet rsPay = null;
+
+try{
+
+conPay = DBConnection.getConnection();
+
+/* Only jobs that are ASSIGNED to jobseeker (Accepted applications) */
+
+
+String sqlPay =
+"SELECT a.application_id AS ref_id, j.title, j.salary, " +
+"COALESCE(p.status,'Pending') AS payment_status " +
+"FROM applications a " +
+"JOIN jobs j ON j.job_id = a.job_id " +
+"LEFT JOIN payments p ON a.application_id = p.application_id " +
+"WHERE a.jobseeker_id=? AND a.status='Accepted' " +
+
+"UNION " +
+
+"SELECT b.bid_id AS ref_id, j.title, j.salary, " +
+"COALESCE(p.status,'Pending') AS payment_status " +
+"FROM bids b " +
+"JOIN jobs j ON j.job_id = b.job_id " +
+"LEFT JOIN payments p ON b.bid_id = p.application_id " +
+"WHERE b.job_seeker_id=? AND b.bid_status='Accepted';";
+
+psPay = conPay.prepareStatement(sqlPay);
+psPay.setInt(1, jobseekerId);
+
+rsPay = psPay.executeQuery();
+
+boolean found=false;
+
+while(rsPay.next()){
+
+found=true;
+
+String status = rsPay.getString("payment_status");
+
+String color="#ffc107"; // Pending
+
+if("Requested".equals(status)) color="#ff9800";
+else if("Paid".equals(status)) color="#2196f3";
+else if("Confirmed".equals(status)) color="#28a745";
+%>
+
+<div class="card">
+
+<h3><%= rsPay.getString("title") %></h3>
+
+<p><b>Salary:</b> ₹<%= rsPay.getString("salary") %></p>
+
+<p>
+<b>Status:</b>
+<span style="padding:5px 12px;border-radius:12px;color:white;background:<%=color%>;">
+<%= status %>
+</span>
+</p>
+
+<div style="margin-top:10px;">
+
+<% if("Pending".equals(status)){ %>
+
+<!-- Worker requests payment -->
+
+<a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=request">
+<button style="background:#ff9800;color:white;padding:8px 16px;border:none;border-radius:6px;">
+Request Payment
+</button>
+</a>
+
+<% } else if("Requested".equals(status)){ %>
+
+<p style="color:#555;">Waiting for employer to pay...</p>
+
+<% } else if("Paid".equals(status)){ %>
+
+<!-- Worker confirms payment -->
+
+<a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=confirm">
+<button style="background:#28a745;color:white;padding:8px 16px;border:none;border-radius:6px;">
+Confirm Payment Received
+</button>
+</a>
+
+<% } else if("Confirmed".equals(status)){ %>
+
+<p style="color:green;font-weight:600;">Payment Completed</p>
+
+<% } %>
+
+</div>
+
+</div>
+
+<%
+}
+
+/* If no assigned jobs */
+
+if(!found){
+%>
+
+<h3>No Assigned Jobs Yet</h3>
+<p style="color:#777;">When an employer accepts your application, the job will appear here.</p>
+
+<%
+}
+
+}catch(Exception e){
+e.printStackTrace();
+}finally{
+
+if(rsPay!=null) try{rsPay.close();}catch(Exception e){}
+if(psPay!=null) try{psPay.close();}catch(Exception e){}
+if(conPay!=null) try{conPay.close();}catch(Exception e){}
+
+}
+%>
+
+</div>
+</div>
+
 <script>
 const jobseekerZip = "<%= currentSession.getAttribute("jzip") %>";
 console.log("ZIP CODE:", jobseekerZip);
 </script>
 
 <script>
+
+// ================= AREA =================
 function loadAreas(){
 
 console.log("Fetching areas for:", jobseekerZip);
 
 fetch("https://api.postalpincode.in/pincode/" + jobseekerZip)
 
-.then(response => response.json())
+.then(function(response){ return response.json(); })
 
-.then(data => {
+.then(function(data){
 
 const container = document.getElementById("areaContainer");
-
 container.innerHTML = "";
 
 if(data && data[0] && data[0].Status === "Success"){
@@ -584,17 +740,14 @@ container.appendChild(label);
 });
 
 }else{
-
 container.innerHTML = "No areas found";
-
 }
 
 })
 
-.catch(error => {
+.catch(function(error){
 
 console.error("API error:", error);
-
 document.getElementById("areaContainer").innerHTML = "Error loading areas";
 
 });
@@ -602,195 +755,191 @@ document.getElementById("areaContainer").innerHTML = "Error loading areas";
 }
 
 loadAreas();
-</script>
-<script>
+
+
+// ================= SEARCH SUGGESTION =================
 const searchInput = document.getElementById("searchInput");
-const suggestionBox = document.getElementById("suggestionBox");
 
-searchInput.addEventListener("keyup", function(){
+const suggestionBox = document.createElement("div");
+suggestionBox.id = "suggestionBox";
+suggestionBox.style.cssText =
+    "position:absolute; background:#fff; border:1px solid #e8edf2; " +
+    "border-radius:8px; width:100%; max-height:220px; overflow-y:auto; " +
+    "z-index:999; box-shadow:0 4px 12px rgba(0,0,0,0.1); display:none; top:100%; left:0;";
 
-const q = this.value;
+searchInput.parentElement.style.position = "relative";
+searchInput.parentNode.insertBefore(suggestionBox, searchInput.nextSibling);
 
-if(q.length < 1){
-suggestionBox.innerHTML="";
-return;
+if(searchInput){
+    searchInput.addEventListener("keyup", function(){
+        const q = this.value.trim();
+
+        if(q.length < 1){
+            suggestionBox.style.display = "none";
+            suggestionBox.innerHTML = "";
+            return;
+        }
+
+        fetch("SearchSuggestionServlet?q=" + encodeURIComponent(q))
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+
+            suggestionBox.innerHTML = "";
+
+            if(data.length === 0){
+                suggestionBox.style.display = "none";
+                return;
+            }
+
+            data.forEach(function(item){
+                const div = document.createElement("div");
+                div.textContent = item;
+                div.style.cssText =
+                    "padding:10px 14px; font-size:14px; cursor:pointer; " +
+                    "border-bottom:1px solid #f0f2f5; color:#1a2a3a;";
+
+                div.addEventListener("mouseenter", function(){
+                    this.style.background = "#f5f8ff";
+                });
+                div.addEventListener("mouseleave", function(){
+                    this.style.background = "#fff";
+                });
+                div.addEventListener("click", function(){
+                    searchInput.value = item;
+                    suggestionBox.style.display = "none";
+                    suggestionBox.innerHTML = "";
+                });
+
+                suggestionBox.appendChild(div);
+            });
+
+            suggestionBox.style.display = "block";
+        });
+    });
 }
 
-fetch("SearchSuggestionServlet?q="+q)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-suggestionBox.innerHTML="";
-
-data.forEach(function(item){
-
-const div = document.createElement("div");
-
-div.className="suggestion-item";
-
-div.textContent=item;
-
-div.onclick=function(){
-
-searchInput.value=item;
-suggestionBox.innerHTML="";
-
-};
-
-suggestionBox.appendChild(div);
-
+document.addEventListener("click", function(e){
+    if(e.target !== searchInput){
+        suggestionBox.style.display = "none";
+    }
 });
-
-});
-});
-</script>
-<script>
-// FILTER TOGGLE
+// ================= FILTER TOGGLE =================
 const filterBtn = document.getElementById("filterBtn");
 const filterBox = document.getElementById("filterContainer");
 
 filterBtn.addEventListener("click", function () {
-    filterBox.style.display =
-        filterBox.style.display === "block" ? "none" : "block";
+
+    if(filterBox.style.display === "block"){
+        filterBox.style.display = "none";
+    } else {
+        filterBox.style.display = "block";
+    }
+
 });
 
-// LOAD SUBSKILLS
-const skillSelect = document.getElementById("skillSelect");
-const subskillContainer = document.getElementById("subskillContainer");
 
-skillSelect.addEventListener("change", function () {
+// ================= APPLY FILTER BUTTON =================
+document.getElementById("applyFilter").addEventListener("click", function(){
+    document.getElementById("filterContainer").style.display = "none";
+});
 
-    const skillId = this.value;
 
-    if (!skillId) {
-        subskillContainer.innerHTML = "Select skill first";
+// ================= LOAD SUBSKILLS =================
+window.onload = function(){
+    loadSubskills();
+};
+
+function loadSubskills(){
+    console.log("Skill ID:", document.getElementById("selectedSkillId")?.value);
+    var skillInput = document.getElementById("selectedSkillId");
+
+    if(!skillInput){
+        console.log("No skillId found");
         return;
     }
 
+    var skillId = skillInput.value;
+
     fetch("GetSubskillsServlet?skillId=" + skillId)
-    .then(res => res.json())
-    .then(data => {
 
-        subskillContainer.innerHTML = "";
+    .then(function(res){ return res.json(); })
 
-        data.forEach(sub => {
-            const label = document.createElement("label");
+    .then(function(data){
+
+        var subskillList = document.getElementById("subskillList");
+        subskillList.innerHTML = "";
+
+        if(data.length === 0){
+            subskillList.innerHTML = "No subskills found";
+            return;
+        }
+
+        data.forEach(function(sub){
+
+            var label = document.createElement("label");
+
             label.innerHTML =
-                `<input type="checkbox" name="subskill" value="${sub.id}"> ${sub.name}`;
-            subskillContainer.appendChild(label);
+                '<input type="checkbox" name="subskill" value="'+sub.id+'"> ' + sub.name;
+
+            subskillList.appendChild(label);
         });
+
+    })
+
+    .catch(function(err){
+        console.error("Subskill error:", err);
     });
-});
-
-// LOAD AREAS FROM PINCODE
+}
 
 
-
-</script>
-<script>
+// ================= PROFILE MENU =================
 const profileIcon = document.getElementById("profileIcon");
 const profileMenu = document.getElementById("profileMenu");
 
-/* OPEN / CLOSE */
 profileIcon.addEventListener("click", function(e){
     e.stopPropagation();
     profileMenu.style.display =
         profileMenu.style.display === "block" ? "none" : "block";
 });
 
-/* 🔥 FIX: prevent closing when clicking inside menu */
 profileMenu.addEventListener("click", function(e){
     e.stopPropagation();
 });
 
-/* CLOSE when clicking outside */
 document.addEventListener("click", function(){
     profileMenu.style.display = "none";
 });
-</script>
-<script>
-    function applyFilters(){
 
-    const q = document.querySelector("input[name='q']").value;
-    const district = document.querySelector("input[name='district']").value;
-    const min_salary = document.querySelector("input[name='min_salary']").value;
-    const max_salary = document.querySelector("input[name='max_salary']").value;
 
-    const jid = "<%= session.getAttribute("jobseekerId") %>";
-
-    // ✅ GET SELECTED AREAS
-    let areas = [];
-    document.querySelectorAll("input[name='area']:checked").forEach(cb=>{
-        areas.push(cb.value);
-    });
-
-    // ✅ GET SELECTED SUBSKILLS
-    let subskills = [];
-    document.querySelectorAll("input[name='subskill']:checked").forEach(cb=>{
-        subskills.push(cb.value);
-    });
-
-    // 🔥 BUILD QUERY STRING
-    let url = "SearchJobsServlet?";
-    url += "jid=" + jid;
-    url += "&q=" + encodeURIComponent(q);
-    url += "&district=" + encodeURIComponent(district);
-
-    areas.forEach(a => url += "&area=" + encodeURIComponent(a));
-    subskills.forEach(s => url += "&subskill=" + s);
-
-    if(min_salary) url += "&min_salary=" + min_salary;
-    if(max_salary) url += "&max_salary=" + max_salary;
-
-    console.log("Fetching:", url);
-
-    // 🚀 FETCH DATA
-    fetch(url)
-    .then(res => res.json())
-    .then(data => {
-        renderJobs(data);
-    })
-    .catch(err => console.error(err));
-}
+// ================= RENDER JOBS =================
 function renderJobs(jobs){
 
     const container = document.querySelector(".cards");
-
-    container.innerHTML = ""; // clear old jobs
+    container.innerHTML = "";
 
     if(jobs.length === 0){
         container.innerHTML = "<h3>No jobs found</h3>";
         return;
     }
 
-    jobs.forEach(job => {
+    jobs.forEach(function(job){
 
         const card = document.createElement("div");
-
         card.className = "card";
-        card.style = "background:white;padding:20px;margin-bottom:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);";
 
-        card.innerHTML = `
-            <h3>${job.title}</h3>
-
-            <p><b>Location:</b> ${job.locality}, ${job.city}</p>
-
-            <p><b>Salary:</b> ₹${job.salary}</p>
-
-            <button onclick="viewJob(${job.jobId})"
-                style="background:#007bff;color:white;padding:8px 16px;border:none;border-radius:6px;">
-                View Job
-            </button>
-        `;
+        card.innerHTML =
+            "<h3>"+job.title+"</h3>" +
+            "<p><b>Location:</b> "+job.locality+", "+job.city+"</p>" +
+            "<p><b>Salary:</b> ₹"+job.salary+"</p>" +
+            '<button onclick="viewJob('+job.jobId+')">View Job</button>';
 
         container.appendChild(card);
     });
 }
-</script>
-<script>
-function showSection(section, el) {
+
+
+// ================= SECTION SWITCH =================
+function showSection(section, el){
 
    const sections = [
     "dashboardSection",
@@ -800,22 +949,79 @@ function showSection(section, el) {
     "reviewsSection"
    ];
 
-   // 🔥 hide all
-   sections.forEach(id => {
+   sections.forEach(function(id){
         const sec = document.getElementById(id);
         if(sec) sec.style.display = "none";
    });
 
-   // 🔥 show selected
    if(section === "dashboard") document.getElementById("dashboardSection").style.display = "block";
    else if(section === "applied") document.getElementById("appliedSection").style.display = "block";
    else if(section === "assigned") document.getElementById("assignedSection").style.display = "block";
    else if(section === "payments") document.getElementById("paymentsSection").style.display = "block";
    else if(section === "reviews") document.getElementById("reviewsSection").style.display = "block";
 
-   // 🔥 active highlight fix
-   document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+   document.querySelectorAll(".sidebar a").forEach(function(a){
+        a.classList.remove("active");
+   });
+
    el.classList.add("active");
+}
+
+
+// ===== SUBSKILL UI (REGISTER STYLE) =====
+function toggleSubskill(){
+    var d = document.getElementById("subskillDropdown");
+    d.style.display = (d.style.display === "block") ? "none" : "block";
+}
+
+function closeSubskill(){
+    document.getElementById("subskillDropdown").style.display = "none";
+    updateSubskillText();
+}
+
+function updateSubskillText(){
+
+    var checks = document.querySelectorAll("input[name='subskill']:checked");
+
+    if(checks.length === 0){
+        document.getElementById("subskillText").innerText = "Select Subskills";
+        return;
+    }
+
+    var names = [];
+
+    checks.forEach(function(c){
+        names.push(c.parentElement.textContent.trim());
+    });
+
+    document.getElementById("subskillText").innerText = names.join(", ");
+}
+
+
+// ===== AREA UI (SAME STYLE) =====
+function toggleArea(){
+    var d = document.getElementById("areaDropdown");
+    d.style.display = (d.style.display === "block") ? "none" : "block";
+}
+
+function closeArea(){
+
+    document.getElementById("areaDropdown").style.display = "none";
+
+    var checks = document.querySelectorAll("input[name='area']:checked");
+
+    if(checks.length === 0){
+        document.getElementById("areaText").innerText = "Select Area";
+        return;
+    }
+
+    var names = [];
+
+    checks.forEach(function(c){
+        names.push(c.parentElement.textContent.trim());
+    });
+
+    document.getElementById("areaText").innerText = names.join(", ");
 }
 </script>
 </div>

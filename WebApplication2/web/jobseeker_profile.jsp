@@ -5,12 +5,12 @@
 <%@ page import="db.DBConnection" %>
 
 <%
-/* 🔒 Prevent browser caching */
+/* Prevent browser caching */
 response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
 response.setHeader("Pragma","no-cache");
 response.setDateHeader("Expires",0);
 
-/* 🔒 SESSION CHECK */
+/* SESSION CHECK */
 HttpSession currentSession = request.getSession(false);
 
 if(currentSession == null || currentSession.getAttribute("jobseekerId") == null){
@@ -192,6 +192,7 @@ input,select{
     padding:10px;
     border:1px solid #ccc;
     border-radius:6px;
+    box-sizing:border-box;
 }
 
 .dropdown-subskills{ position:relative; }
@@ -212,16 +213,43 @@ input,select{
     background:white;
     border:1px solid #ccc;
     border-radius:6px;
-    max-height:200px;
+    max-height:220px;
     overflow-y:auto;
     width:100%;
     z-index:10;
     padding:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 
 .dropdown-content label{
     display:block;
     margin-bottom:5px;
+    cursor:pointer;
+}
+
+/* ── OK button inside dropdown ── */
+.dropdown-ok-wrap{
+    text-align:right;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid #eee;
+    position:sticky;
+    bottom:0;
+    background:white;
+}
+
+.dropdown-ok-btn{
+    background:#4a6fa5;
+    color:white;
+    padding:5px 18px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.dropdown-ok-btn:hover{
+    background:#3a5f95;
 }
 </style>
 </head>
@@ -268,7 +296,8 @@ input,select{
     </div>
 
     <hr>
-        <div class="row">
+
+    <div class="row">
         <span class="label">Skill:</span>
 
         <%
@@ -324,9 +353,9 @@ input,select{
 
         con3.close();
         %>
-
-        <hr>
     </div>
+
+    <hr>
 
     <div class="row"><span class="label">District:</span> <%=district%></div>
     <div class="row"><span class="label">Area:</span> <%=area%></div>
@@ -436,12 +465,13 @@ input,select{
             <div>
                 <label>Subskills</label>
 
-                <div class="dropdown-subskills">
+                <div class="dropdown-subskills" id="subskill-wrapper">
 
                     <button type="button"
                             onclick="toggleSubskills()"
-                            class="dropdown-btn">
-                        Select Subskills
+                            class="dropdown-btn"
+                            id="subskill-toggle-btn">
+                        Select Subskills ▾
                     </button>
 
                     <div id="subskill-container" class="dropdown-content">
@@ -474,6 +504,15 @@ input,select{
                         }
                         con2.close();
                         %>
+
+                        <!-- ✅ FIX: OK button to close dropdown (server-rendered subskills) -->
+                        <div class="dropdown-ok-wrap">
+                            <button type="button"
+                                    class="dropdown-ok-btn"
+                                    onclick="closeSubskills()">
+                                OK
+                            </button>
+                        </div>
 
                     </div>
                 </div>
@@ -533,7 +572,7 @@ input,select{
         <br>
 
         <button class="btn">Update</button>
-        <a href="jobseeker_profile.jsp" class="btn">Cancel</a>
+        <a href="jobseeker_profile.jsp" class="btn" style="margin-left:10px;">Cancel</a>
 
     </form>
 </div>
@@ -543,39 +582,74 @@ input,select{
 <!-- JS -->
 <script>
 
+/* ── Toggle open/close ── */
+function toggleSubskills(){
+    const box = document.getElementById("subskill-container");
+    box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+
+/* ── Close only (used by OK button) ── */
+function closeSubskills(){
+    document.getElementById("subskill-container").style.display = "none";
+
+    /* Update button label to show count of selected */
+    const checked = document.querySelectorAll("#subskill-container input[type='checkbox']:checked");
+    const btn = document.getElementById("subskill-toggle-btn");
+    if(checked.length > 0){
+        btn.textContent = checked.length + " subskill(s) selected ▾";
+    } else {
+        btn.textContent = "Select Subskills ▾";
+    }
+}
+
+/* ── Load subskills dynamically when skill changes ── */
 function loadSubskills(){
     const skillId = document.querySelector("select[name='skill']").value;
     const box = document.getElementById("subskill-container");
 
-    box.innerHTML = "Loading...";
+    box.innerHTML = "<p style='padding:6px;color:#888;font-size:13px;'>Loading...</p>";
+    box.style.display = "block";
 
     fetch("<%=request.getContextPath()%>/GetSubskillsServlet?skillId=" + skillId)
         .then(res => res.json())
         .then(data => {
             box.innerHTML = "";
 
-            data.forEach(s => {
-                const label = document.createElement("label");
-                label.style.display = "block";
+            if(data.length === 0){
+                box.innerHTML = "<p style='padding:6px;color:#888;font-size:13px;'>No subskills found.</p>";
+            } else {
+                data.forEach(s => {
+                    const label = document.createElement("label");
+                    label.style.display = "block";
+                    label.style.marginBottom = "5px";
+                    label.style.cursor = "pointer";
+                    label.innerHTML =
+                        '<input type="checkbox" name="subskills" value="' + s.id + '"> ' + s.name;
+                    box.appendChild(label);
+                });
+            }
 
-                label.innerHTML =
-                    '<input type="checkbox" name="subskills" value="' + s.id + '"> ' + s.name;
-
-                box.appendChild(label);
-            });
+            /* ✅ FIX: Re-add OK button after dynamic load */
+            const okWrap = document.createElement("div");
+            okWrap.className = "dropdown-ok-wrap";
+            okWrap.innerHTML =
+                '<button type="button" class="dropdown-ok-btn" onclick="closeSubskills()">OK</button>';
+            box.appendChild(okWrap);
+        })
+        .catch(err => {
+            box.innerHTML = "<p style='padding:6px;color:red;font-size:13px;'>Error loading subskills.</p>";
         });
 }
 
-function toggleSubskills(){
-    const box = document.getElementById("subskill-container");
-
-    if(box.style.display === "block"){
-        box.style.display = "none";
-    } else {
-        box.style.display = "block";
+/* ── FIX: Close dropdown when clicking outside ── */
+document.addEventListener("click", function(e){
+    const wrapper = document.getElementById("subskill-wrapper");
+    if(wrapper && !wrapper.contains(e.target)){
+        document.getElementById("subskill-container").style.display = "none";
     }
-}
+});
 
+/* ── ZIP / Pincode auto-fill ── */
 function fetchLocation(){
     let pincode = document.getElementById("zip").value;
 
@@ -589,15 +663,15 @@ function fetchLocation(){
                     let po = data[0].PostOffice;
 
                     document.getElementById("district").value = po[0].District;
-                    document.getElementById("state").value = po[0].State;
-                    document.getElementById("country").value = po[0].Country;
+                    document.getElementById("state").value    = po[0].State;
+                    document.getElementById("country").value  = po[0].Country;
 
                     let areaSelect = document.getElementById("area");
                     areaSelect.innerHTML = "";
 
                     po.forEach(p => {
                         let opt = document.createElement("option");
-                        opt.value = p.Name;
+                        opt.value       = p.Name;
                         opt.textContent = p.Name;
                         areaSelect.appendChild(opt);
                     });
@@ -605,7 +679,6 @@ function fetchLocation(){
                 } else {
                     alert("Invalid Pincode");
                 }
-
             });
     }
 }
