@@ -1,0 +1,141 @@
+/* ================= GLOBAL RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6fa;
+}
+
+/* ================= EDIT PAGE WRAPPER ================= */
+
+.edit-page-wrapper {
+    min-height: 100vh;
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* ================= CARD ================= */
+
+.edit-job-card {
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+.edit-job-card h2 {
+    margin-bottom: 30px;
+    font-size: 26px;
+    color: #222;
+}
+
+/* ================= FORM ================= */
+
+.edit-job-form label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    color: #333;
+}
+
+.edit-job-form input,
+.edit-job-form textarea,
+.edit-job-form select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
+    font-size: 14px;
+    transition: 0.2s ease;
+    background: #fafafa;
+}
+
+.edit-job-form textarea {
+    resize: none;
+}
+
+.edit-job-form input:focus,
+.edit-job-form textarea:focus,
+.edit-job-form select:focus {
+    border-color: #637b96;
+    background: #fff;
+    outline: none;
+}
+
+/* ================= GRID ROW ================= */
+
+.edit-job-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ================= CHECKBOX GROUP ================= */
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.checkbox-group label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    accent-color: #637b96;
+    width: 16px;
+    height: 16px;
+}
+
+/* ================= BUTTON ================= */
+
+.post-job-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: #637b96;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.post-job-btn:hover {
+    background: #4f657a;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+    .edit-job-card {
+        padding: 25px;
+    }
+
+    .edit-job-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+}

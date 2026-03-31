@@ -1,0 +1,287 @@
+/* ================= GLOBAL RESET ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Segoe UI", Arial, sans-serif;
+    background:#f4f6fa;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    background:#2c3e50;
+    color:#fff;
+    padding:16px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header .logo{
+    font-size:18px;
+    font-weight:600;
+}
+
+.header button{
+    background:#fff;
+    border:none;
+    padding:6px 12px;
+    cursor:pointer;
+    border-radius:6px;
+    font-size:14px;
+}
+
+/* ================= PAGE WRAPPER ================= */
+
+.container{
+    min-height:100vh;
+    padding:60px 20px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+}
+
+/* ================= CARD ================= */
+
+.post-job-form{
+    width:100%;
+    max-width:900px;
+    background:#ffffff;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.08);
+}
+
+/* ================= FORM TITLE ================= */
+
+.post-job-form h2{
+    margin-bottom:30px;
+    font-size:26px;
+    color:#222;
+}
+
+/* ================= LABEL ================= */
+
+.post-job-form label{
+    font-weight:600;
+    margin-bottom:6px;
+    display:block;
+    color:#333;
+}
+
+/* ================= INPUT FIELDS ================= */
+
+.post-job-form input,
+.post-job-form textarea,
+.post-job-form select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #dcdcdc;
+    margin-bottom:20px;
+    font-size:14px;
+    transition:0.2s ease;
+    background:#fafafa;
+}
+
+.post-job-form textarea{
+    resize:none;
+    min-height:120px;
+}
+
+/* ================= INPUT FOCUS ================= */
+
+.post-job-form input:focus,
+.post-job-form textarea:focus,
+.post-job-form select:focus{
+    border-color:#637b96;
+    background:#fff;
+    outline:none;
+}
+
+/* ================= GRID ROW ================= */
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+/* ================= CHECKBOX GROUP ================= */
+
+.checkbox-group{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.checkbox-group label{
+    font-weight:normal;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.checkbox-group input[type="checkbox"]{
+    accent-color:#637b96;
+    width:16px;
+    height:16px;
+}
+
+/* ================= SUBSKILL TAGS ================= */
+
+.selected-skills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.skill-tag{
+    background:#e6f0ff;
+    color:#1e40af;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.skill-tag span{
+    cursor:pointer;
+    color:red;
+    font-weight:bold;
+}
+
+/* ================= SUBSKILL SELECT ================= */
+
+#subskillSelect{
+    margin-bottom:10px;
+}
+
+/* ================= LANGUAGE MULTI SELECT ================= */
+
+.multi-select{
+    position:relative;
+    width:100%;
+    margin-bottom:20px;
+}
+
+.select-box{
+    width:100%;
+    border:1px solid #dcdcdc;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#fafafa;
+    cursor:pointer;
+    font-size:14px;
+}
+
+/* Dropdown */
+
+.dropdown{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    width:100%;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:10px;
+    margin-top:5px;
+    box-shadow:0 10px 20px rgba(0,0,0,0.1);
+    z-index:1000;
+    max-height:200px;
+    overflow-y:auto;
+}
+
+/* Fix checkbox width inside language dropdown */
+
+.dropdown input[type="checkbox"]{
+    width:auto;
+    margin:0;
+}
+
+/* Proper alignment */
+
+.dropdown label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+/* OK button */
+
+.ok-btn{
+    margin-top:8px;
+    padding:8px 12px;
+    border:none;
+    background:#637b96;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+    width:100%;
+}
+
+.ok-btn:hover{
+    background:#4f657a;
+}
+
+/* ================= BUTTON ================= */
+
+.post-job-form button{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:#637b96;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s ease;
+}
+
+.post-job-form button:hover{
+    background:#4f657a;
+}
+
+/* ================= DESCRIPTION COUNTER ================= */
+
+#descCounter{
+    font-size:12px;
+    color:#777;
+    margin-top:-15px;
+    margin-bottom:20px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width:768px){
+
+    .post-job-form{
+        padding:25px;
+    }
+
+    .row{
+        grid-template-columns:1fr;
+    }
+
+    .checkbox-group{
+        grid-template-columns:1fr;
+    }
+
+}
