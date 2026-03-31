@@ -1,0 +1,239 @@
+/* ================= GLOBAL ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    display: flex;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: 230px;
+    background-color: #4f6d84;
+    color: #fff;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin: 20px 0 30px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 25px;
+    color: #e8eef3;
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+.sidebar a:hover {
+    background-color: #3e5a70;
+}
+
+/* 🔥 ACTIVE LINK */
+.sidebar a.active {
+    background-color: #2f4658;
+    font-weight: 600;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 230px;
+    width: calc(100% - 230px);
+    height: 60px;
+    background-color: #4f6d84;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    z-index: 1000;
+}
+
+.nav-left {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.profile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+}
+
+.profile-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 55px;
+    background: #fff;
+    width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* ================= MAIN ================= */
+.main {
+    margin-left: 230px;
+    margin-top: 60px;
+    padding: 25px;
+    width: calc(100% - 230px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ================= SEARCH BOX ================= */
+.search-box {
+    background-color: #fff;
+    padding: 18px 20px;
+    border-radius: 12px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    align-items: center;
+    margin-bottom: 10px; /* 🔥 spacing added */
+}
+
+.search-box input {
+    padding: 12px;
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.search-box button {
+    padding: 10px 18px;
+    background-color: #4f6d84;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search-box button:hover {
+    background-color: #3e5a70;
+}
+
+/* ================= FILTER ================= */
+.filter-container {
+    display: none;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* ================= CARDS GRID ================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px; /* 🔥 spacing increased */
+    margin-top: 15px; /* 🔥 spacing from search */
+}
+
+/* ================= CARD ================= */
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* TITLE */
+.job-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+}
+
+/* DESCRIPTION */
+.desc {
+    font-size: 14px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* INFO ROW */
+.card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOCATION */
+.location {
+    font-size: 13px;
+    color: #555;
+}
+
+/* SALARY */
+.salary {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* BUTTON */
+button {
+    border-radius: 10px;
+}
+
+/* ================= AREA ================= */
+#areaContainer {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+#areaContainer label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+/* ================= SECTIONS ================= */
+#appliedSection,
+#assignedSection,
+#paymentsSection,
+#reviewsSection {
+    display: none;
+}
