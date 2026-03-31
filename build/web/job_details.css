@@ -1,0 +1,95 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 14 Feb, 2026, 12:01:05 AM
+    Author     : hp
+*/
+
+/* ===== Body ===== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e9edf2;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background-color: #5b768b;
+    color: white;
+    padding: 18px 40px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* ===== Container ===== */
+.details-container {
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ===== Card ===== */
+.job-details-card {
+    background: white;
+    width: 650px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* ===== Title ===== */
+.job-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* ===== Salary Highlight ===== */
+.salary {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1dbf73;
+    margin-bottom: 15px;
+}
+
+/* ===== Section Labels ===== */
+.label {
+    font-weight: bold;
+}
+
+/* ===== Paragraph spacing ===== */
+.section {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* ===== Apply Button ===== */
+.apply-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.apply-btn:hover {
+    background-color: #0056b3;
+}
+
+/* ===== Back Link ===== */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
