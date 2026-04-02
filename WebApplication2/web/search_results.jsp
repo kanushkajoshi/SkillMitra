@@ -164,137 +164,23 @@ int totalResults = bestMatchJobs.size() + otherJobs.size();
 <html>
 <head>
 <title>Search Results | SkillMitra</title>
-
-<style>
-body { font-family: Arial; background: #f5f5f5; }
-
-.main { width: 70%; margin: auto; }
-
-.card {
-    background: white;
-    padding: 15px;
-    margin: 15px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.view-btn {
-    padding: 8px 15px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* ── improved empty state ── */
-.no-results {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px;
-    padding: 2rem 0;
-}
-
-.no-results-card {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e5e5;
-    padding: 3rem 2.5rem;
-    text-align: center;
-    max-width: 420px;
-    width: 100%;
-}
-
-.no-results-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: #f5f5f5;
-    border: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    font-size: 32px;
-    line-height: 1;
-}
-
-.no-results-card h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 0.5rem;
-}
-
-.no-results-card > p {
-    font-size: 14px;
-    color: #666;
-    margin: 0 0 1.5rem;
-}
-
-.suggestions-box {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin: 0 0 1.5rem;
-    text-align: left;
-}
-
-.suggestions-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #999;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 0 0 0.65rem;
-}
-
-.suggestions-box ul {
-    margin: 0;
-    padding-left: 1.25rem;
-}
-
-.suggestions-box ul li {
-    font-size: 14px;
-    color: #333;
-    padding: 3px 0;
-}
-
-.reset-btn {
-    width: 100%;
-    padding: 10px 0;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.reset-btn:hover {
-    background: #0069d9;
-}
-/* find your back button style or add this */
-.back-btn{
-    background:#4a6fa5;
-    color:white;
-    padding:8px 16px;
-    border-radius:6px;
-    text-decoration:none;
-}
-
-</style>
-
+<link rel="stylesheet" href="search_results.css">
 </head>
 
 <body>
 
-<div class="main">
+<!-- 🔵 NAVBAR -->
+<div class="navbar">
+  <div class="nav-left">SkillMitra</div>
+  <a href="jobseeker_dash.jsp" class="back-btn">← Back</a>
+</div>
 
-<a href="jobseeker_dash.jsp" class="back-btn">← Back to Dashboard</a>
+<!-- 🔵 MAIN CONTAINER (IMPORTANT CHANGE) -->
+<div class="results-container">
 
-<p><b>Total Results:</b> <%= totalResults %></p>
+<p class="total-results">
+    <b>Total Results:</b> <%= totalResults %>
+</p>
 
 <%
 if(totalResults == 0){
@@ -305,6 +191,7 @@ if(totalResults == 0){
         <div class="no-results-icon">😕</div>
         <h2>No jobs found</h2>
         <p>Try adjusting your filters to see more results</p>
+
         <div class="suggestions-box">
             <p class="suggestions-label">Suggestions</p>
             <ul>
@@ -313,7 +200,9 @@ if(totalResults == 0){
                 <li>Increase your salary range</li>
             </ul>
         </div>
-        <button class="reset-btn" onclick="window.location='jobseeker_dash.jsp'">
+
+        <button class="reset-btn"
+            onclick="window.location='jobseeker_dash.jsp'">
             Reset Filters
         </button>
     </div>
@@ -323,13 +212,14 @@ if(totalResults == 0){
 } else {
 %>
 
-<h2>🔥 Best Skill Match</h2>
+<h2 class="section-title">🔥 Best Skill Match</h2>
 
 <%
 if(bestMatchJobs.isEmpty()){
 %>
 
 <p>No strong skill matches found</p>
+
 <%
 }
 
@@ -338,14 +228,24 @@ Map<String,Object> job = bestMatchJobs.get(i);
 %>
 
 <div class="card">
+
 <h3><%= job.get("title") %></h3>
 
-<p><b>Location:</b> <%= job.get("locality") %>, <%= job.get("city") %></p>
-<p><b>Salary:</b> ₹<%= job.get("salary") %></p>
-<p><b>Min Salary:</b> ₹<%= job.get("min_salary") %></p>
-<p><b>Match:</b> <b style="color:green"><%= job.get("percent") %>%</b></p>
+<p>📍 <%= job.get("locality") %>, <%= job.get("city") %></p>
 
-<a href="job_details.jsp?jobId=<%= job.get("job_id") %>"> <button class="view-btn">View Job</button> </a>
+<p>Salary: ₹<%= job.get("salary") %></p>
+
+<p>Min Salary: ₹<%= job.get("min_salary") %></p>
+
+<p>
+Match: <span class="match">
+<%= job.get("percent") %>%
+</span>
+</p>
+
+<a href="job_details.jsp?jobId=<%= job.get("job_id") %>">
+<button class="view-btn">View Job</button>
+</a>
 
 </div>
 
@@ -353,13 +253,14 @@ Map<String,Object> job = bestMatchJobs.get(i);
 }
 %>
 
-<h2>Other Jobs</h2>
+<h2 class="section-title">Other Jobs</h2>
 
 <%
 if(otherJobs.isEmpty()){
 %>
 
 <p>No other jobs available</p>
+
 <%
 }
 
@@ -368,26 +269,32 @@ Map<String,Object> job = otherJobs.get(i);
 %>
 
 <div class="card">
+
 <h3><%= job.get("title") %></h3>
 
-<p><b>Location:</b> <%= job.get("locality") %>, <%= job.get("city") %></p>
-<p><b>Salary:</b> ₹<%= job.get("salary") %></p>
-<p><b>Min Salary:</b> ₹<%= job.get("min_salary") %></p>
-<p><b>Match:</b> <b style="color:green"><%= job.get("percent") %>%</b></p>
+<p>📍 <%= job.get("locality") %>, <%= job.get("city") %></p>
 
-<a href="job_details.jsp?jobId=<%= job.get("job_id") %>"> <button class="view-btn">View Job</button> </a>
+<p>Salary: ₹<%= job.get("salary") %></p>
+
+<p>Min Salary: ₹<%= job.get("min_salary") %></p>
+
+<p>
+Match: <span class="match">
+<%= job.get("percent") %>%
+</span>
+</p>
+
+<a href="job_details.jsp?jobId=<%= job.get("job_id") %>">
+<button class="view-btn">View Job</button>
+</a>
 
 </div>
 
 <%
 }
-%>
-
-<%
 }
 %>
 
 </div>
 
 </body>
-</html>

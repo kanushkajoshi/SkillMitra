@@ -59,7 +59,17 @@ ResultSet rs = ps.executeQuery();
 <body>
 
 <div class="navbar">
-SkillMitra
+
+    <div class="nav-left">
+        SkillMitra
+    </div>
+
+    <div class="nav-right">
+        <a href="jobseeker_dash.jsp?section=applied" class="back-btn">
+            ← Back
+        </a>
+    </div>
+
 </div>
 
 <div class="details-container">
@@ -70,81 +80,92 @@ SkillMitra
 if (rs.next()) {
 %>
 
-<div class="job-title">
-<%= rs.getString("title") %>
+<div class="job-header">
+
+    <div>
+        <h2 class="job-title"><%= rs.getString("title") %></h2>
+        <p class="job-location">
+            📍 <%= rs.getString("locality") %>, <%= rs.getString("city") %>
+        </p>
+    </div>
+
+    <div class="salary">
+        ₹<%= rs.getString("salary") %>
+    </div>
+
 </div>
 
-<div class="salary">
-₹<%= rs.getString("salary") %>
-</div>
+<div class="job-grid">
 
-<div class="section">
-<span class="label">Description:</span><br>
-<%= rs.getString("description") != null ? rs.getString("description") : "No description provided." %>
-</div>
+    <div class="job-box">
+        <span>Description</span>
+        <p><%= rs.getString("description") != null ? rs.getString("description") : "No description provided." %></p>
+    </div>
 
-<div class="section">
-<span class="label">Location:</span><br>
-<%= rs.getString("locality") %>,
-<%= rs.getString("city") %>,
-<%= rs.getString("state") %>,
-<%= rs.getString("country") %> -
-<%= rs.getString("zip") %>
-</div>
+    <div class="job-box">
+        <span>Job Type</span>
+        <p><%= rs.getString("job_type") %></p>
+    </div>
+      
+    <div class="job-box">
+    <span>Location</span>
+    <p>
+        <%= rs.getString("locality") %>, 
+        <%= rs.getString("city") %>, 
+        <%= rs.getString("state") %>, 
+        <%= rs.getString("country") %> - 
+        <%= rs.getString("zip") %>
+    </p>
+    </div>
+    <div class="job-box">
+        <span>Experience Level</span>
+        <p><%= rs.getString("experience_level") != null ? rs.getString("experience_level") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Job Type:</span>
-<%= rs.getString("job_type") %>
-</div>
+    <div class="job-box">
+        <span>Experience Required</span>
+        <p><%= rs.getString("experience_required") != null ? rs.getString("experience_required") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Experience Level:</span>
-<%= rs.getString("experience_level") != null ? rs.getString("experience_level") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Workers Required</span>
+        <p><%= rs.getString("workers_required") != null ? rs.getString("workers_required") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Experience Required:</span>
-<%= rs.getString("experience_required") != null ? rs.getString("experience_required") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Working Hours</span>
+        <p><%= rs.getString("working_hours") != null ? rs.getString("working_hours") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Workers Required:</span>
-<%= rs.getString("workers_required") != null ? rs.getString("workers_required") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Gender Preference</span>
+        <p><%= rs.getString("gender_preference") != null ? rs.getString("gender_preference") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Working Hours:</span>
-<%= rs.getString("working_hours") != null ? rs.getString("working_hours") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Languages</span>
+        <p><%= rs.getString("languages_preferred") != null ? rs.getString("languages_preferred") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Gender Preference:</span>
-<%= rs.getString("gender_preference") != null ? rs.getString("gender_preference") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Maximum Salary</span>
+        <p>₹<%= rs.getString("min_salary") != null ? rs.getString("min_salary") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Languages Preferred:</span>
-<%= rs.getString("languages_preferred") != null ? rs.getString("languages_preferred") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Expiry Date</span>
+        <p><%= rs.getString("expiry_date") != null ? rs.getString("expiry_date") : "Not specified" %></p>
+    </div>
 
-<div class="section">
-<span class="label">Minimum Salary:</span>
-₹<%= rs.getString("min_salary") != null ? rs.getString("min_salary") : "Not specified" %>
-</div>
+    <div class="job-box">
+        <span>Posted On</span>
+        <p><%= rs.getString("created_at") %></p>
+    </div>
 
-<div class="section">
-<span class="label">Expiry Date:</span>
-<%= rs.getString("expiry_date") != null ? rs.getString("expiry_date") : "Not specified" %>
 </div>
-
-<div class="section">
-<span class="label">Posted On:</span>
-<%= rs.getString("created_at") %>
-</div>
-
 <br>
 
-<<div style="margin-top:20px;">
+<div class="job-actions">
 
 <!-- DIRECT APPLY -->
 
@@ -159,7 +180,7 @@ Apply Now
 </form>
 
 
-<hr style="margin:20px 0;">
+<!--<hr style="margin:20px 0 -->
 
 
 <!-- BID SYSTEM -->
@@ -195,9 +216,7 @@ Place Bid
 
 </div>
 
-<a href="jobseeker_dash.jsp?section=applied" class="back-link">
-← Back to Applied Jobs
-</a>
+
 
 <%
 } else {

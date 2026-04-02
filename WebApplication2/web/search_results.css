@@ -1,0 +1,167 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5; /* old bg restore */
+}
+
+/* NAVBAR */
+.navbar {
+    width: 100%;
+    background: #4f6d84; /* 🔥 old blue */
+    color: white;
+    padding: 15px 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: white;
+    color: #007bff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background: #eaeaea;
+}
+
+/* 🔥 MAIN CENTER FIX (IMPORTANT) */
+.results-container {
+    width: 70%;
+    margin: 30px auto;   /* center fix */
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .results-container {
+        width: 95%;
+    }
+}
+
+/* TOTAL TEXT */
+.total-results {
+    margin-bottom: 15px;
+}
+
+/* HEADINGS */
+.section-title {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+/* BUTTON */
+.view-btn {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-btn:hover {
+    background: #0056b3;
+}
+
+/* MATCH TEXT */
+.match {
+    color: green;
+    font-weight: bold;
+}
+
+/* NO RESULTS */
+.no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.no-results-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    padding: 2.5rem;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.no-results-icon {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+/* SUGGESTIONS */
+.suggestions-box {
+    background: #f1f3f6;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 15px 0;
+    text-align: left;
+}
+
+/* RESET BUTTON */
+.reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.reset-btn:hover {
+    background: #0056b3;
+}
+
+/* MOBILE NAVBAR */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 12px 15px;
+    }
+
+    .nav-left {
+        font-size: 16px;
+    }
+
+    .back-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
