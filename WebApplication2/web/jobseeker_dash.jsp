@@ -743,6 +743,320 @@ try {
 </div>
 </div>
 
+<%--
+  ================================================================
+  FILE: js_reviews_section.jsp  (include or paste into jobseeker_dashboard.jsp)
+  Drop this inside the <div class="main"> of jobseeker_dashboard.jsp.
+  The sidebar link already calls showSection('reviews', this).
+  Add 'reviewsSection' to the sections[] array in showSection().
+  ================================================================
+--%>
+
+<!-- ================= JOBSEEKER → RATE & REVIEW SECTION ================= -->
+<!-- ================= JOBSEEKER → RATE & REVIEW SECTION ================= -->
+<div id="reviewsSection" style="display:none;">
+<div style="padding:2rem 1.5rem; max-width:820px; font-family:inherit;">
+
+<%
+HttpSession currentSession2 = request.getSession(false);
+String ratingSuccessJs = (String) currentSession2.getAttribute("ratingMsg_js_success");
+String ratingErrorJs   = (String) currentSession2.getAttribute("ratingMsg_js_error");
+if (ratingSuccessJs != null) { currentSession2.removeAttribute("ratingMsg_js_success"); }
+if (ratingErrorJs   != null) { currentSession2.removeAttribute("ratingMsg_js_error"); }
+%>
+
+<% if (ratingSuccessJs != null) { %>
+<div style="background:#EAF3DE;border:0.5px solid #97C459;border-radius:10px;
+            padding:12px 16px;color:#3B6D11;font-size:14px;font-weight:500;margin-bottom:1.5rem;">
+    ✓ &nbsp;<%= ratingSuccessJs %>
+</div>
+<% } %>
+<% if (ratingErrorJs != null) { %>
+<div style="background:#FCEBEB;border:0.5px solid #F09595;border-radius:10px;
+            padding:12px 16px;color:#A32D2D;font-size:14px;font-weight:500;margin-bottom:1.5rem;">
+    ! &nbsp;<%= ratingErrorJs %>
+</div>
+<% } %>
+
+<%-- ── SECTION: Rate employers ── --%>
+<p style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+          color:var(--color-text-tertiary);margin:0 0 1rem;">Ratings & Reviews</p>
+<h2 style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px;">Rate Employers</h2>
+<p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 1.5rem;">
+    Leave a review after payment has been confirmed
+</p>
+
+<%
+int jobseekerId2 = (Integer) currentSession2.getAttribute("jobseekerId");
+Connection conJsRev = null;
+PreparedStatement psJsRev = null;
+ResultSet rsJsRev = null;
+try {
+    conJsRev = db.DBConnection.getConnection();
+    String sqlJsRev =
+        "SELECT j.job_id, j.title, j.eid AS employer_id, " +
+        "CONCAT(e.efirstname,' ',e.elastname) AS employer_name, e.ecompanyname, " +
+        "r.rating_id AS already_rated " +
+        "FROM applications a " +
+        "JOIN jobs j ON j.job_id = a.job_id " +
+        "JOIN employer e ON e.eid = j.eid " +
+        "JOIN payments p ON p.application_id = a.application_id " +
+        "LEFT JOIN ratings r ON r.job_id = j.job_id " +
+        "    AND r.employer_id = j.eid " +
+        "    AND r.jobseeker_id = a.jobseeker_id " +
+        "    AND r.rating_by = 'Jobseeker' " +
+        "WHERE a.jobseeker_id = ? AND a.status = 'Accepted' AND p.status = 'Confirmed' " +
+        "UNION " +
+        "SELECT j.job_id, j.title, j.eid AS employer_id, " +
+        "CONCAT(e.efirstname,' ',e.elastname) AS employer_name, e.ecompanyname, " +
+        "r.rating_id AS already_rated " +
+        "FROM bids b " +
+        "JOIN jobs j ON j.job_id = b.job_id " +
+        "JOIN employer e ON e.eid = j.eid " +
+        "JOIN payments p ON p.application_id = b.bid_id " +
+        "LEFT JOIN ratings r ON r.job_id = j.job_id " +
+        "    AND r.employer_id = j.eid " +
+        "    AND r.jobseeker_id = b.job_seeker_id " +
+        "    AND r.rating_by = 'Jobseeker' " +
+        "WHERE b.job_seeker_id = ? AND b.bid_status = 'Accepted' AND p.status = 'Confirmed' " +
+        "ORDER BY job_id DESC";
+    psJsRev = conJsRev.prepareStatement(sqlJsRev);
+    psJsRev.setInt(1, jobseekerId2);
+    psJsRev.setInt(2, jobseekerId2);
+    //rsJsRev = conJsRev.executeQuery(sqlJsRev); // use psJsRev!
+    rsJsRev = psJsRev.executeQuery();
+
+    boolean anyJsRow = false;
+    while (rsJsRev.next()) {
+        anyJsRow = true;
+        boolean jsRated = (rsJsRev.getObject("already_rated") != null);
+        String empName = rsJsRev.getString("employer_name");
+        String initials = "";
+        if (empName != null && empName.contains(" ")) {
+            String[] parts = empName.trim().split(" ");
+            initials = ("" + parts[0].charAt(0) + parts[parts.length-1].charAt(0)).toUpperCase();
+        } else if (empName != null && empName.length() > 0) {
+            initials = ("" + empName.charAt(0)).toUpperCase();
+        }
+        String companyName = rsJsRev.getString("ecompanyname");
+        if (companyName == null) companyName = "";
+%>
+<%-- Employer card --%>
+<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);
+            border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;margin-bottom:12px;
+            display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div style="width:42px;height:42px;border-radius:50%;background:#E6F1FB;
+                display:flex;align-items:center;justify-content:center;
+                font-size:14px;font-weight:500;color:#185FA5;flex-shrink:0;">
+        <%= initials %>
+    </div>
+    <div style="flex:1;min-width:0;">
+        <p style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 2px;
+                  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            <%= empName %>
+        </p>
+        <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 8px;">
+            <%= companyName.isEmpty() ? "" : companyName + " &nbsp;·&nbsp; " %>
+            <%= rsJsRev.getString("title") %>
+        </p>
+        <% if (jsRated) { %>
+        <span style="display:inline-block;background:#EAF3DE;color:#3B6D11;
+                     font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;">
+            Review submitted
+        </span>
+        <% } else { %>
+        <span style="display:inline-block;background:#FAEEDA;color:#854F0B;
+                     font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;">
+            Pending your review
+        </span>
+        <% } %>
+    </div>
+    <% if (!jsRated) { %>
+    <a href="rating_form.jsp?job_id=<%= rsJsRev.getInt("job_id") %>&employer_id=<%= rsJsRev.getInt("employer_id") %>&jobseeker_id=<%= jobseekerId2 %>"
+       style="text-decoration:none;flex-shrink:0;">
+        <button style="background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);
+                       padding:9px 20px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;">
+            Rate employer
+        </button>
+    </a>
+    <% } else { %>
+    <button disabled style="background:var(--color-background-secondary);color:var(--color-text-tertiary);
+                            border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);
+                            padding:9px 20px;font-size:14px;white-space:nowrap;cursor:default;">
+        Submitted
+    </button>
+    <% } %>
+</div>
+<%
+    }
+    if (!anyJsRow) {
+%>
+<div style="text-align:center;padding:3rem 1rem;color:var(--color-text-tertiary);
+            background:var(--color-background-secondary);border-radius:var(--border-radius-lg);">
+    <div style="font-size:28px;margin-bottom:12px;">⭐</div>
+    <p style="font-size:15px;color:var(--color-text-secondary);margin:0 0 6px;font-weight:500;">
+        No completed jobs yet
+    </p>
+    <p style="font-size:13px;margin:0;">Review option appears after payment is confirmed.</p>
+</div>
+<%
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+} finally {
+    if (rsJsRev  != null) try { rsJsRev.close();  } catch(Exception ignored){}
+    if (psJsRev  != null) try { psJsRev.close();  } catch(Exception ignored){}
+    if (conJsRev != null) try { conJsRev.close(); } catch(Exception ignored){}
+}
+%>
+
+<%-- ── DIVIDER ── --%>
+<hr style="border:none;border-top:0.5px solid var(--color-border-tertiary);margin:2.5rem 0;">
+
+<%-- ── SECTION: Reviews received ── --%>
+<p style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+          color:var(--color-text-tertiary);margin:0 0 1rem;">Reviews from employers</p>
+<h2 style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px;">Your Reviews</h2>
+<p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 1.5rem;">
+    What employers say about your work
+</p>
+
+<%
+Connection conJsMyRev = null;
+PreparedStatement psJsMyRev = null;
+ResultSet rsJsMyRev = null;
+try {
+    conJsMyRev = db.DBConnection.getConnection();
+
+    PreparedStatement psAvgJs = conJsMyRev.prepareStatement(
+        "SELECT ROUND(AVG(rating_value),1) AS avg_r, COUNT(*) AS total " +
+        "FROM ratings WHERE jobseeker_id=? AND rating_by='Employer'"
+    );
+    psAvgJs.setInt(1, jobseekerId2);
+    ResultSet rsAvgJs = psAvgJs.executeQuery();
+    double avgRjs = 0; int totalRjs = 0;
+    if (rsAvgJs.next()) { avgRjs = rsAvgJs.getDouble("avg_r"); totalRjs = rsAvgJs.getInt("total"); }
+    rsAvgJs.close(); psAvgJs.close();
+%>
+
+<%-- Score summary box --%>
+<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);
+            padding:1.25rem 1.5rem;display:flex;align-items:center;gap:20px;margin-bottom:1.5rem;">
+    <div>
+        <div style="font-size:36px;font-weight:500;color:var(--color-text-primary);line-height:1;">
+            <%= totalRjs > 0 ? String.format("%.1f", avgRjs) : "—" %>
+        </div>
+        <div style="display:flex;gap:3px;margin-top:6px;">
+<%
+        if (totalRjs > 0) {
+            int full = (int) Math.floor(avgRjs);
+            for (int si = 1; si <= 5; si++) {
+                if (si <= full) {
+                    out.print("<span style='color:#BA7517;font-size:16px;'>★</span>");
+                } else {
+                    out.print("<span style='color:var(--color-border-secondary);font-size:16px;'>★</span>");
+                }
+            }
+        }
+%>
+        </div>
+    </div>
+    <div>
+        <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Overall rating</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;">
+            <%= totalRjs > 0 ? "Based on " + totalRjs + " review" + (totalRjs!=1?"s":"") : "No reviews yet" %>
+        </div>
+    </div>
+</div>
+
+<%
+    psJsMyRev = conJsMyRev.prepareStatement(
+        "SELECT r.rating_value, r.review_text, r.created_at, " +
+        "r.work_quality, r.performance, r.punctuality, r.professional_behavior, " +
+        "CONCAT(e.efirstname,' ',e.elastname) AS reviewer_name, " +
+        "e.ecompanyname, j.title AS job_title " +
+        "FROM ratings r " +
+        "JOIN employer e ON e.eid = r.employer_id " +
+        "JOIN jobs j ON j.job_id = r.job_id " +
+        "WHERE r.jobseeker_id=? AND r.rating_by='Employer' " +
+        "ORDER BY r.created_at DESC"
+    );
+    psJsMyRev.setInt(1, jobseekerId2);
+    rsJsMyRev = psJsMyRev.executeQuery();
+    boolean anyJsReview = false;
+
+    while (rsJsMyRev.next()) {
+        anyJsReview = true;
+        double rv = rsJsMyRev.getDouble("rating_value");
+        String reviewerName = rsJsMyRev.getString("reviewer_name");
+        String co2 = rsJsMyRev.getString("ecompanyname");
+        if (co2 == null) co2 = "";
+        String reviewText = rsJsMyRev.getString("review_text");
+        int wq = rsJsMyRev.getInt("work_quality");
+        int pf = rsJsMyRev.getInt("performance");
+        int pu = rsJsMyRev.getInt("punctuality");
+        int pb = rsJsMyRev.getInt("professional_behavior");
+        String dateStr = new java.text.SimpleDateFormat("dd MMM yyyy")
+                            .format(rsJsMyRev.getTimestamp("created_at"));
+%>
+<%-- Review card --%>
+<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);
+            border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;margin-bottom:12px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <div>
+            <p style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin:0 0 2px;">
+                <%= reviewerName %>
+            </p>
+            <p style="font-size:12px;color:var(--color-text-tertiary);margin:0;">
+                <%= co2.isEmpty() ? "" : co2 + " · " %>
+                <%= rsJsMyRev.getString("job_title") %>
+                &nbsp;·&nbsp; <%= dateStr %>
+            </p>
+        </div>
+        <span style="background:#FAEEDA;color:#633806;font-size:13px;font-weight:500;
+                     padding:4px 10px;border-radius:var(--border-radius-md);white-space:nowrap;flex-shrink:0;">
+            <%= String.format("%.1f", rv) %> ★
+        </span>
+    </div>
+    <%-- Criteria tags --%>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+        <% if (wq > 0) { %><span style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-size:12px;padding:3px 10px;border-radius:20px;">Work quality: <%= wq %>/5</span><% } %>
+        <% if (pf > 0) { %><span style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-size:12px;padding:3px 10px;border-radius:20px;">Performance: <%= pf %>/5</span><% } %>
+        <% if (pu > 0) { %><span style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-size:12px;padding:3px 10px;border-radius:20px;">Punctuality: <%= pu %>/5</span><% } %>
+        <% if (pb > 0) { %><span style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-size:12px;padding:3px 10px;border-radius:20px;">Professionalism: <%= pb %>/5</span><% } %>
+    </div>
+    <% if (reviewText != null && !reviewText.trim().isEmpty()) { %>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin:0 0 10px;
+              border-left:2px solid var(--color-border-secondary);padding-left:12px;">
+        <%= reviewText.trim() %>
+    </p>
+    <% } %>
+</div>
+<%
+    }
+    if (!anyJsReview) {
+%>
+<div style="text-align:center;padding:3rem 1rem;color:var(--color-text-tertiary);
+            background:var(--color-background-secondary);border-radius:var(--border-radius-lg);">
+    <p style="font-size:15px;color:var(--color-text-secondary);margin:0;font-weight:500;">
+        No reviews received yet
+    </p>
+</div>
+<%
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+} finally {
+    if (rsJsMyRev  != null) try { rsJsMyRev.close();  } catch(Exception ignored){}
+    if (psJsMyRev  != null) try { psJsMyRev.close();  } catch(Exception ignored){}
+    if (conJsMyRev != null) try { conJsMyRev.close(); } catch(Exception ignored){}
+}
+%>
+
+</div><%-- inner padding div --%>
+</div><%-- reviewsSection --%>
+
+
 <script>
 const jobseekerZip = "<%= currentSession.getAttribute("jzip") %>";
 console.log("ZIP CODE:", jobseekerZip);
@@ -1064,7 +1378,7 @@ function closeArea(){
     });
 
     document.getElementById("areaText").innerText = names.join(", ");
-}
+} 
 // ── Read URL param and show correct section on page load ──
 document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);

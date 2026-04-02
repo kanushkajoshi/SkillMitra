@@ -145,6 +145,39 @@ String imgPath =
         (photo != null && !photo.trim().equals(""))
                 ? request.getContextPath() + "/uploads/" + photo
                 : request.getContextPath() + "/images/default-user.png";
+
+/* ── RATING WIDGET DATA (employer profile — rated by jobseekers) ── */
+double empAvgRating  = 0;
+int    empTotalRating = 0;
+try {
+    Connection conRat = db.DBConnection.getConnection();
+    // We need the eid from session or by querying via email
+    PreparedStatement psEid = conRat.prepareStatement(
+        "SELECT eid FROM employer WHERE eemail=?"
+    );
+    psEid.setString(1, email);
+    ResultSet rsEid = psEid.executeQuery();
+    int profileEid = 0;
+    if (rsEid.next()) profileEid = rsEid.getInt("eid");
+    rsEid.close(); psEid.close();
+
+    if (profileEid > 0) {
+        PreparedStatement psRat = conRat.prepareStatement(
+            "SELECT ROUND(AVG(rating_value),1) AS avg_r, COUNT(*) AS total " +
+            "FROM ratings WHERE employer_id=? AND rating_by='Jobseeker'"
+        );
+        psRat.setInt(1, profileEid);
+        ResultSet rsRat = psRat.executeQuery();
+        if (rsRat.next()) {
+            empAvgRating  = rsRat.getDouble("avg_r");
+            empTotalRating = rsRat.getInt("total");
+        }
+        rsRat.close(); psRat.close();
+    }
+    conRat.close();
+} catch (Exception e) {
+    // silently ignore — don't break profile page if ratings table missing
+}
 %>
 
 <!DOCTYPE html>
@@ -327,6 +360,41 @@ input:focus, select:focus{
     margin-bottom:10px;
 }
 
+/* ── RATING WIDGET ── */
+.rating-widget {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+.rating-widget .stars {
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.rating-widget .star-filled  { color: #f59e0b; }
+.rating-widget .star-half    { color: #f59e0b; opacity: .55; }
+.rating-widget .star-empty   { color: #d1d5db; }
+
+.rating-widget .rat-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #92400e;
+}
+
+.rating-widget .rat-meta {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-left: 4px;
+}
+
 </style>
 
 </head>
@@ -350,6 +418,39 @@ input:focus, select:focus{
 <img src="<%=imgPath%>" class="profile-photo">
 
 <h2>Employer Profile</h2>
+
+<%-- ── RATING WIDGET (view mode only) ──────────────────────────────────── --%>
+<div style="text-align:center; margin-bottom:16px;">
+    <div class="rating-widget">
+        <div class="stars">
+<%
+if (empTotalRating > 0) {
+    for (int i = 1; i <= 5; i++) {
+        if (i <= Math.floor(empAvgRating)) {
+            out.print("<span class='star-filled'>★</span>");
+        } else if ((i - empAvgRating) > 0 && (i - empAvgRating) < 1) {
+            out.print("<span class='star-half'>★</span>");
+        } else {
+            out.print("<span class='star-empty'>★</span>");
+        }
+    }
+} else {
+    out.print("<span class='star-empty'>★★★★★</span>");
+}
+%>
+        </div>
+        <div>
+<% if (empTotalRating > 0) { %>
+            <span class="rat-val"><%= empAvgRating %></span>
+            <span style="font-size:13px;color:#78716c;">/5</span>
+            <span class="rat-meta">(<%= empTotalRating %> review<%= empTotalRating != 1 ? "s" : "" %>)</span>
+<% } else { %>
+            <span class="rat-meta">No reviews yet</span>
+<% } %>
+        </div>
+    </div>
+</div>
+<%-- ── END RATING WIDGET ─────────────────────────────────────────────── --%>
 
 <div class="row">
 <span class="label">Name:</span> <%=fname%> <%=lname%>

@@ -125,6 +125,27 @@ try {
 } catch(Exception e){
     out.println("ERROR: " + e);
 }
+
+/* ── RATING WIDGET DATA (jobseeker profile — rated by employers) ── */
+double jsAvgRating  = 0;
+int    jsTotalRating = 0;
+try {
+    Connection conRat = DBConnection.getConnection();
+    PreparedStatement psRat = conRat.prepareStatement(
+        "SELECT ROUND(AVG(rating_value),1) AS avg_r, COUNT(*) AS total " +
+        "FROM ratings WHERE jobseeker_id=? AND rating_by='Employer'"
+    );
+    psRat.setInt(1, jid);
+    ResultSet rsRat = psRat.executeQuery();
+    if (rsRat.next()) {
+        jsAvgRating   = rsRat.getDouble("avg_r");
+        jsTotalRating = rsRat.getInt("total");
+    }
+    rsRat.close(); psRat.close();
+    conRat.close();
+} catch (Exception e) {
+    // silently ignore — don't break profile page if ratings table missing
+}
 %>
 
 <!DOCTYPE html>
@@ -251,6 +272,41 @@ input,select{
 .dropdown-ok-btn:hover{
     background:#3a5f95;
 }
+
+/* ── RATING WIDGET ── */
+.rating-widget {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+.rating-widget .stars {
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.rating-widget .star-filled  { color: #f59e0b; }
+.rating-widget .star-half    { color: #f59e0b; opacity: .55; }
+.rating-widget .star-empty   { color: #d1d5db; }
+
+.rating-widget .rat-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #92400e;
+}
+
+.rating-widget .rat-meta {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-left: 4px;
+}
 </style>
 </head>
 
@@ -278,6 +334,39 @@ input,select{
     <img src="<%=imgPath%>" class="profile-photo">
 
     <h2 style="text-align:center">Jobseeker Profile</h2>
+
+    <%-- ── RATING WIDGET (view mode only) ──────────────────────────────── --%>
+    <div style="text-align:center; margin-bottom:16px;">
+        <div class="rating-widget">
+            <div class="stars">
+<%
+if (jsTotalRating > 0) {
+    for (int i = 1; i <= 5; i++) {
+        if (i <= Math.floor(jsAvgRating)) {
+            out.print("<span class='star-filled'>★</span>");
+        } else if ((i - jsAvgRating) > 0 && (i - jsAvgRating) < 1) {
+            out.print("<span class='star-half'>★</span>");
+        } else {
+            out.print("<span class='star-empty'>★</span>");
+        }
+    }
+} else {
+    out.print("<span class='star-empty'>★★★★★</span>");
+}
+%>
+            </div>
+            <div>
+<% if (jsTotalRating > 0) { %>
+                <span class="rat-val"><%= jsAvgRating %></span>
+                <span style="font-size:13px;color:#78716c;">/5</span>
+                <span class="rat-meta">(<%= jsTotalRating %> review<%= jsTotalRating != 1 ? "s" : "" %>)</span>
+<% } else { %>
+                <span class="rat-meta">No reviews yet</span>
+<% } %>
+            </div>
+        </div>
+    </div>
+    <%-- ── END RATING WIDGET ──────────────────────────────────────────── --%>
 
     <div class="row"><span class="label">Name:</span> <%=fname%> <%=lname%></div>
     <div class="row"><span class="label">Email:</span> <%=email%></div>
