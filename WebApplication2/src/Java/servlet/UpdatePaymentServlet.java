@@ -97,16 +97,17 @@ public class UpdatePaymentServlet extends HttpServlet {
             // ───────── CONFIRM PAYMENT RECEIVED ─────────
             else if ("confirm".equals(action)) {
 
-                ps = con.prepareStatement(
-                        "UPDATE payments SET status='Confirmed' WHERE application_id=?"
-                );
+    ps = con.prepareStatement(
+        "INSERT INTO payments(application_id, status) VALUES (?, 'Confirmed') "
+      + "ON DUPLICATE KEY UPDATE status='Confirmed'"
+    );
 
-                ps.setInt(1, appId);
-                ps.executeUpdate();
+    ps.setInt(1, appId);
+    ps.executeUpdate();
 
-                response.sendRedirect("jobseeker_dash.jsp?section=payments");
-                return;
-            }
+    response.sendRedirect("jobseeker_dash.jsp?section=payments");
+    return;
+}
 
             // ───────── EMPLOYER MARKS PAID ─────────
             else if ("paid".equals(action)) {
