@@ -314,7 +314,7 @@ if (successMsg != null) {
     <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
     <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
     <a href="#" onclick="showSection('payments')">Payments</a>
-    <a href="#" onclick="showSection('reviewsSection')">Rate & Review</a>
+    <a href="#" onclick="showSection('reviews', event)">Rate & Review</a>
 </aside>
 
     <main class="content">
@@ -995,7 +995,6 @@ ResultSet rs5 = null;
 try{
 
 
-
 con5 = DBConnection.getConnection();
 
 String query2 =
@@ -1546,6 +1545,9 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (section === "payments") {
         showSection("payments");
     }
+    else if(section === "reviews"){
+    document.getElementById("reviewsSection").style.display = "block";
+});
 </script>
 
 <script>
@@ -1573,7 +1575,8 @@ function showSection(section, event) {
         "reviewApplicationsSection",
         "acceptedApplicationsSection",
         "rejectedApplicationsSection",
-        "paymentsSection"
+        "paymentsSection",
+        "reviewsSection" 
     ];
 
     // Hide all sections
@@ -1603,6 +1606,9 @@ function showSection(section, event) {
     else if(section === "payments"){
         document.getElementById("paymentsSection").style.display = "block";
     }
+    else if(section === "reviews"){
+    document.getElementById("reviewsSection").style.display = "block";
+}
 
     // Remove active class from all sidebar links
     document.querySelectorAll(".sidebar a").forEach(function(a){
