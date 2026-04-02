@@ -5,57 +5,153 @@ import java.io.IOException;
 import java.sql.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.servlet.annotation.WebServlet;
 
+@WebServlet("/UpdatePaymentServlet")
 public class UpdatePaymentServlet extends HttpServlet {
 
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-int applicationId = Integer.parseInt(request.getParameter("applicationId"));
-String action = request.getParameter("action");
+        String applicationId = request.getParameter("applicationId");
+        String action = request.getParameter("action");
+        String type = request.getParameter("type");
 
-Connection con = null;
-PreparedStatement ps = null;
+        if (applicationId == null || action == null) {
+            response.sendRedirect("jobseeker_dash.jsp?section=payments");
+            return;
+        }
 
-try {
+        int appId = Integer.parseInt(applicationId);
 
-con = DBConnection.getConnection();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-if("request".equals(action)){
+        try {
+            con = DBConnection.getConnection();
 
-ps = con.prepareStatement(
-"INSERT INTO payments(application_id,status) VALUES (?, 'Requested') " +
-"ON DUPLICATE KEY UPDATE status='Requested'"
-);
+            // ───────── REQUEST PAYMENT ─────────
+            if ("request".equals(action)) {
 
-ps.setInt(1, applicationId);
-ps.executeUpdate();
+                ps = con.prepareStatement(
+                        "INSERT INTO payments(application_id, status) VALUES (?, 'Requested') "
+                        + "ON DUPLICATE KEY UPDATE status='Requested'"
+                );
 
-}
+                ps.setInt(1, appId);
+                ps.executeUpdate();
+                ps.close();
 
-else if("confirm".equals(action)){
+                // Find employer info
+                if ("application".equals(type)) {
 
-ps = con.prepareStatement(
-"UPDATE payments SET status='Confirmed' WHERE application_id=?"
-);
+                    ps = con.prepareStatement(
+                            "SELECT j.eid, j.title, js.jfirstname, js.jlastname "
+                            + "FROM applications a "
+                            + "JOIN jobs j ON j.job_id = a.job_id "
+                            + "JOIN jobseeker js ON js.jid = a.jobseeker_id "
+                            + "WHERE a.application_id = ?"
+                    );
 
-ps.setInt(1, applicationId);
-ps.executeUpdate();
+                } else {
 
-}
+                    ps = con.prepareStatement(
+                            "SELECT j.eid, j.title, js.jfirstname, js.jlastname "
+                            + "FROM bids b "
+                            + "JOIN jobs j ON j.job_id = b.job_id "
+                            + "JOIN jobseeker js ON js.jid = b.job_seeker_id "
+                            + "WHERE b.bid_id = ?"
+                    );
+                }
 
-response.sendRedirect("jobseeker.jsp?section=payments");
+                ps.setInt(1, appId);
+                rs = ps.executeQuery();
 
-}catch(Exception e){
-e.printStackTrace();
-}
+                if (rs.next()) {
 
-finally{
+                    int eid = rs.getInt("eid");
+                    String jobTitle = rs.getString("title");
+                    String workerName = rs.getString("jfirstname") + " " + rs.getString("jlastname");
 
-try{ if(ps!=null) ps.close(); }catch(Exception e){}
-try{ if(con!=null) con.close(); }catch(Exception e){}
+                    rs.close();
+                    ps.close();
 
-}
+                    // Insert notification
+                    ps = con.prepareStatement(
+                            "INSERT INTO notifications(employer_id, message) VALUES (?, ?)"
+                    );
 
-}
+                    ps.setInt(1, eid);
+                    ps.setString(2,
+                            "💰 " + workerName + " has requested payment for job: \"" + jobTitle + "\""
+                    );
+
+                    ps.executeUpdate();
+                }
+
+                response.sendRedirect("jobseeker_dash.jsp?section=payments");
+                return;
+            }
+
+            // ───────── CONFIRM PAYMENT RECEIVED ─────────
+            else if ("confirm".equals(action)) {
+
+                ps = con.prepareStatement(
+                        "UPDATE payments SET status='Confirmed' WHERE application_id=?"
+                );
+
+                ps.setInt(1, appId);
+                ps.executeUpdate();
+
+                response.sendRedirect("jobseeker_dash.jsp?section=payments");
+                return;
+            }
+
+            // ───────── EMPLOYER MARKS PAID ─────────
+            else if ("paid".equals(action)) {
+
+                ps = con.prepareStatement(
+                        "UPDATE payments SET status='Paid' WHERE application_id=?"
+                );
+
+                ps.setInt(1, appId);
+                ps.executeUpdate();
+
+                response.sendRedirect("emp_dash.jsp?section=payments");
+                return;
+            }
+
+            // ───────── DEFAULT SAFETY REDIRECT ─────────
+            response.sendRedirect("jobseeker_dash.jsp?section=payments");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            response.sendRedirect("jobseeker_dash.jsp?section=payments");
+
+        } finally {
+
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (Exception ignored) {
+            }
+
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (Exception ignored) {
+            }
+
+            try {
+                if (con != null) {
+                    con.close();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
 }

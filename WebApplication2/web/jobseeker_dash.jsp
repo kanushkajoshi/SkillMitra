@@ -416,6 +416,7 @@ conBids.close();
 </div>
 </div> <%-- closes dashboardSection --%>
 
+
 <!-- ================= APPLIED SECTION ================= -->
 <div id="appliedSection" style="display:none;">
 <div class="cards">
@@ -423,21 +424,26 @@ conBids.close();
 Connection conApp = null;
 PreparedStatement psApp = null;
 ResultSet rsApp = null;
+
 try {
     conApp = DBConnection.getConnection();
     boolean found = false;
 
-    String sqlApp = "SELECT j.*, " +
-        "CASE " +
-        "WHEN a.application_id IS NOT NULL THEN a.status " +
-        "ELSE b.bid_status " +
-        "END AS final_status " +
-        "FROM jobs j " +
-        "LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
-        "LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
-        "AND a.application_id IS NULL " +
-        "WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
-        "AND j.status='ACTIVE'";
+   String sqlApp = 
+"SELECT j.*, " +
+"CASE " +
+"WHEN b.bid_id IS NOT NULL THEN b.bid_status " +
+"ELSE a.status " +
+"END AS final_status, " +
+"b.counter_bid, b.bid_id " +
+
+"FROM jobs j " +
+
+"LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
+"LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
+
+"WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
+"AND j.status='ACTIVE'";
 
     psApp = conApp.prepareStatement(sqlApp);
     psApp.setInt(1, jobseekerId);
@@ -446,36 +452,58 @@ try {
 
     while(rsApp.next()){
         found = true;
-%>
-<div class="card">
-    <h3><%= rsApp.getString("title") %></h3>
-    <p>Description: <%= rsApp.getString("description") %></p>
-    <p>📍 <%= rsApp.getString("locality") %>, <%= rsApp.getString("city") %></p>
-    <p>₹<%= rsApp.getString("salary") %></p>
-    <button disabled>✓ <%= rsApp.getString("status") %></button>
-</div>
-<%
-    }
-    rsApp.close(); psApp.close();
 
-    // BIDS (NOT ACCEPTED)
-    String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
-                    "JOIN jobs j ON j.job_id = b.job_id " +
-                    "WHERE b.job_seeker_id=? AND b.bid_status!='Accepted'";
-    psApp = conApp.prepareStatement(sqlBid);
-    psApp.setInt(1, jobseekerId);
-    rsApp = psApp.executeQuery();
-
-    while(rsApp.next()){
-        found = true;
+        int counterBid = rsApp.getInt("counter_bid");
+        int bidId = rsApp.getInt("bid_id");
+        String status = rsApp.getString("final_status");
 %>
+
 <div class="card">
+
     <h3><%= rsApp.getString("title") %></h3>
-    <p>Description: <%= rsApp.getString("description") %></p>
+
+    <p><b>Description:</b> <%= rsApp.getString("description") %></p>
+
     <p>📍 <%= rsApp.getString("locality") %>, <%= rsApp.getString("city") %></p>
-    <p>₹<%= rsApp.getString("salary") %></p>
-    <button disabled>✓ Bid Placed</button>
+
+    <p><b>Salary:</b> ₹<%= rsApp.getString("salary") %></p>
+
+    <!-- STATUS -->
+    <span style="
+        display:inline-block;
+        padding:5px 12px;
+        border-radius:20px;
+        font-size:12px;
+        background:#eef2ff;
+        color:#3b5bdb;
+        margin-bottom:8px;">
+        <%= status %>
+    </span>
+
+    <% if("Countered".equals(status)) { %>
+
+        <!-- COUNTER BID -->
+        <p style="color:#dc3545; font-weight:600;">
+            💸 Employer Countered: ₹<%= counterBid %>
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top:10px; display:flex; gap:10px;">
+
+            <a href="RespondCounterServlet?bid_id=<%= bidId %>&action=accept">
+                <button class="btn accept-btn">✓ Accept</button>
+            </a>
+
+            <a href="RespondCounterServlet?bid_id=<%= bidId %>&action=reject">
+                <button class="btn reject-btn">✕ Reject</button>
+            </a>
+
+        </div>
+
+    <% } %>
+
 </div>
+
 <%
     }
 
@@ -571,133 +599,147 @@ finally {
 </div>
 </div>
 <!-- ================= PAYMENTS SECTION (JOBSEEKER) ================= -->
-
 <div id="paymentsSection" style="display:none;">
 <div class="cards">
-
 <%
 Connection conPay = null;
 PreparedStatement psPay = null;
 ResultSet rsPay = null;
+try {
+    conPay = DBConnection.getConnection();
 
-try{
+   
+        String sqlPay =
+    "SELECT a.application_id AS ref_id, j.title, j.salary, " +
+    "COALESCE(p.status, 'Pending') AS payment_status, " +
+    "'application' AS type " +
+    "FROM applications a " +
+    "JOIN jobs j ON j.job_id = a.job_id " +
+    "LEFT JOIN payments p ON a.application_id = p.application_id " +
+    "WHERE a.jobseeker_id = ? AND a.status = 'Accepted' " +
 
-conPay = DBConnection.getConnection();
+    "UNION " +
 
-/* Only jobs that are ASSIGNED to jobseeker (Accepted applications) */
+    "SELECT b.bid_id AS ref_id, j.title, j.salary, " +
+    "COALESCE(p.status, 'Pending') AS payment_status, " +
+    "'bid' AS type " +
+    "FROM bids b " +
+    "JOIN jobs j ON j.job_id = b.job_id " +
+    "LEFT JOIN payments p ON b.bid_id = p.application_id " +
+    "WHERE b.job_seeker_id = ? AND b.bid_status = 'Accepted'";
 
+    psPay = conPay.prepareStatement(sqlPay);
+    psPay.setInt(1, jobseekerId);
+    psPay.setInt(2, jobseekerId); // ✅ both ? filled
+    rsPay = psPay.executeQuery();
 
-String sqlPay =
-"SELECT a.application_id AS ref_id, j.title, j.salary, " +
-"COALESCE(p.status,'Pending') AS payment_status " +
-"FROM applications a " +
-"JOIN jobs j ON j.job_id = a.job_id " +
-"LEFT JOIN payments p ON a.application_id = p.application_id " +
-"WHERE a.jobseeker_id=? AND a.status='Accepted' " +
+    boolean foundPay = false;
 
-"UNION " +
-
-"SELECT b.bid_id AS ref_id, j.title, j.salary, " +
-"COALESCE(p.status,'Pending') AS payment_status " +
-"FROM bids b " +
-"JOIN jobs j ON j.job_id = b.job_id " +
-"LEFT JOIN payments p ON b.bid_id = p.application_id " +
-"WHERE b.job_seeker_id=? AND b.bid_status='Accepted';";
-
-psPay = conPay.prepareStatement(sqlPay);
-psPay.setInt(1, jobseekerId);
-
-rsPay = psPay.executeQuery();
-
-boolean found=false;
-
-while(rsPay.next()){
-
-found=true;
-
-String status = rsPay.getString("payment_status");
-
-String color="#ffc107"; // Pending
-
-if("Requested".equals(status)) color="#ff9800";
-else if("Paid".equals(status)) color="#2196f3";
-else if("Confirmed".equals(status)) color="#28a745";
+    while (rsPay.next()) {
+        foundPay = true;
+        String payStatus = rsPay.getString("payment_status");
+        String type = rsPay.getString("type");
+        // badge color
+        String color = "#ffc107";
+        if ("Requested".equals(payStatus))  color = "#ff9800";
+        else if ("Paid".equals(payStatus))  color = "#2196f3";
+        else if ("Confirmed".equals(payStatus)) color = "#28a745";
 %>
 
-<div class="card">
+<div class="card" style="border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:16px;">
 
-<h3><%= rsPay.getString("title") %></h3>
+    <h3 style="margin:0 0 8px;"><%= rsPay.getString("title") %></h3>
+    <p style="margin:4px 0;"><b>Salary:</b> ₹<%= rsPay.getString("salary") %></p>
+    <p style="margin:4px 0;">
+        <b>Payment Status:</b>
+        <span style="padding:4px 12px; border-radius:20px; color:#fff; background:<%= color %>; font-size:13px;">
+            <%= payStatus %>
+        </span>
+    </p>
 
-<p><b>Salary:</b> ₹<%= rsPay.getString("salary") %></p>
+    <div style="margin-top:14px;">
 
-<p>
-<b>Status:</b>
-<span style="padding:5px 12px;border-radius:12px;color:white;background:<%=color%>;">
-<%= status %>
-</span>
-</p>
+    <%-- ── PENDING: ask the worker first ──────────────────────────────── --%>
+    <% if ("Pending".equals(payStatus)) { %>
 
-<div style="margin-top:10px;">
+        <p style="font-weight:600; margin-bottom:10px;">Have you received payment for this job?</p>
+        <div style="display:flex; gap:10px;">
 
-<% if("Pending".equals(status)){ %>
+            <%-- YES → mark confirmed directly --%>
+            <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&type=<%= rsPay.getString("type") %>&action=confirm">
+                <button style="background:#28a745; color:#fff; padding:8px 20px;
+                               border:none; border-radius:8px; cursor:pointer; font-size:14px;">
+                    ✅ Yes, Received
+                </button>
+            </a>
 
-<!-- Worker requests payment -->
+            <%-- NO → request payment from employer (sends notification) --%>
+            <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&type=<%= rsPay.getString("type") %>&action=request">
+                <button style="background:#ff9800; color:#fff; padding:8px 20px;
+                               border:none; border-radius:8px; cursor:pointer; font-size:14px;">
+                    ❌ No, Request Payment
+                </button>
+            </a>
 
-<a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=request">
-<button style="background:#ff9800;color:white;padding:8px 16px;border:none;border-radius:6px;">
-Request Payment
-</button>
-</a>
+        </div>
 
-<% } else if("Requested".equals(status)){ %>
+    <%-- ── REQUESTED: waiting for employer ───────────────────────────── --%>
+    <% } else if ("Requested".equals(payStatus)) { %>
 
-<p style="color:#555;">Waiting for employer to pay...</p>
+        <div style="background:#fff8e1; border:1px solid #ffe082; border-radius:8px; padding:12px;">
+            <p style="margin:0; color:#795548;">
+                ⏳ Payment request sent. Waiting for employer to mark it as paid...
+            </p>
+        </div>
 
-<% } else if("Paid".equals(status)){ %>
+    <%-- ── PAID: employer marked paid, now worker confirms ────────────── --%>
+    <% } else if ("Paid".equals(payStatus)) { %>
 
-<!-- Worker confirms payment -->
+        <p style="font-weight:600; margin-bottom:10px;">Employer has marked this as paid. Did you receive it?</p>
+        <div style="display:flex; gap:10px;">
 
-<a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=confirm">
-<button style="background:#28a745;color:white;padding:8px 16px;border:none;border-radius:6px;">
-Confirm Payment Received
-</button>
-</a>
+            <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=confirm">
+                <button style="background:#28a745; color:#fff; padding:8px 20px;
+                               border:none; border-radius:8px; cursor:pointer; font-size:14px;">
+                    ✅ Yes, Confirm Receipt
+                </button>
+            </a>
 
-<% } else if("Confirmed".equals(status)){ %>
+        </div>
 
-<p style="color:green;font-weight:600;">Payment Completed</p>
+    <%-- ── CONFIRMED: done ────────────────────────────────────────────── --%>
+    <% } else if ("Confirmed".equals(payStatus)) { %>
 
-<% } %>
+        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:12px;">
+            <p style="margin:0; color:#2e7d32; font-weight:600;">✔ Payment completed successfully!</p>
+        </div>
 
-</div>
+    <% } %>
 
+    </div>
 </div>
 
 <%
-}
+    }
 
-/* If no assigned jobs */
-
-if(!found){
+    if (!foundPay) {
 %>
-
-<h3>No Assigned Jobs Yet</h3>
-<p style="color:#777;">When an employer accepts your application, the job will appear here.</p>
-
+    <div style="text-align:center; padding:50px 20px;">
+        <h3 style="color:#555;">No Payment Records Yet</h3>
+        <p style="color:#999;">Your accepted jobs will appear here once payment flow begins.</p>
+    </div>
 <%
-}
+    }
 
-}catch(Exception e){
-e.printStackTrace();
-}finally{
-
-if(rsPay!=null) try{rsPay.close();}catch(Exception e){}
-if(psPay!=null) try{psPay.close();}catch(Exception e){}
-if(conPay!=null) try{conPay.close();}catch(Exception e){}
-
+} catch (Exception e) {
+    out.println("<p style='color:red;'>Error loading payments: " + e.getMessage() + "</p>");
+    e.printStackTrace();
+} finally {
+    if (rsPay  != null) try { rsPay.close();  } catch (Exception ignored) {}
+    if (psPay  != null) try { psPay.close();  } catch (Exception ignored) {}
+    if (conPay != null) try { conPay.close(); } catch (Exception ignored) {}
 }
 %>
-
 </div>
 </div>
 
@@ -1023,6 +1065,20 @@ function closeArea(){
 
     document.getElementById("areaText").innerText = names.join(", ");
 }
+// ── Read URL param and show correct section on page load ──
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get("section");
+
+    if (section === "payments") {
+        // find the payments sidebar link and simulate click
+        document.querySelectorAll(".sidebar a").forEach(function(a) {
+            if (a.getAttribute("onclick") && a.getAttribute("onclick").includes("payments")) {
+                showSection("payments", a);
+            }
+        });
+    }
+});
 </script>
 </div>
 </body>

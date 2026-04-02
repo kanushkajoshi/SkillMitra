@@ -27,7 +27,7 @@ if (currentSession == null || currentSession.getAttribute("eid") == null) {
 //String email = (String) session.getAttribute("eemail");
 
 try {
-    
+   
     Connection con = DBConnection.getConnection();
 
    Integer employerId = (Integer) currentSession.getAttribute("eid");
@@ -57,7 +57,7 @@ ps.setInt(1, employerId);
 <head>
     <title>Employer Dashboard | SkillMitra</title>
     <link rel="stylesheet" href="emp_dash.css">
-    
+   
     <style>
 .section-container{
 max-width:950px;
@@ -162,39 +162,147 @@ if (successMsg != null) {
 }
 %>
 
-<header>
+<header style="display:flex; align-items:center; justify-content:space-between; position:relative;">
+
     <div class="logo">SkillMitra</div>
-    
+
+    <%-- ── NOTIFICATION BELL ── --%>
+    <%
+    int unreadCount = 0;
+    Connection conNotif = null;
+    PreparedStatement psNotif = null;
+    ResultSet rsNotif = null;
+    try {
+        Integer empIdNotif = (Integer) currentSession.getAttribute("eid");
+        if (empIdNotif != null) {
+            conNotif = DBConnection.getConnection();
+            psNotif = conNotif.prepareStatement(
+                "SELECT COUNT(*) FROM notifications WHERE employer_id=? AND is_read=0"
+            );
+            psNotif.setInt(1, empIdNotif);
+            rsNotif = psNotif.executeQuery();
+            if (rsNotif.next()) unreadCount = rsNotif.getInt(1);
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    finally {
+        if (rsNotif  != null) try { rsNotif.close();  } catch (Exception ignored) {}
+        if (psNotif  != null) try { psNotif.close();  } catch (Exception ignored) {}
+        if (conNotif != null) try { conNotif.close(); } catch (Exception ignored) {}
+    }
+    %>
+
+    <%-- Bell + Profile wrapper on right side --%>
+    <div style="display:flex; align-items:center; gap:20px; margin-left:auto;">
+
+        <%-- Bell icon --%>
+        <div style="position:relative; cursor:pointer;" onclick="toggleNotifPanel()">
+            <span style="font-size:22px; filter:brightness(0) invert(1);">🔔</span>
+            <% if (unreadCount > 0) { %>
+            <span id="notifBadge"
+                  style="position:absolute; top:-6px; right:-8px;
+                         background:#ff1744; color:#fff; border-radius:50%;
+                         font-size:11px; padding:2px 6px; font-weight:700;">
+                <%= unreadCount %>
+            </span>
+            <% } %>
+        </div>
+
+        <%-- Notification Panel --%>
+        <div id="notifPanel"
+             style="display:none; position:absolute; top:55px; right:60px;
+                    width:340px; background:#fff; border:1px solid #e0e0e0;
+                    border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.12);
+                    z-index:9999; max-height:400px; overflow-y:auto;">
+
+            <div style="padding:14px 16px; border-bottom:1px solid #f0f0f0;
+                        font-weight:600; color:#1b5e20; font-size:15px;">
+                🔔 Notifications
+                <% if (unreadCount > 0) { %>
+                <a href="MarkAllNotifReadServlet"
+                   style="float:right; font-size:12px; color:#1976d2;
+                          font-weight:400; text-decoration:none;">
+                    Mark all read
+                </a>
+                <% } %>
+            </div>
+
+            <%
+            Connection conN2 = null;
+            PreparedStatement psN2 = null;
+            ResultSet rsN2 = null;
+            try {
+                Integer empIdN = (Integer) currentSession.getAttribute("eid");
+                if (empIdN != null) {
+                    conN2 = DBConnection.getConnection();
+                    psN2 = conN2.prepareStatement(
+                        "SELECT notification_id, message, is_read, created_at " +
+                        "FROM notifications WHERE employer_id=? " +
+                        "ORDER BY created_at DESC LIMIT 20"
+                    );
+                    psN2.setInt(1, empIdN);
+                    rsN2 = psN2.executeQuery();
+                    boolean anyNotif = false;
+                    while (rsN2.next()) {
+                        anyNotif = true;
+                        boolean isRead = rsN2.getInt("is_read") == 1;
+                        String bg = isRead ? "#fff" : "#fff8e1";
+            %>
+            <div style="padding:12px 16px; border-bottom:1px solid #f5f5f5;
+                        background:<%= bg %>; font-size:14px; color:#333;">
+                <%= rsN2.getString("message") %>
+                <div style="font-size:11px; color:#999; margin-top:4px;">
+                    <%= rsN2.getTimestamp("created_at") %>
+                </div>
+            </div>
+            <%
+                    }
+                    if (!anyNotif) {
+            %>
+            <div style="padding:24px; text-align:center; color:#999; font-size:14px;">
+                No notifications yet.
+            </div>
+            <%
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+            finally {
+                if (rsN2  != null) try { rsN2.close();  } catch (Exception ignored) {}
+                if (psN2  != null) try { psN2.close();  } catch (Exception ignored) {}
+                if (conN2 != null) try { conN2.close(); } catch (Exception ignored) {}
+            }
+            %>
+        </div>
+
+        <%-- Profile dropdown --%>
+        <div class="profile-dropdown">
+            <%
+            String photo = (String) currentSession.getAttribute("ephoto");
+            String imgPath;
+            if(photo != null && !photo.trim().isEmpty()){
+                imgPath = "uploads/" + photo;
+            }else{
+                imgPath = "images/default-user.png";
+            }
+            %>
+            <img src="<%= imgPath %>" class="profile-icon" id="profileIcon">
+            <div class="profile-menu" id="profileMenu">
+                <div class="profile-name" style="background:none; color:#000; font-weight:600; border-bottom:none;">
+                    <%
+                    String fname = (String) currentSession.getAttribute("efirstname");
+                    String lname = (String) currentSession.getAttribute("elastname");
+                    %>
+                    <%= fname != null ? fname : "" %> <%= lname != null ? lname : "" %>
+                </div>
+                <a href="employer_profile.jsp">View Profile</a>
+                <a href="LogoutServlet">Logout</a>
+            </div>
+        </div>
+
+    </div>
+
 
    
-    <div class="profile-dropdown">
-        <%
-String photo = (String) currentSession.getAttribute("ephoto");
-
-String imgPath;
-
-if(photo != null && !photo.trim().isEmpty()){
-    imgPath = "uploads/" + photo;
-}else{
-    imgPath = "images/default-user.png";
-}
-%>
-
-<img src="<%= imgPath %>" class="profile-icon" id="profileIcon">
-        <div class="profile-menu" id="profileMenu">
-            <div class="profile-name" style="background:none; color:#000; font-weight:600; border-bottom:none;">
-                <%
-    String fname = (String) currentSession.getAttribute("efirstname");
-    String lname = (String) currentSession.getAttribute("elastname");
-%>
-
-<%= fname != null ? fname : "" %> <%= lname != null ? lname : "" %>
-
-            </div>
-            <a href="employer_profile.jsp">View Profile</a>
-            <a href="LogoutServlet">Logout</a>
-        </div>
-    </div>
+   
 </header>
 
 <div class="dashboard">
@@ -281,7 +389,7 @@ if(photo != null && !photo.trim().isEmpty()){
 
 <!-- MANAGE JOBS SECTION -->
 <div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
-    
+   
 
     <div class="manage-header">
         <h2>Manage Jobs</h2>
@@ -707,12 +815,12 @@ Bid: ₹<%= rsBid.getInt("bid_amount") %>
 
 <div>
 
-<a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
+<a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
 style="background:#22c55e;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
 Accept
 </a>
 
-<a href="RespondCounterServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
+<a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
 style="background:#ef4444;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
 Reject
 </a>
@@ -1051,7 +1159,7 @@ if(empIdPay != null){
 
 <% } else if("Requested".equals(status)) { %>
 
-    <a href="UpdatePaymentServlet?app_id=<%= rsPay.getInt("application_id") %>&action=paid"
+    <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("application_id") %>&action=paid"
        class="accept-btn">Mark Paid 💸</a>
 
 <% } else if("Paid".equals(status)) { %>
@@ -1091,6 +1199,7 @@ if(empIdPay != null){
 
 
 
+
     </main>
 </div>
 
@@ -1112,18 +1221,18 @@ function applyFilters() {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     const params = new URLSearchParams(window.location.search);
     const section = params.get("section");
 
     if (section === "manageJobs") {
         showSection("manageJobs");
     }
-    else if(section === "reviewBids"){
+    else if (section === "reviewBids") {
         showSection("reviewBids");
     }
-
-});
+    else if (section === "payments") {
+        showSection("payments");
+    }
 </script>
 
 <script>
@@ -1199,16 +1308,7 @@ function showSection(section, event) {
 <script>
 window.onload = function() {
     // Check if there are any accepted applications
-    var acceptedSection = document.getElementById('acceptedApplicationsSection');
-    var rejectedSection = document.getElementById('rejectedApplicationsSection');
-
-    if(acceptedSection.querySelectorAll('.review-card').length > 0){
-        acceptedSection.style.display = 'block';
-    }
-
-    if(rejectedSection.querySelectorAll('.review-card').length > 0){
-        rejectedSection.style.display = 'block';
-    }
+   
 };
 </script>
 <script>
@@ -1242,6 +1342,34 @@ document.querySelectorAll(".respondBidBtn").forEach(function(button) {
             })
             .catch(err => console.error(err));
     });
+});
+
+
+</script>
+<script>
+// ================= NOTIFICATION BELL =================
+function toggleNotifPanel() {
+    var panel = document.getElementById("notifPanel");
+    if (panel.style.display === "block") {
+        panel.style.display = "none";
+    } else {
+        panel.style.display = "block";
+        // mark all as read silently
+        fetch("MarkAllNotifReadServlet").then(function() {
+            var badge = document.getElementById("notifBadge");
+            if (badge) badge.remove();
+        });
+    }
+}
+
+// close panel when clicking outside
+document.addEventListener("click", function(e) {
+    var panel = document.getElementById("notifPanel");
+    if (!panel) return;
+    var bell = document.querySelector("[onclick='toggleNotifPanel()']");
+    if (!panel.contains(e.target) && !bell.contains(e.target)) {
+        panel.style.display = "none";
+    }
 });
 </script>
 </body>
