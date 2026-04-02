@@ -936,20 +936,19 @@ hasAccepted=true;
 </div>
 
 <div class="worker-details">
-
 <h3>
-<%= rs4.getString("jfirstname") %>
-<%= rs4.getString("jlastname") %>
-<span style="color:#1dbf73;">✔ Accepted (<%= rs4.getString("source") %>)</span>
+    <%= rs4.getString("title") %>   <!-- 🔥 JOB TITLE FIRST -->
 </h3>
 
-<p><%= rs4.getString("jemail") %></p>
+<p style="margin:5px 0; font-weight:600;">
+    👤 <%= rs4.getString("jfirstname") %> 
+    <%= rs4.getString("jlastname") %>
+    <span style="color:#1dbf73;">✔ Accepted (<%= rs4.getString("source") %>)</span>
+</p>
 
-<div class="meta">
-<span>Applied For: <%= rs4.getString("title") %> | </span>
-<span>Location: <%= rs4.getString("jdistrict") %></span>
-</div>
-
+<p style="color:#666;">
+    📍 <%= rs4.getString("jdistrict") %>
+</p>
 </div>
 </div>
 
@@ -1039,18 +1038,20 @@ hasRejected=true;
 
 <div class="worker-details">
 
-<h3>
-<%= rs5.getString("jfirstname") %>
-<%= rs5.getString("jlastname") %>
-<span style="color:#e53935;">✖ Rejected (<%= rs5.getString("source") %>)</span>
+<!-- 🔥 JOB TITLE FIRST -->
+<h3 style="color:#2563eb;">
+    <%= rs5.getString("title") %>
 </h3>
 
-<p><%= rs5.getString("jemail") %></p>
+<p style="margin:5px 0; font-weight:600;">
+    👤 <%= rs5.getString("jfirstname") %> 
+    <%= rs5.getString("jlastname") %>
+    <span style="color:#e53935;">✖ Rejected (<%= rs5.getString("source") %>)</span>
+</p>
 
-<div class="meta">
-<span>Applied For: <%= rs5.getString("title") %> | </span>
-<span>Location: <%= rs5.getString("jdistrict") %></span>
-</div>
+<p style="color:#666;">
+    📍 <%= rs5.getString("jdistrict") %>
+</p>
 
 </div>
 </div>
