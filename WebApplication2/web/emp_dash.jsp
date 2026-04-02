@@ -314,7 +314,7 @@ if (successMsg != null) {
     <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
     <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
     <a href="#" onclick="showSection('payments')">Payments</a>
-    <a href="#">Rate & Review</a>
+    <a href="#" onclick="showSection('reviewsSection')">Rate & Review</a>
 </aside>
 
     <main class="content">
@@ -1198,6 +1198,318 @@ if(empIdPay != null){
 
 </div>
 
+
+<!-- ================= EMPLOYER → RATE & REVIEW SECTION ================= -->
+<div id="reviewsSection" style="display:none; width:100%; max-width:900px;">
+
+<%
+/* ── Flash messages ─────────────────────────────────────────────────────── */
+String ratingSuccessEmp = (String) currentSession.getAttribute("ratingMsg_emp_success");
+String ratingErrorEmp   = (String) currentSession.getAttribute("ratingMsg_emp_error");
+if (ratingSuccessEmp != null) { currentSession.removeAttribute("ratingMsg_emp_success"); }
+if (ratingErrorEmp   != null) { currentSession.removeAttribute("ratingMsg_emp_error"); }
+%>
+
+<% if (ratingSuccessEmp != null) { %>
+<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;
+            padding:14px 18px;color:#065f46;font-weight:600;margin-bottom:20px;">
+    ✅ <%= ratingSuccessEmp %>
+</div>
+<% } %>
+
+<% if (ratingErrorEmp != null) { %>
+<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;
+            padding:14px 18px;color:#b91c1c;font-weight:600;margin-bottom:20px;">
+    ⚠️ <%= ratingErrorEmp %>
+</div>
+<% } %>
+
+<div class="manage-header">
+    <div>
+        <h2>Rate & Review Workers</h2>
+        <p>Rate workers whose payment has been confirmed</p>
+    </div>
+</div>
+
+<%
+/*
+ * Show all accepted + payment-confirmed workers that the employer
+ * has NOT yet rated.
+ */
+Integer empIdRev = (Integer) currentSession.getAttribute("eid");
+if (empIdRev != null) {
+    Connection conRev = null;
+    PreparedStatement psRev = null;
+    ResultSet rsRev = null;
+    try {
+        conRev = db.DBConnection.getConnection();
+
+        /*
+         * Union: application-based + bid-based accepted & payment confirmed
+         * Left-join ratings to detect already-rated rows.
+         */
+        String sqlRev =
+            "SELECT j.job_id, j.title, " +
+            "js.jid AS jobseeker_id, CONCAT(js.jfirstname,' ',js.jlastname) AS worker_name, " +
+            "js.jdistrict, " +
+            "r.rating_id AS already_rated " +
+            "FROM applications a " +
+            "JOIN jobs j ON j.job_id = a.job_id " +
+            "JOIN jobseeker js ON js.jid = a.jobseeker_id " +
+            "JOIN payments p ON p.application_id = a.application_id " +
+            "LEFT JOIN ratings r ON r.job_id = j.job_id " +
+            "    AND r.employer_id = j.eid " +
+            "    AND r.jobseeker_id = js.jid " +
+            "    AND r.rating_by = 'Employer' " +
+            "WHERE j.eid = ? AND a.status = 'Accepted' AND p.status = 'Confirmed' " +
+
+            "UNION " +
+
+            "SELECT j.job_id, j.title, " +
+            "js.jid AS jobseeker_id, CONCAT(js.jfirstname,' ',js.jlastname) AS worker_name, " +
+            "js.jdistrict, " +
+            "r.rating_id AS already_rated " +
+            "FROM bids b " +
+            "JOIN jobs j ON j.job_id = b.job_id " +
+            "JOIN jobseeker js ON js.jid = b.job_seeker_id " +
+            "JOIN payments p ON p.application_id = b.bid_id " +
+            "LEFT JOIN ratings r ON r.job_id = j.job_id " +
+            "    AND r.employer_id = j.eid " +
+            "    AND r.jobseeker_id = js.jid " +
+            "    AND r.rating_by = 'Employer' " +
+            "WHERE j.eid = ? AND b.bid_status = 'Accepted' AND p.status = 'Confirmed' " +
+
+            "ORDER BY job_id DESC";
+
+        psRev = conRev.prepareStatement(sqlRev);
+        psRev.setInt(1, empIdRev);
+        psRev.setInt(2, empIdRev);
+        rsRev = psRev.executeQuery();
+
+        boolean anyRow = false;
+        while (rsRev.next()) {
+            anyRow = true;
+            boolean rated = (rsRev.getObject("already_rated") != null);
+%>
+
+<div style="display:flex; justify-content:space-between; align-items:center;
+            border:1px solid #e5e7eb; border-radius:12px; padding:18px 22px;
+            margin-bottom:14px; background:#fff;
+            box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+
+    <div>
+        <h4 style="margin:0; font-size:16px; color:#1a2a3a;">
+            👤 <%= rsRev.getString("worker_name") %>
+        </h4>
+        <p style="margin:4px 0; font-size:13px; color:#6b7280;">
+            Job: <strong><%= rsRev.getString("title") %></strong> |
+            📍 <%= rsRev.getString("jdistrict") %>
+        </p>
+        <% if (rated) { %>
+        <span style="display:inline-block; margin-top:6px; padding:3px 12px;
+                     background:#dcfce7; color:#166534; border-radius:20px;
+                     font-size:12px; font-weight:600;">
+            ✅ Already Rated
+        </span>
+        <% } else { %>
+        <span style="display:inline-block; margin-top:6px; padding:3px 12px;
+                     background:#fef9c3; color:#854d0e; border-radius:20px;
+                     font-size:12px; font-weight:600;">
+            ⏳ Pending Your Review
+        </span>
+        <% } %>
+    </div>
+
+    <% if (!rated) { %>
+    <a href="rating_form.jsp?job_id=<%= rsRev.getInt("job_id") %>&employer_id=<%= empIdRev %>&jobseeker_id=<%= rsRev.getInt("jobseeker_id") %>">
+        <button style="background:linear-gradient(135deg,#1b5e20,#2e7d32);
+                       color:#fff; border:none; border-radius:10px;
+                       padding:10px 20px; font-size:14px; font-weight:600;
+                       cursor:pointer; white-space:nowrap;">
+            ⭐ Rate Worker
+        </button>
+    </a>
+    <% } else { %>
+    <a href="view_reviews.jsp?job_id=<%= rsRev.getInt("job_id") %>&target=jobseeker&id=<%= rsRev.getInt("jobseeker_id") %>">
+        <button style="background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;
+                       border-radius:10px; padding:10px 20px; font-size:14px;
+                       cursor:pointer; white-space:nowrap;">
+            👁 View Review
+        </button>
+    </a>
+    <% } %>
+
+</div>
+
+<%
+        }
+        if (!anyRow) {
+%>
+<div style="text-align:center; padding:50px 20px; color:#9ca3af;">
+    <p style="font-size:40px; margin-bottom:10px;">⭐</p>
+    <h3 style="color:#6b7280;">No completed jobs to review yet</h3>
+    <p>Rating becomes available after payment is confirmed.</p>
+</div>
+<%
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (rsRev  != null) try { rsRev.close();  } catch(Exception ignored){}
+        if (psRev  != null) try { psRev.close();  } catch(Exception ignored){}
+        if (conRev != null) try { conRev.close(); } catch(Exception ignored){}
+    }
+}
+%>
+
+<hr style="margin:40px 0; border:none; border-top:1px solid #f3f4f6;">
+
+<!-- ── Reviews received by this employer from jobseekers ────────────────── -->
+<div class="manage-header">
+    <div>
+        <h2>Reviews You've Received</h2>
+        <p>What workers say about you</p>
+    </div>
+</div>
+
+<%
+if (empIdRev != null) {
+    Connection conMyRev = null;
+    PreparedStatement psMyRev = null;
+    ResultSet rsMyRev = null;
+    try {
+        conMyRev = db.DBConnection.getConnection();
+
+        // Average rating for this employer
+        PreparedStatement psAvg = conMyRev.prepareStatement(
+            "SELECT ROUND(AVG(rating_value),1) AS avg_r, COUNT(*) AS total " +
+            "FROM ratings WHERE employer_id=? AND rating_by='Jobseeker'"
+        );
+        psAvg.setInt(1, empIdRev);
+        ResultSet rsAvg = psAvg.executeQuery();
+        double avgR = 0; int totalR = 0;
+        if (rsAvg.next()) { avgR = rsAvg.getDouble("avg_r"); totalR = rsAvg.getInt("total"); }
+        rsAvg.close(); psAvg.close();
+%>
+
+<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px;
+            padding:20px 24px; margin-bottom:24px; display:flex;
+            align-items:center; gap:16px;">
+    <div style="font-size:40px; line-height:1;">⭐</div>
+    <div>
+        <div style="font-size:28px; font-weight:800; color:#166534;">
+            <%= totalR > 0 ? avgR : "—" %><span style="font-size:16px; color:#4b5563;">/5</span>
+        </div>
+        <div style="font-size:14px; color:#6b7280;">
+            <%
+            if (totalR > 0) {
+                out.print(starHtml(avgR));
+            } else {
+                out.print("No reviews yet");
+            }
+            %>
+            <% if (totalR > 0) { %> &nbsp;(<%= totalR %> review<%= totalR!=1?"s":"" %>)<% } %>
+        </div>
+    </div>
+</div>
+
+<%
+        psMyRev = conMyRev.prepareStatement(
+            "SELECT r.rating_value, r.review_text, r.created_at, " +
+            "r.employer_behavior, r.timely_payment, r.work_environment, r.fairness_communication, " +
+            "CONCAT(js.jfirstname,' ',js.jlastname) AS reviewer_name, " +
+            "j.title AS job_title " +
+            "FROM ratings r " +
+            "JOIN jobseeker js ON js.jid = r.jobseeker_id " +
+            "JOIN jobs j ON j.job_id = r.job_id " +
+            "WHERE r.employer_id=? AND r.rating_by='Jobseeker' " +
+            "ORDER BY r.created_at DESC"
+        );
+        psMyRev.setInt(1, empIdRev);
+        rsMyRev = psMyRev.executeQuery();
+        boolean anyReview = false;
+
+        while (rsMyRev.next()) {
+            anyReview = true;
+            double rv = rsMyRev.getDouble("rating_value");
+%>
+
+<div style="border:1px solid #e5e7eb; border-radius:12px; padding:18px 22px;
+            margin-bottom:14px; background:#fff;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <div>
+            <strong style="font-size:15px;"><%= rsMyRev.getString("reviewer_name") %></strong>
+            <span style="font-size:12px; color:#9ca3af; margin-left:8px;">
+                • <%= rsMyRev.getString("job_title") %>
+            </span>
+        </div>
+        <div style="font-size:20px; color:#f59e0b;">
+            <%= starHtml(rv) %>
+            <span style="font-size:13px; color:#6b7280; font-weight:600;">
+                <%= String.format("%.1f", rv) %>
+            </span>
+        </div>
+    </div>
+
+    <!-- Criteria breakdown -->
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <%= miniCriteria("Behavior",    rsMyRev.getInt("employer_behavior")) %>
+        <%= miniCriteria("Timely Pay",  rsMyRev.getInt("timely_payment")) %>
+        <%= miniCriteria("Work Env",    rsMyRev.getInt("work_environment")) %>
+        <%= miniCriteria("Fairness",    rsMyRev.getInt("fairness_communication")) %>
+    </div>
+
+    <% String review = rsMyRev.getString("review_text");
+       if (review != null && !review.trim().isEmpty()) { %>
+    <p style="font-size:14px; color:#374151; line-height:1.6; margin:0;">
+        "<%= review.trim() %>"
+    </p>
+    <% } %>
+
+    <div style="font-size:12px; color:#9ca3af; margin-top:8px;">
+        <%= new java.text.SimpleDateFormat("dd MMM yyyy").format(rsMyRev.getTimestamp("created_at")) %>
+    </div>
+</div>
+
+<%
+        }
+        if (!anyReview) {
+%>
+<p style="color:#9ca3af; text-align:center; padding:20px 0;">No reviews received yet.</p>
+<%
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (rsMyRev  != null) try { rsMyRev.close();  } catch(Exception ignored){}
+        if (psMyRev  != null) try { psMyRev.close();  } catch(Exception ignored){}
+        if (conMyRev != null) try { conMyRev.close(); } catch(Exception ignored){}
+    }
+}
+%>
+
+</div><!-- end reviewsSection -->
+
+<%!
+/* Renders filled/empty star HTML for a given rating (0‑5) */
+private String starHtml(double rating) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 1; i <= 5; i++) {
+        if (i <= Math.floor(rating))       sb.append("<span style='color:#f59e0b;'>★</span>");
+        else if (i - rating < 1 && i - rating > 0) sb.append("<span style='color:#f59e0b;'>½</span>");
+        else                               sb.append("<span style='color:#d1d5db;'>★</span>");
+    }
+    return sb.toString();
+}
+
+/* Small criteria badge */
+private String miniCriteria(String label, int val) {
+    if (val == 0) return "";
+    return "<span style='background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;" +
+           "border-radius:20px;font-size:12px;padding:2px 10px;'>" +
+           label + ": " + val + "/5</span>";
+}
+%>
 
 
 
