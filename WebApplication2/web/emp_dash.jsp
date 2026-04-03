@@ -1285,12 +1285,12 @@ hasAccepted=true;
 <div class="review-card" style="border:1.5px solid #b9f5c8;">
 
 <div class="worker-info">
-
+<div style="display:flex; align-items:center; gap:12px;">
 <div class="avatar">
 <%= rs4.getString("jfirstname").substring(0,1) %>
 <%= rs4.getString("jlastname").substring(0,1) %>
 </div>
-
+</div>
 <div class="worker-details">
 <h3>
     <%= rs4.getString("title") %>   <!-- 🔥 JOB TITLE FIRST -->

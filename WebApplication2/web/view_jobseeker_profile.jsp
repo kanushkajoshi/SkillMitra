@@ -88,6 +88,10 @@ body { font-family: "Segoe UI", sans-serif; background: #f4f6f9; margin: 0; padd
     max-width: 720px;
     margin: 32px auto 60px;
     padding: 0 16px;
+    margin-top: 80px;
+    
+    
+    
 }
 
 .profile-card {
@@ -191,7 +195,9 @@ body { font-family: "Segoe UI", sans-serif; background: #f4f6f9; margin: 0; padd
 <!-- ═══ HEADER ═══ -->
 <header style="display:flex; align-items:center; justify-content:space-between; 
                padding:0 24px; position:relative; background:#4a6fa5; height:60px;
-               width:100%; box-sizing:border-box; margin:0;">
+               width:100%; box-sizing:border-box; margin:0;  position:fixed;
+    top:0;
+    left:0;">
 
     <div style="display:flex; align-items:center; gap:12px;">
         <img src="skillmitralogo.jpg" alt="Logo" 

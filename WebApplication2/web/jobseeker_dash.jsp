@@ -635,21 +635,35 @@ try {
     conApp = DBConnection.getConnection();
     boolean found = false;
 
-   String sqlApp = 
-"SELECT j.*, " +
-"CASE " +
-"WHEN b.bid_id IS NOT NULL THEN b.bid_status " +
-"ELSE a.status " +
-"END AS final_status, " +
-"b.counter_bid, b.bid_id " +
+    String sqlApp = 
+    "SELECT j.*, " +
 
-"FROM jobs j " +
+    "CASE " +
+    "WHEN b.bid_id IS NOT NULL THEN b.bid_status " +
+    "ELSE a.status " +
+    "END AS final_status, " +
 
-"LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
-"LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
+    "b.counter_bid, " +
+    "b.bid_amount, " +
+    "b.bid_id, " +
 
-"WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
-"AND j.status='ACTIVE'";
+    // 🔥 FINAL SALARY LOGIC
+    "CASE " +
+    "WHEN b.bid_id IS NOT NULL AND b.bid_status='Accepted' AND b.counter_bid IS NOT NULL THEN b.counter_bid " +
+    "WHEN b.bid_id IS NOT NULL AND b.bid_status='Accepted' THEN b.bid_amount " +
+    "WHEN b.bid_id IS NOT NULL AND b.bid_status='Rejected' THEN 0 " +
+    "WHEN b.bid_id IS NOT NULL AND b.counter_bid IS NOT NULL THEN b.counter_bid " +
+    "WHEN b.bid_id IS NOT NULL THEN b.bid_amount " +
+    "ELSE j.salary " +
+    "END AS final_salary " +
+
+    "FROM jobs j " +
+
+    "LEFT JOIN bids b ON j.job_id = b.job_id AND b.job_seeker_id = ? " +
+    "LEFT JOIN applications a ON j.job_id = a.job_id AND a.jobseeker_id = ? " +
+
+    "WHERE (a.application_id IS NOT NULL OR b.bid_id IS NOT NULL) " +
+    "AND j.status='ACTIVE'";
 
     psApp = conApp.prepareStatement(sqlApp);
     psApp.setInt(1, jobseekerId);
@@ -662,6 +676,7 @@ try {
         int counterBid = rsApp.getInt("counter_bid");
         int bidId = rsApp.getInt("bid_id");
         String status = rsApp.getString("final_status");
+        int finalSalary = rsApp.getInt("final_salary");
 %>
 
 <div class="card">
@@ -669,12 +684,11 @@ try {
     <h3><%= rsApp.getString("title") %></h3>
 
     <p><b>Description:</b> <%= rsApp.getString("description") %></p>
+    
 
     <p>📍 <%= rsApp.getString("locality") %>, <%= rsApp.getString("city") %></p>
 
-    <p><b>Salary:</b> ₹<%= rsApp.getString("salary") %></p>
-
-    <!-- STATUS -->
+    <!-- 🔥 STATUS -->
     <span style="
         display:inline-block;
         padding:5px 12px;
@@ -686,14 +700,32 @@ try {
         <%= status %>
     </span>
 
-    <% if("Countered".equals(status)) { %>
+    <!-- 🔥 FINAL SALARY DISPLAY -->
+    <%
+    String label = "Posted Salary";
 
-        <!-- COUNTER BID -->
+    if(rsApp.getObject("bid_id") != null){
+        if(counterBid > 0){
+            label = "Counter Offer";
+        } else {
+            label = "Your Bid";
+        }
+    }
+    %>
+
+    <% if(finalSalary > 0){ %>
+        <p><b><%= label %>:</b> ₹<%= finalSalary %></p>
+    <% } else { %>
+        <p style="color:red; font-weight:600;">❌ Application Rejected</p>
+    <% } %>
+
+    <!-- 🔥 COUNTER ACTION -->
+    <% if("Countered".equalsIgnoreCase(status)) { %>
+
         <p style="color:#dc3545; font-weight:600;">
             💸 Employer Countered: ₹<%= counterBid %>
         </p>
 
-        <!-- ACTION BUTTONS -->
         <div style="margin-top:10px; display:flex; gap:10px;">
 
             <a href="RespondCounterServlet?bid_id=<%= bidId %>&action=accept">
@@ -728,7 +760,6 @@ finally {
 %>
 </div>
 </div>
-
 <!-- ================= ASSIGNED SECTION ================= -->
 <div id="assignedSection" style="display:none;">
 <div class="cards">
@@ -741,9 +772,11 @@ try {
     boolean found = false;
 
     // ACCEPTED APPLICATIONS
-    String sqlApp = "SELECT j.*, a.status FROM applications a " +
-                    "JOIN jobs j ON j.job_id = a.job_id " +
-                    "WHERE a.jobseeker_id=? AND a.status='Accepted'";
+    String sqlApp = 
+"SELECT j.*, a.status, j.salary AS final_salary " +
+"FROM applications a " +
+"JOIN jobs j ON j.job_id = a.job_id " +
+"WHERE a.jobseeker_id=? AND a.status='Accepted'";
 
     psAss = conAss.prepareStatement(sqlApp);
     psAss.setInt(1, jobseekerId);
@@ -757,19 +790,24 @@ try {
     <p>Description: <%= rsAss.getString("description") %></p>
     <p>📍 <%= rsAss.getString("locality") %>, <%= rsAss.getString("city") %></p>
     <p>₹<%= rsAss.getString("salary") %></p>
-    <button disabled style="background:#28a745;color:white;">
-        ✓ Accepted
-    </button>
+    
 </div>
 <%
     }
     rsAss.close(); psAss.close();
 
     // ACCEPTED BIDS
-    String sqlBid = "SELECT j.*, b.bid_status FROM bids b " +
-                    "JOIN jobs j ON j.job_id = b.job_id " +
-                    "WHERE b.job_seeker_id=? AND b.bid_status='Accepted'";
+   String sqlBid = 
+"SELECT j.*, b.bid_status, b.bid_amount, b.counter_bid, " +
 
+"CASE " +
+"WHEN b.counter_bid IS NOT NULL AND b.counter_bid > 0 THEN b.counter_bid " +
+"ELSE b.bid_amount " +
+"END AS final_salary " +
+
+"FROM bids b " +
+"JOIN jobs j ON j.job_id = b.job_id " +
+"WHERE b.job_seeker_id=? AND b.bid_status='Accepted'";
     psAss = conAss.prepareStatement(sqlBid);
     psAss.setInt(1, jobseekerId);
     rsAss = psAss.executeQuery();
@@ -781,10 +819,8 @@ try {
     <h3><%= rsAss.getString("title") %></h3>
     <p>Description: <%= rsAss.getString("description") %></p>
     <p>📍 <%= rsAss.getString("locality") %>, <%= rsAss.getString("city") %></p>
-    <p>₹<%= rsAss.getString("salary") %></p>
-    <button disabled style="background:#28a745;color:white;">
-        ✓ Accepted
-    </button>
+    <p><b>Final Salary:</b> ₹<%= rsAss.getInt("final_salary") %></p>
+
 </div>
 <%
     }

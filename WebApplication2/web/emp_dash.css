@@ -308,7 +308,9 @@ table th {
 
 .worker-info {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+
+    /*justify-content: space-between;*/
 }
 
 .avatar {
@@ -324,6 +326,9 @@ table th {
     margin-right: 15px;
 }
 
+.worker-details {
+    margin-left: 0;
+}
 .worker-details h3 {
     margin-bottom: 5px;
 }
