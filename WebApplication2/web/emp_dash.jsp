@@ -220,7 +220,7 @@ margin-top:10px;
                         font-weight:600; color:#1b5e20; font-size:15px;">
                 🔔 Notifications
                 <% if (unreadCount > 0) { %>
-                <a href="MarkAllNotifReadServlet"
+                <a href="javascript:void(0)" onclick="markAllRead()">
                    style="float:right; font-size:12px; color:#1976d2;
                           font-weight:400; text-decoration:none;">
                     Mark all read
@@ -1453,18 +1453,32 @@ if(empIdPay != null){
        
 
         Connection conPay = DBConnection.getConnection();
-        PreparedStatement psPay = conPay.prepareStatement(
-            "SELECT a.application_id, j.title, " +
-            "js.jfirstname, js.jlastname, " +
-            "IFNULL(p.status,'Pending') AS payment_status " +
-            "FROM applications a " +
-            "JOIN jobs j ON a.job_id = j.job_id " +
-            "JOIN jobseeker js ON a.jobseeker_id = js.jid " +
-            "LEFT JOIN payments p ON a.application_id = p.application_id " +
-            "WHERE j.eid=? AND a.status='Accepted'"
-        );
+        String query =
+"SELECT a.application_id AS ref_id, j.title, " +
+"js.jfirstname, js.jlastname, " +
+"'application' AS type, " +
+"IFNULL(p.status,'Pending') AS payment_status " +
+"FROM applications a " +
+"JOIN jobs j ON a.job_id = j.job_id " +
+"JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+"LEFT JOIN payments p ON a.application_id = p.application_id " +
+"WHERE j.eid=? AND a.status='Accepted' " +
 
-        psPay.setInt(1, empIdPay);
+"UNION " +
+
+"SELECT b.bid_id AS ref_id, j.title, " +
+"js.jfirstname, js.jlastname, " +
+"'bid' AS type, " +
+"IFNULL(p.status,'Pending') AS payment_status " +
+"FROM bids b " +
+"JOIN jobs j ON b.job_id = j.job_id " +
+"JOIN jobseeker js ON b.job_seeker_id = js.jid " +
+"LEFT JOIN payments p ON b.bid_id = p.application_id " +
+"WHERE j.eid=? AND b.bid_status='Accepted'";
+
+PreparedStatement psPay = conPay.prepareStatement(query);
+psPay.setInt(1, empIdPay);
+psPay.setInt(2, empIdPay);   // ⚠️ IMPORTANT
         ResultSet rsPay = psPay.executeQuery();
 
         boolean hasData = false;
@@ -1478,6 +1492,7 @@ if(empIdPay != null){
             if("Requested".equals(status)) color="#ff9800";
             else if("Paid".equals(status)) color="#2196f3";
             else if("Confirmed".equals(status)) color="#28a745";
+            else if("Failed".equals(status)) color="#dc3545";
 %>
 
 <div class="review-card">
@@ -1515,8 +1530,20 @@ if(empIdPay != null){
 
 <% } else if("Requested".equals(status)) { %>
 
-    <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("application_id") %>&action=paid"
+    <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=paid&type=<%= rsPay.getString("type") %>"
        class="accept-btn">Mark Paid 💸</a>
+
+<% } else if("Failed".equals(status)) { %>
+
+    <div style="color:#dc3545; font-weight:600; margin-bottom:8px;">
+        ⚠️ Worker reported payment NOT received
+    </div>
+
+    <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=paid&type=<%= rsPay.getString("type") %>"
+       style="background:#dc3545; color:#fff; padding:8px 18px;
+              border-radius:8px; text-decoration:none;">
+        🔁 Re-Pay Now
+    </a>
 
 <% } else if("Paid".equals(status)) { %>
 
@@ -1676,7 +1703,7 @@ if (empIdRev != null) {
     </div>
 
     <% if (!rated) { %>
-    <a href="rating_form.jsp?job_id=<%= rsRev.getInt("job_id") %>&employer_id=<%= empIdRev %>&jobseeker_id=<%= rsRev.getInt("jobseeker_id") %>">
+    <a href="rating_form.jsp?job_id=<%= rsRev.getInt("job_id") %>&employer_id=<%= empIdRev %>&jobseeker_id=<%= rsRev.getInt("jobseeker_id") %>&rating_by=Employer">
         <button style="background:linear-gradient(135deg,#1b5e20,#2e7d32);
                        color:#fff; border:none; border-radius:10px;
                        padding:10px 20px; font-size:14px; font-weight:600;
@@ -1892,18 +1919,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);
     const section = params.get("section");
 
-    if (section === "manageJobs") {
-        showSection("manageJobs");
+    if (section) {
+        showSection(section, null);
     }
-    else if (section === "reviewBids") {
-        showSection("reviewBids");
-    }
-    else if (section === "payments") {
-        showSection("payments");
-    }
-    else if(section === "reviews"){
-    document.getElementById("reviewsSection").style.display = "block";
-}
 });
 </script>
 
@@ -2064,6 +2082,22 @@ document.addEventListener("click", function(e) {
         panel.style.display = "none";
     }
 });
+function markAllRead() {
+    fetch("MarkAllNotifReadServlet")
+    .then(res => res.text())
+    .then(data => {
+        console.log(data);
+
+        // remove badge
+        var badge = document.getElementById("notifBadge");
+        if (badge) badge.remove();
+
+        // update UI
+        document.querySelectorAll("#notifPanel div").forEach(function(item, index) {
+            if(index !== 0) item.style.background = "#fff";
+        });
+    });
+}
 </script>
 </body>
 </html> 

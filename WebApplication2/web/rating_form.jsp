@@ -8,7 +8,6 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="db.DBConnection" %>
 <%
-    // ── Session guard ─────────────────────────────────────────────────────────
     HttpSession currentSession = request.getSession(false);
     if (currentSession == null) { response.sendRedirect("login.jsp"); return; }
 
@@ -17,51 +16,59 @@
 
     if (eid == null && jid == null) { response.sendRedirect("login.jsp"); return; }
 
-    // ── Params ────────────────────────────────────────────────────────────────
     int    jobId       = Integer.parseInt(request.getParameter("job_id"));
     int    employerId  = Integer.parseInt(request.getParameter("employer_id"));
     int    jobseekerId = Integer.parseInt(request.getParameter("jobseeker_id"));
+
+    // rating_by from URL param is the single source of truth
+    // Dashboard buttons always pass it explicitly
+    String rbParam  = request.getParameter("rating_by");
     String ratingBy;
-if (jid != null && eid == null) {
-    ratingBy = "Jobseeker";
-} else if (eid != null && jid == null) {
-    ratingBy = "Employer";
-} else if (jid != null) {
-    // Both set (dirty session) — use URL context to decide
-    // jobseeker_dash always passes jobseeker_id matching jid
-    String jsIdParam = request.getParameter("jobseeker_id");
-    ratingBy = (jsIdParam != null && Integer.parseInt(jsIdParam) == jid) 
-               ? "Jobseeker" : "Employer";
-} else {
-    response.sendRedirect("login.jsp");
-    return;
-}
-    String jobTitle    = "";
-    String targetName  = "";
+
+    if ("Employer".equals(rbParam) && eid != null) {
+        // Employer clicked "Rate Worker" button
+        ratingBy = "Employer";
+    } else if ("Jobseeker".equals(rbParam) && jid != null) {
+        // Jobseeker clicked "Rate Employer" button
+        ratingBy = "Jobseeker";
+    } else if (eid != null && jid == null) {
+        // No URL param but only employer in session — safe fallback
+        ratingBy = "Employer";
+    } else if (jid != null && eid == null) {
+        // No URL param but only jobseeker in session — safe fallback
+        ratingBy = "Jobseeker";
+    } else {
+        // Can't determine role safely
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    String jobTitle   = "";
+    String targetName = "";
 
     Connection con = DBConnection.getConnection();
     try {
         // Fetch job title
-        PreparedStatement ps1 = con.prepareStatement("SELECT title FROM jobs WHERE job_id=?");
+        PreparedStatement ps1 = con.prepareStatement(
+            "SELECT title FROM jobs WHERE job_id=?");
         ps1.setInt(1, jobId);
         ResultSet rs1 = ps1.executeQuery();
         if (rs1.next()) jobTitle = rs1.getString("title");
         rs1.close(); ps1.close();
 
-        // Fetch target person name
         if ("Employer".equals(ratingBy)) {
-            // Rating the jobseeker
+            // Employer is rating — target is the JOBSEEKER
             PreparedStatement ps2 = con.prepareStatement(
                 "SELECT CONCAT(jfirstname,' ',jlastname) AS name FROM jobseeker WHERE jid=?");
-            ps2.setInt(1, jobseekerId);
+            ps2.setInt(1, jobseekerId);   // ← jobseeker's ID from URL
             ResultSet rs2 = ps2.executeQuery();
             if (rs2.next()) targetName = rs2.getString("name");
             rs2.close(); ps2.close();
         } else {
-            // Rating the employer
+            // Jobseeker is rating — target is the EMPLOYER
             PreparedStatement ps3 = con.prepareStatement(
                 "SELECT CONCAT(efirstname,' ',elastname) AS name FROM employer WHERE eid=?");
-            ps3.setInt(1, employerId);
+            ps3.setInt(1, employerId);    // ← employer's ID from URL
             ResultSet rs3 = ps3.executeQuery();
             if (rs3.next()) targetName = rs3.getString("name");
             rs3.close(); ps3.close();

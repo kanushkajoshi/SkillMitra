@@ -18,9 +18,9 @@ public class RespondBidByEmployerServlet extends HttpServlet {
 
         String newStatus = null;
         if("accept".equalsIgnoreCase(action)){
-            newStatus = "AcceptedByEmployer";
+            newStatus = "Accepted";   // ✅ FIXED HERE
         } else if("reject".equalsIgnoreCase(action)){
-            newStatus = "RejectedByEmployer";
+            newStatus = "Rejected";
         } else {
             response.sendRedirect("emp_dash.jsp?section=reviewApplications");
             return;
@@ -47,33 +47,33 @@ public class RespondBidByEmployerServlet extends HttpServlet {
             psGet.close();
 
             // 🔹 2. Update bids table with employer decision
-PreparedStatement psUpdateBid = con.prepareStatement(
-    "UPDATE bids SET bid_status=? WHERE bid_id=?"
-);
-psUpdateBid.setString(1, newStatus);
-psUpdateBid.setInt(2, bidId);
-psUpdateBid.executeUpdate();
-psUpdateBid.close();
+            PreparedStatement psUpdateBid = con.prepareStatement(
+                "UPDATE bids SET bid_status=? WHERE bid_id=?"
+            );
+            psUpdateBid.setString(1, newStatus);
+            psUpdateBid.setInt(2, bidId);
+            psUpdateBid.executeUpdate();
+            psUpdateBid.close();
 
-// 🔹 3. Update applications table accordingly
-String appStatus = null;
-if("AcceptedByEmployer".equals(newStatus)){
-    appStatus = "Accepted";
-} else if("RejectedByEmployer".equals(newStatus)){
-    appStatus = "Rejected";
-}
+            // 🔹 3. Update applications table accordingly
+            String appStatus = null;
+            if("Accepted".equals(newStatus)){   // ✅ FIXED HERE
+                appStatus = "Accepted";
+            } else if("RejectedByEmployer".equals(newStatus)){
+                appStatus = "Rejected";
+            }
 
-PreparedStatement psUpdateApp = con.prepareStatement(
-    "UPDATE applications SET status=? WHERE job_id=? AND jobseeker_id=?"
-);
-psUpdateApp.setString(1, appStatus);
-psUpdateApp.setInt(2, jobId);
-psUpdateApp.setInt(3, jobSeekerId);
-psUpdateApp.executeUpdate();
-psUpdateApp.close();
+            PreparedStatement psUpdateApp = con.prepareStatement(
+                "UPDATE applications SET status=? WHERE job_id=? AND jobseeker_id=?"
+            );
+            psUpdateApp.setString(1, appStatus);
+            psUpdateApp.setInt(2, jobId);
+            psUpdateApp.setInt(3, jobSeekerId);
+            psUpdateApp.executeUpdate();
+            psUpdateApp.close();
 
             // 🔹 4. If accepted → check workers_required and close job if limit reached
-            if("AcceptedByEmployer".equals(newStatus)){
+            if("Accepted".equals(newStatus)){   // ✅ FIXED HERE
                 PreparedStatement psCount = con.prepareStatement(
                     "SELECT COUNT(*) FROM applications WHERE job_id=? AND status='Accepted'"
                 );
@@ -105,13 +105,13 @@ psUpdateApp.close();
             }
 
             // Redirect to correct section after accept/reject
-if("AcceptedByEmployer".equalsIgnoreCase(newStatus)){
-    response.sendRedirect("emp_dash.jsp?section=acceptedApplications");
-} else if("RejectedByEmployer".equalsIgnoreCase(newStatus)){
-    response.sendRedirect("emp_dash.jsp?section=rejectedApplications");
-} else {
-    response.sendRedirect("emp_dash.jsp?section=reviewApplications");
-}
+            if("Accepted".equalsIgnoreCase(newStatus)){   // ✅ FIXED HERE
+                response.sendRedirect("emp_dash.jsp?section=acceptedApplications");
+            } else if("RejectedByEmployer".equalsIgnoreCase(newStatus)){
+                response.sendRedirect("emp_dash.jsp?section=rejectedApplications");
+            } else {
+                response.sendRedirect("emp_dash.jsp?section=reviewApplications");
+            }
 
         } catch(Exception e){
             e.printStackTrace();

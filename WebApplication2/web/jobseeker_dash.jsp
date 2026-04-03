@@ -899,28 +899,42 @@ try {
         </div>
 
     <%-- ── PAID: employer marked paid, now worker confirms ────────────── --%>
-    <% } else if ("Paid".equals(payStatus)) { %>
+<% } else if ("Paid".equals(payStatus)) { %>
 
-        <p style="font-weight:600; margin-bottom:10px;">Employer has marked this as paid. Did you receive it?</p>
-        <div style="display:flex; gap:10px;">
+    <p style="font-weight:600; margin-bottom:10px;">
+        Employer has marked this as paid. Did you receive it?
+    </p>
 
-            <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=confirm">
-                <button style="background:#28a745; color:#fff; padding:8px 20px;
-                               border:none; border-radius:8px; cursor:pointer; font-size:14px;">
-                    ✅ Yes, Confirm Receipt
-                </button>
-            </a>
+    <div style="display:flex; gap:10px;">
 
-        </div>
+        <!-- ✅ YES BUTTON -->
+        <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=confirm&type=<%= rsPay.getString("type") %>">
+            <button style="background:#28a745; color:#fff; padding:8px 20px;
+                           border:none; border-radius:8px; cursor:pointer; font-size:14px;">
+                ✅ Yes, Received
+            </button>
+        </a>
 
-    <%-- ── CONFIRMED: done ────────────────────────────────────────────── --%>
-    <% } else if ("Confirmed".equals(payStatus)) { %>
+        <!-- ❌ NO BUTTON -->
+        <a href="UpdatePaymentServlet?applicationId=<%= rsPay.getInt("ref_id") %>&action=notreceived&type=<%= rsPay.getString("type") %>">
+            <button style="background:#dc3545; color:#fff; padding:8px 20px;
+                           border:none; border-radius:8px; cursor:pointer; font-size:14px;">
+                ❌ Not Received
+            </button>
+        </a>
 
-        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:12px;">
-            <p style="margin:0; color:#2e7d32; font-weight:600;">✔ Payment completed successfully!</p>
-        </div>
+    </div>
 
-    <% } %>
+<%-- ── CONFIRMED: done ────────────────────────────────────────────── --%>
+<% } else if ("Confirmed".equals(payStatus)) { %>
+
+    <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:12px;">
+        <p style="margin:0; color:#2e7d32; font-weight:600;">
+            ✔ Payment completed successfully!
+        </p>
+    </div>
+
+<% } %>
 
     </div>
 </div>
@@ -1078,7 +1092,7 @@ try {
         <% } %>
     </div>
     <% if (!jsRated) { %>
-    <a href="rating_form.jsp?job_id=<%= rsJsRev.getInt("job_id") %>&employer_id=<%= rsJsRev.getInt("employer_id") %>&jobseeker_id=<%= jobseekerId2 %>"
+    <a href="rating_form.jsp?job_id=<%= rsJsRev.getInt("job_id") %>&employer_id=<%= rsJsRev.getInt("employer_id") %>&jobseeker_id=<%= jobseekerId2 %>&rating_by=Jobseeker"
        style="text-decoration:none;flex-shrink:0;">
         <button style="background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);
                        padding:9px 20px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;">
@@ -1590,11 +1604,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);
     const section = params.get("section");
 
-    if (section === "payments") {
-        // find the payments sidebar link and simulate click
+    if (section) {
         document.querySelectorAll(".sidebar a").forEach(function(a) {
-            if (a.getAttribute("onclick") && a.getAttribute("onclick").includes("payments")) {
-                showSection("payments", a);
+            const oc = a.getAttribute("onclick") || "";
+            if (oc.includes("'" + section + "'") || oc.includes('"' + section + '"')) {
+                showSection(section, a);
             }
         });
     }
