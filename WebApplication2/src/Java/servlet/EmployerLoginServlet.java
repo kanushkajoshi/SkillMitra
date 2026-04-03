@@ -32,14 +32,12 @@ System.out.println("Password: " + password);
                 ""
             );
 
-            String sql = "SELECT eid,ecompanyname, efirstname,ephoto FROM employer WHERE eemail=? AND epwd=?";
+            String sql = "SELECT eid,ecompanyname, efirstname,ephoto,epwd FROM employer WHERE eemail=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, email);
-            ps.setString(2, password);
-
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            if (rs.next() && org.mindrot.jbcrypt.BCrypt.checkpw(password, rs.getString("epwd"))) {
                 // Login success
                 System.out.println("LOGIN SUCCESS");
                 HttpSession session = request.getSession();

@@ -152,7 +152,8 @@ public class EmployerRegisterServlet extends HttpServlet {
         session.setAttribute("ecompanyname", company);
         session.setAttribute("eemail", email);
         session.setAttribute("ephone", phone);
-        session.setAttribute("epwd", password);
+        String hashed = org.mindrot.jbcrypt.BCrypt.hashpw(password, org.mindrot.jbcrypt.BCrypt.gensalt());
+        session.setAttribute("epwd", hashed);
 
         session.setAttribute("ecompanywebsite", website);
         session.setAttribute("ezip", zip);

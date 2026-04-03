@@ -156,7 +156,8 @@ public class JobSeekerRegisterServlet extends HttpServlet {
         session.setAttribute("jlastname", lastname);
         session.setAttribute("jemail", email);
         session.setAttribute("jphone", phone);
-        session.setAttribute("jpwd", password);
+        String hashed = org.mindrot.jbcrypt.BCrypt.hashpw(password, org.mindrot.jbcrypt.BCrypt.gensalt());
+        session.setAttribute("jpwd", hashed);
         session.setAttribute("jeducation", education);
         session.setAttribute("jcountry", country);
         session.setAttribute("jstate", state);

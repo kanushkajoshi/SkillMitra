@@ -28,20 +28,15 @@ public class JobSeekerLoginServlet extends HttpServlet {
                 ""
             );
 
-            String sql =
-                "SELECT jid,jfirstname,jlastname,email_verified "+
-                "FROM jobseeker "+
-                "WHERE jemail=? AND jpwd=?";
+            String sql = "SELECT jid,jfirstname,jlastname,email_verified,jpwd FROM jobseeker WHERE jemail=?";
 
             PreparedStatement ps =
                 con.prepareStatement(sql);
 
             ps.setString(1,email);
-            ps.setString(2,password);
-
             ResultSet rs = ps.executeQuery();
 
-            if(rs.next()) {
+            if(rs.next() && org.mindrot.jbcrypt.BCrypt.checkpw(password, rs.getString("jpwd"))) {
 
                 boolean verified =
                     rs.getBoolean("email_verified");
