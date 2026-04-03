@@ -9,35 +9,45 @@
 body {
     background-color: #f4f6f9;
     min-height: 100vh;
-    display: flex;
 }
-
 /* ================= SIDEBAR ================= */
 .sidebar {
-    width: 230px;
-    background-color: #4f6d84;
-    color: #fff;
-    padding: 20px 0;
     position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
     height: 100vh;
+    background-color: #4f6d84;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;  
 }
 
 .sidebar h2 {
     text-align: center;
-    margin: 20px 0 30px;
-    font-size: 22px;
-    font-weight: 600;
+    color: white;
+    margin-bottom: 30px;
+    padding: 0 10px;     
+    word-wrap: break-word; 
 }
 
 .sidebar a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: 12px 25px;
     color: #e8eef3;
     text-decoration: none;
     font-size: 15px;
     transition: all 0.25s ease;
+}
+
+.sidebar a .nav-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 .sidebar a:hover {
@@ -48,7 +58,97 @@ body {
     background-color: #2f4658;
     font-weight: 600;
 }
+/* ── SIDEBAR COLLAPSE ── */
+.sidebar {
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
 
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar.collapsed h2 {
+    display: none;
+}
+
+.sidebar.collapsed a {
+    padding: 14px 0;
+    justify-content: center;
+    gap: 0;
+    font-size: 15px;
+}
+
+.sidebar.collapsed a .nav-icon {
+    font-size: 18px;
+    width: auto;
+}
+
+.sidebar a .nav-label {
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed a .nav-label {
+    display: none;
+}
+
+/* ── HAMBURGER BUTTON ── */
+.hamburger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 22px;
+    margin-right: 14px;
+}
+
+/* adjust main content when collapsed */
+.main.collapsed {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+    transition: all 0.3s ease;
+}
+
+.main {
+    transition: all 0.3s ease;
+}
+
+/* for emp_dash */
+.content.collapsed {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+    transition: all 0.3s ease;
+}
+
+.content {
+    transition: all 0.3s ease;
+}
+
+/* navbar shift */
+.navbar.collapsed,
+header.collapsed {
+    left: 60px;
+    width: calc(100% - 60px);
+    transition: all 0.3s ease;
+}
+
+.navbar, header {
+    transition: all 0.3s ease;
+}
+header {
+    position: fixed;
+    top: 0;
+    left: 230px;             /* must match sidebar width */
+    width: calc(100% - 230px);
+    height: 60px;
+    background-color: #4f6d84;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    color: white;
+    z-index: 1000;
+}
 /* ================= NAVBAR ================= */
 .navbar {
     position: fixed;

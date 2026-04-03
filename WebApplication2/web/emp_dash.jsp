@@ -57,7 +57,7 @@ ps.setInt(1, employerId);
 <head>
     <title>Employer Dashboard | SkillMitra</title>
     <link rel="stylesheet" href="emp_dash.css">
-   
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
 .section-container{
 max-width:950px;
@@ -147,9 +147,7 @@ margin-top:10px;
 
 
 <body>
-<%
-if (successMsg != null) {
-%>
+<% if (successMsg != null) { %>
 <div id="successModal" class="modal-overlay">
     <div class="modal-box">
         <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -164,7 +162,11 @@ if (successMsg != null) {
 
 <header style="display:flex; align-items:center; justify-content:space-between; position:relative;">
 
+    <div style="display:flex; align-items:center; gap:12px;">
+    <button class="hamburger" id="hamburger">&#9776;</button>
+    <img src="skillmitralogo.jpg" alt="Logo" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
     <div class="logo">SkillMitra</div>
+</div>
 
     <%-- ── NOTIFICATION BELL ── --%>
     <%
@@ -306,86 +308,445 @@ if (successMsg != null) {
 </header>
 
 <div class="dashboard">
-    <aside class="sidebar">
-    <h2>Employer Dashboard</h2>
-    <a class="active" href="#" onclick="showSection('dashboard')">Dashboard</a>
-    <a href="#" onclick="showSection('manageJobs')">Manage Jobs</a>
-    <a href="#" onclick="showSection('reviewApplications')">Review Applications</a>
-    <a href="#" onclick="showSection('acceptedApplications')">Accepted Applications</a>
-    <a href="#" onclick="showSection('rejectedApplications')">Rejected Applications</a>
-    <a href="#" onclick="showSection('payments')">Payments</a>
-    <a href="#" onclick="showSection('reviews', event)">Rate & Review</a>
+<aside class="sidebar" id="sidebar">
+<h2>Employer Dashboard</h2>
+<a class="active" href="#" onclick="showSection('dashboard')">
+    <i class="fa-solid fa-house nav-icon"></i>
+    <span class="nav-label"> Dashboard</span>
+</a>
+<a href="#" onclick="showSection('manageJobs')">
+    <i class="fa-solid fa-briefcase nav-icon"></i>
+    <span class="nav-label"> Manage Jobs</span>
+</a>
+<a href="#" onclick="showSection('reviewApplications')">
+    <i class="fa-solid fa-file-lines nav-icon"></i>
+    <span class="nav-label"> Review Applications</span>
+</a>
+<a href="#" onclick="showSection('acceptedApplications')">
+    <i class="fa-solid fa-circle-check nav-icon"></i>
+    <span class="nav-label"> Accepted Applications</span>
+</a>
+<a href="#" onclick="showSection('rejectedApplications')">
+    <i class="fa-solid fa-circle-xmark nav-icon"></i>
+    <span class="nav-label"> Rejected Applications</span>
+</a>
+<a href="#" onclick="showSection('payments')">
+    <i class="fa-solid fa-wallet nav-icon"></i>
+    <span class="nav-label"> Payments</span>
+</a>
+<a href="#" onclick="showSection('reviews', event)">
+    <i class="fa-solid fa-star nav-icon"></i>
+    <span class="nav-label"> Rate & Review</span>
+</a>
 </aside>
 
     <main class="content">
 
-     
- <div class="topbar">
-        <div>
-    Welcome,
-    <b><%= currentSession.getAttribute("efirstname") %>
-    <%= currentSession.getAttribute("elastname") %></b>
+<div class="topbar" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+        Welcome,
+        <b><%= currentSession.getAttribute("efirstname") %>
+        <%= currentSession.getAttribute("elastname") %></b>
+    </div>
+    <a id="postJobBtn" href="<%= request.getContextPath() %>/post-job" style="text-decoration:none;">
+        <button style="background:#3b5bdb; color:#fff; border:none; border-radius:10px;
+                       padding:10px 20px; font-size:14px; font-weight:600; cursor:pointer;
+                       display:flex; align-items:center; gap:8px;">
+            ➕ Post New Job
+        </button>
+    </a>
 </div>
 
-       
-    </div>
-
-        <div class="top-search">
-            <input type="text" placeholder="Search workers by skill or location">
-        </div>
 
         <!-- DASHBOARD SECTION -->
-        <div id="dashboardSection">
-            <div class="dashboard-header">
-                <h2>Dashboard Overview</h2>
-                <p>Welcome back! Here's what's happening.</p>
-            </div>
+<div id="dashboardSection">
+    <div class="dashboard-header">
+        <h2>Dashboard Overview</h2>
+        <p>Welcome back! Here's what's happening with your jobs.</p>
+    </div>
 
-            <div class="stats-cards">
-                <div class="stats-card">
-                    <span class="title">Active Jobs</span>
-                    <span class="number">12</span>
-                    <span class="change">+2 this week</span>
-                </div>
-                <div class="stats-card">
-                    <span class="title">Total Applications</span>
-                    <span class="number">48</span>
-                    <span class="change">+12 this week</span>
-                </div>
-                <div class="stats-card">
-                    <span class="title">Hired</span>
-                    <span class="number">8</span>
-                    <span class="change">+3 this month</span>
-                </div>
-                <div class="stats-card">
-                    <span class="title">Total Spent</span>
-                    <span class="number">$12,450</span>
-                    <span class="change">+15% this month</span>
-                </div>
-            </div>
+<%
+/* ── REAL STATS FROM DB ── */
+Integer empDashId = (Integer) currentSession.getAttribute("eid");
 
-            <div class="lower-section">
-                <div class="lower-card">
-                    <h3>Recent Applications</h3>
-                    <table>
-                        <tr><th>Worker Name</th><th>Position</th><th>Date</th></tr>
-                        <tr><td>Ramesh Kumar</td><td>Electrician</td><td>12 Jan 2026</td></tr>
-                        <tr><td>Sunita Devi</td><td>House Maid</td><td>13 Jan 2026</td></tr>
-                        <tr><td>Ajay Singh</td><td>Plumber</td><td>14 Jan 2026</td></tr>
-                    </table>
-                </div>
+int empActiveJobs = 0, empTotalApps = 0, empHired = 0, empTotalBids = 0;
 
-                <div class="lower-card">
-                    <h3>Active Job Posts</h3>
-                    <table>
-                        <tr><th>Job Title</th><th>Location</th><th>Applicants</th></tr>
-                        <tr><td>Electrician</td><td>Delhi</td><td>12</td></tr>
-                        <tr><td>House Maid</td><td>Noida</td><td>8</td></tr>
-                        <tr><td>Plumber</td><td>Gurgaon</td><td>5</td></tr>
-                    </table>
+Connection conDash = null;
+try {
+    conDash = DBConnection.getConnection();
+
+    // Active Jobs
+    PreparedStatement psDash1 = conDash.prepareStatement(
+        "SELECT COUNT(*) FROM jobs WHERE eid=? AND status='Active'"
+    );
+    psDash1.setInt(1, empDashId);
+    ResultSet rsDash1 = psDash1.executeQuery();
+    if (rsDash1.next()) empActiveJobs = rsDash1.getInt(1);
+    rsDash1.close(); psDash1.close();
+
+    // Total Applications
+    PreparedStatement psDash2 = conDash.prepareStatement(
+        "SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.job_id WHERE j.eid=?"
+    );
+    psDash2.setInt(1, empDashId);
+    ResultSet rsDash2 = psDash2.executeQuery();
+    if (rsDash2.next()) empTotalApps = rsDash2.getInt(1);
+    rsDash2.close(); psDash2.close();
+
+    // Hired (Accepted apps + Accepted bids)
+    PreparedStatement psDash3 = conDash.prepareStatement(
+        "SELECT " +
+        "(SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.job_id WHERE j.eid=? AND a.status='Accepted') + " +
+        "(SELECT COUNT(*) FROM bids b JOIN jobs j ON b.job_id=j.job_id WHERE j.eid=? AND b.bid_status='Accepted') AS total"
+    );
+    psDash3.setInt(1, empDashId);
+    psDash3.setInt(2, empDashId);
+    ResultSet rsDash3 = psDash3.executeQuery();
+    if (rsDash3.next()) empHired = rsDash3.getInt("total");
+    rsDash3.close(); psDash3.close();
+
+    // Total Bids
+    PreparedStatement psDash4 = conDash.prepareStatement(
+        "SELECT COUNT(*) FROM bids b JOIN jobs j ON b.job_id=j.job_id WHERE j.eid=?"
+    );
+    psDash4.setInt(1, empDashId);
+    ResultSet rsDash4 = psDash4.executeQuery();
+    if (rsDash4.next()) empTotalBids = rsDash4.getInt(1);
+    rsDash4.close(); psDash4.close();
+
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conDash != null) try{ conDash.close(); }catch(Exception ignored){} }
+%>
+
+    <div class="stats-cards">
+        <div class="stats-card">
+            <span class="title">Active Jobs</span>
+            <span class="number"><%= empActiveJobs %></span>
+            <span class="change">Currently open</span>
+        </div>
+        <div class="stats-card">
+            <span class="title">Total Applications</span>
+            <span class="number"><%= empTotalApps %></span>
+            <span class="change">Across all jobs</span>
+        </div>
+        <div class="stats-card">
+            <span class="title">Hired</span>
+            <span class="number"><%= empHired %></span>
+            <span class="change">Apps + Bids accepted</span>
+        </div>
+        <div class="stats-card">
+            <span class="title">Total Bids</span>
+            <span class="number"><%= empTotalBids %></span>
+            <span class="change">Received on your jobs</span>
+        </div>
+    </div>
+    <%-- ── PENDING ALERTS ── --%>
+<%
+int alertPendingApps = 0, alertPendingBids = 0, alertPayRequests = 0;
+Connection conAlert = null;
+try {
+    conAlert = DBConnection.getConnection();
+    Integer empAlertId = (Integer) currentSession.getAttribute("eid");
+
+    // Pending applications
+    PreparedStatement psAl1 = conAlert.prepareStatement(
+        "SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE j.eid=? AND a.status='Pending' AND a.is_bid=0"
+    );
+    psAl1.setInt(1, empAlertId);
+    ResultSet rsAl1 = psAl1.executeQuery();
+    if(rsAl1.next()) alertPendingApps = rsAl1.getInt(1);
+    rsAl1.close(); psAl1.close();
+
+    // Pending bids
+    PreparedStatement psAl2 = conAlert.prepareStatement(
+        "SELECT COUNT(*) FROM bids b JOIN jobs j ON b.job_id=j.job_id " +
+        "WHERE j.eid=? AND b.bid_status='Pending'"
+    );
+    psAl2.setInt(1, empAlertId);
+    ResultSet rsAl2 = psAl2.executeQuery();
+    if(rsAl2.next()) alertPendingBids = rsAl2.getInt(1);
+    rsAl2.close(); psAl2.close();
+
+    // Payment requests from workers
+    PreparedStatement psAl3 = conAlert.prepareStatement(
+        "SELECT COUNT(*) FROM payments p " +
+        "JOIN applications a ON p.application_id=a.application_id " +
+        "JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE j.eid=? AND p.status='Requested'"
+    );
+    psAl3.setInt(1, empAlertId);
+    ResultSet rsAl3 = psAl3.executeQuery();
+    if(rsAl3.next()) alertPayRequests = rsAl3.getInt(1);
+    rsAl3.close(); psAl3.close();
+
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conAlert != null) try{ conAlert.close(); }catch(Exception ignored){} }
+%>
+
+<%-- Pending Applications Alert --%>
+<% if(alertPendingApps > 0){ %>
+<div style="background:#fffbeb; border:1.5px solid #fcd34d; border-radius:10px;
+            padding:14px 18px; margin-bottom:10px;
+            display:flex; align-items:center; justify-content:space-between;">
+    <span style="font-size:14px; color:#92400e; font-weight:500;">
+        ⚠️ You have <b><%= alertPendingApps %></b>
+        pending application<%= alertPendingApps > 1 ? "s" : "" %> waiting for review
+    </span>
+    <button onclick="showSection('reviewApplications', event)"
+            style="background:#f59e0b; color:#fff; border:none; border-radius:8px;
+                   padding:7px 16px; font-size:13px; font-weight:600; cursor:pointer;">
+        Review Now →
+    </button>
+</div>
+<% } %>
+
+<%-- Pending Bids Alert --%>
+<% if(alertPendingBids > 0){ %>
+<div style="background:#fffbeb; border:1.5px solid #fcd34d; border-radius:10px;
+            padding:14px 18px; margin-bottom:10px;
+            display:flex; align-items:center; justify-content:space-between;">
+    <span style="font-size:14px; color:#92400e; font-weight:500;">
+        🔔 You have <b><%= alertPendingBids %></b>
+        pending bid<%= alertPendingBids > 1 ? "s" : "" %> waiting for response
+    </span>
+    <button onclick="showSection('reviewApplications', event)"
+            style="background:#f59e0b; color:#fff; border:none; border-radius:8px;
+                   padding:7px 16px; font-size:13px; font-weight:600; cursor:pointer;">
+        Review Bids →
+    </button>
+</div>
+<% } %>
+
+<%-- Payment Requests Warning --%>
+<% if(alertPayRequests > 0){ %>
+<div style="background:#fff5f5; border:1.5px solid #fca5a5; border-radius:10px;
+            padding:14px 18px; margin-bottom:10px;
+            display:flex; align-items:center; justify-content:space-between;">
+    <span style="font-size:14px; color:#991b1b; font-weight:500;">
+        💸 <b><%= alertPayRequests %></b>
+        worker<%= alertPayRequests > 1 ? "s have" : " has" %> requested payment
+    </span>
+    <button onclick="showSection('payments', event)"
+            style="background:#ef4444; color:#fff; border:none; border-radius:8px;
+                   padding:7px 16px; font-size:13px; font-weight:600; cursor:pointer;">
+        Pay Now →
+    </button>
+</div>
+<% } %>
+
+<%
+/* ── APPLICATION STATUS BREAKDOWN ── */
+int empPending = 0, empAccepted = 0, empRejected = 0;
+Connection conDashStatus = null;
+try {
+    conDashStatus = DBConnection.getConnection();
+    PreparedStatement psStatus = conDashStatus.prepareStatement(
+        "SELECT a.status, COUNT(*) as cnt " +
+        "FROM applications a JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE j.eid=? GROUP BY a.status"
+    );
+    psStatus.setInt(1, empDashId);
+    ResultSet rsStatus = psStatus.executeQuery();
+    while(rsStatus.next()){
+        String st = rsStatus.getString("status");
+        int cnt = rsStatus.getInt("cnt");
+        if("Pending".equalsIgnoreCase(st))  empPending  = cnt;
+        if("Accepted".equalsIgnoreCase(st)) empAccepted = cnt;
+        if("Rejected".equalsIgnoreCase(st)) empRejected = cnt;
+    }
+    rsStatus.close(); psStatus.close();
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conDashStatus != null) try{ conDashStatus.close(); }catch(Exception ignored){} }
+%>
+
+    <div class="lower-section">
+
+        <%-- Application Status Card --%>
+        <div class="lower-card" style="flex:0 0 260px;">
+            <h3>Application Status</h3>
+            <div style="display:flex; flex-direction:column; gap:14px; margin-top:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:10px 14px; background:#fff8e1; border-radius:10px;">
+                    <span style="font-size:14px; color:#555;">Pending</span>
+                    <span style="background:#ffc107; color:#fff; border-radius:20px;
+                                 padding:3px 12px; font-weight:700; font-size:14px;">
+                        <%= empPending %>
+                    </span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:10px 14px; background:#e8f5e9; border-radius:10px;">
+                    <span style="font-size:14px; color:#555;">Accepted</span>
+                    <span style="background:#28a745; color:#fff; border-radius:20px;
+                                 padding:3px 12px; font-weight:700; font-size:14px;">
+                        <%= empAccepted %>
+                    </span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;
+                            padding:10px 14px; background:#fdecea; border-radius:10px;">
+                    <span style="font-size:14px; color:#555;">Rejected</span>
+                    <span style="background:#ef4444; color:#fff; border-radius:20px;
+                                 padding:3px 12px; font-weight:700; font-size:14px;">
+                        <%= empRejected %>
+                    </span>
                 </div>
             </div>
         </div>
+
+        <%-- Recent Applications --%>
+        <div class="lower-card" style="flex:1;">
+            <h3>Recent Applications</h3>
+            <table>
+                <tr><th>Worker Name</th><th>Position</th><th>Date</th><th>Status</th></tr>
+<%
+Connection conRecApp = null;
+try {
+    conRecApp = DBConnection.getConnection();
+    PreparedStatement psRecApp = conRecApp.prepareStatement(
+        "SELECT js.jfirstname, js.jlastname, j.title, a.applied_at, a.status " +
+        "FROM applications a " +
+        "JOIN jobs j ON a.job_id=j.job_id " +
+        "JOIN jobseeker js ON a.jobseeker_id=js.jid " +
+        "WHERE j.eid=? ORDER BY a.applied_at DESC LIMIT 5"
+    );
+    psRecApp.setInt(1, empDashId);
+    ResultSet rsRecApp = psRecApp.executeQuery();
+    boolean anyRecApp = false;
+    while(rsRecApp.next()){
+        anyRecApp = true;
+        String appStatus = rsRecApp.getString("status");
+        String badgeColor = "#ffc107";
+        if("Accepted".equals(appStatus)) badgeColor = "#28a745";
+        else if("Rejected".equals(appStatus)) badgeColor = "#ef4444";
+        String dateStr = new java.text.SimpleDateFormat("dd MMM yyyy")
+                            .format(rsRecApp.getTimestamp("applied_at"));
+%>
+                <tr>
+                    <td><%= rsRecApp.getString("jfirstname") %> <%= rsRecApp.getString("jlastname") %></td>
+                    <td><%= rsRecApp.getString("title") %></td>
+                    <td><%= dateStr %></td>
+                    <td>
+                        <span style="padding:2px 10px; border-radius:12px; color:#fff;
+                                     background:<%= badgeColor %>; font-size:12px;">
+                            <%= appStatus %>
+                        </span>
+                    </td>
+                </tr>
+<%
+    }
+    if(!anyRecApp){
+%>
+                <tr><td colspan="4" style="text-align:center; color:#999;">No applications yet</td></tr>
+<%
+    }
+    rsRecApp.close(); psRecApp.close();
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conRecApp != null) try{ conRecApp.close(); }catch(Exception ignored){} }
+%>
+            </table>
+        </div>
+
+    </div>
+
+    <%-- Second Row: Active Job Posts + Recent Bids --%>
+    <div class="lower-section" style="margin-top:20px;">
+
+        <%-- Active Job Posts with real applicant count --%>
+        <div class="lower-card" style="flex:1;">
+            <h3>Active Job Posts</h3>
+            <table>
+                <tr><th>Job Title</th><th>Location</th><th>Applicants</th><th>Bids</th></tr>
+<%
+Connection conActiveJobs = null;
+try {
+    conActiveJobs = DBConnection.getConnection();
+    PreparedStatement psAJ = conActiveJobs.prepareStatement(
+        "SELECT j.job_id, j.title, j.city, " +
+        "(SELECT COUNT(*) FROM applications a WHERE a.job_id=j.job_id) AS app_count, " +
+        "(SELECT COUNT(*) FROM bids b WHERE b.job_id=j.job_id) AS bid_count " +
+        "FROM jobs j WHERE j.eid=? AND j.status='Active' ORDER BY j.job_id DESC LIMIT 5"
+    );
+    psAJ.setInt(1, empDashId);
+    ResultSet rsAJ = psAJ.executeQuery();
+    boolean anyAJ = false;
+    while(rsAJ.next()){
+        anyAJ = true;
+%>
+                <tr>
+                    <td><%= rsAJ.getString("title") %></td>
+                    <td><%= rsAJ.getString("city") %></td>
+                    <td><%= rsAJ.getInt("app_count") %></td>
+                    <td><%= rsAJ.getInt("bid_count") %></td>
+                </tr>
+<%
+    }
+    if(!anyAJ){
+%>
+                <tr><td colspan="4" style="text-align:center; color:#999;">No active jobs</td></tr>
+<%
+    }
+    rsAJ.close(); psAJ.close();
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conActiveJobs != null) try{ conActiveJobs.close(); }catch(Exception ignored){} }
+%>
+            </table>
+        </div>
+
+        <%-- Recent Bids --%>
+        <div class="lower-card" style="flex:1;">
+            <h3>Recent Bids</h3>
+            <table>
+                <tr><th>Worker</th><th>Job</th><th>Bid Amount</th><th>Status</th></tr>
+<%
+Connection conRecentBids = null;
+try {
+    conRecentBids = DBConnection.getConnection();
+    PreparedStatement psRB = conRecentBids.prepareStatement(
+        "SELECT js.jfirstname, js.jlastname, j.title, b.bid_amount, b.bid_status " +
+        "FROM bids b " +
+        "JOIN jobs j ON b.job_id=j.job_id " +
+        "JOIN jobseeker js ON b.job_seeker_id=js.jid " +
+        "WHERE j.eid=? ORDER BY b.created_at DESC LIMIT 5"
+    );
+    psRB.setInt(1, empDashId);
+    ResultSet rsRB = psRB.executeQuery();
+    boolean anyRB = false;
+    while(rsRB.next()){
+        anyRB = true;
+        String bidSt = rsRB.getString("bid_status");
+        String bidColor = "#ffc107";
+        if("Accepted".equals(bidSt)) bidColor = "#28a745";
+        else if("Rejected".equals(bidSt)) bidColor = "#ef4444";
+        else if("Countered".equals(bidSt)) bidColor = "#ff9800";
+%>
+                <tr>
+                    <td><%= rsRB.getString("jfirstname") %> <%= rsRB.getString("jlastname") %></td>
+                    <td><%= rsRB.getString("title") %></td>
+                    <td>₹<%= rsRB.getInt("bid_amount") %></td>
+                    <td>
+                        <span style="padding:2px 10px; border-radius:12px; color:#fff;
+                                     background:<%= bidColor %>; font-size:12px;">
+                            <%= bidSt %>
+                        </span>
+                    </td>
+                </tr>
+<%
+    }
+    if(!anyRB){
+%>
+                <tr><td colspan="4" style="text-align:center; color:#999;">No bids yet</td></tr>
+<%
+    }
+    rsRB.close(); psRB.close();
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conRecentBids != null) try{ conRecentBids.close(); }catch(Exception ignored){} }
+%>
+            </table>
+        </div>
+
+    </div>
+
+</div>
 
 <!-- MANAGE JOBS SECTION -->
 <div id="manageJobsSection" style="display:none; width:100%; max-width:900px;">
@@ -432,119 +793,137 @@ if(employerId != null){
 
     <!-- JOB CARD -->
     <div class="job-card">
-        <div class="job-details">
 
-            <h3><%= rs2.getString("title") %></h3>
-
-            <p><strong>Description:</strong>
-                <%= rs2.getString("description") %>
-            </p>
-
-            <!-- ✅ FIXED SUBSKILLS DISPLAY -->
-            <p><strong>Required Subskills:</strong>
-                <%
-                String subs = rs2.getString("subskills");
-                if(subs != null && !subs.trim().isEmpty()){
-                    out.print(subs);
-                } else {
-                    out.print("Not specified");
-                }
-                %>
-            </p>
-
-            <p><strong>Location:</strong>
-                <%= rs2.getString("locality") %>,
-                <%= rs2.getString("city") %>,
-                <%= rs2.getString("state") %>,
-                <%= rs2.getString("country") %>
-            </p>
-
-            <p><strong>Salary:</strong>
-                ₹<%= rs2.getString("salary") %>
-            </p>
-
-            <p><strong>Minimum Salary:</strong>
-                ₹<%= rs2.getString("min_salary") %>
-            </p>
-
-            <p><strong>Experience Required:</strong>
-                <%= rs2.getString("experience_required") %>
-            </p>
-
-            <p><strong>Workers Required:</strong>
-                <%= rs2.getInt("workers_required") %>
-            </p>
-
-            <p><strong>Working Hours:</strong>
-                <%= rs2.getString("working_hours") %>
-            </p>
-
-            <p><strong>Gender Preference:</strong>
-                <%= rs2.getString("gender_preference") %>
-            </p>
-
-            <p><strong>Expiry Date:</strong>
-                <%= rs2.getDate("expiry_date") %>
-            </p>
-            <p><strong>Status:</strong>
-<%
-java.sql.Date expiry = rs2.getDate("expiry_date");
-java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
-
-String status = "ACTIVE";
-
-if(expiry != null && expiry.before(today)){
-    status = "EXPIRED";
-}
-String color = "#6c757d";
-
-if("ACTIVE".equals(status)){
-    color = "#28a745";
-}else if("EXPIRED".equals(status)){
-    color = "#dc3545";
-}
-%>
-
-<span style="padding:4px 10px;border-radius:12px;font-size:13px;color:white;background:<%= color %>;">
-<%= status %>
-</span>
-
-            <p><strong>Job Type:</strong>
-                <%= rs2.getString("job_type") %>
-            </p>
-
-            <p><strong>Languages Preferred:</strong>
-                <%= rs2.getString("languages_preferred") %>
-            </p>
-
-            <p><strong>ZIP Code:</strong>
-                <%= rs2.getString("zip") %>
-            </p>
-
-            <p><strong>Posted On:</strong>
-                <%
-                Timestamp ts = rs2.getTimestamp("created_at");
-                if(ts != null){
-                    out.print(new java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a")
-                    .format(ts));
-                }
-                %>
-            </p>
-
+    <!-- TOP ROW: Title + Status + Actions -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+        <div>
+            <h3 style="font-size:18px; font-weight:700; color:#1a2a3a; margin-bottom:6px;">
+                <%= rs2.getString("title") %>
+            </h3>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:13px; color:#6b7280;">
+                <span>📍 <%= rs2.getString("locality") %>, <%= rs2.getString("city") %></span>
+                <span>🕒 <%= rs2.getString("working_hours") %></span>
+                <span>💼 <%= rs2.getString("job_type") %></span>
+            </div>
         </div>
-
-        <div class="job-actions">
-            <a href="EditJobServlet?job_id=<%= rs2.getInt("job_id") %>" class="edit-btn">
-                Edit
-            </a>
-
-            <a href="DeleteJobServlet?job_id=<%= rs2.getInt("job_id") %>"
-               class="delete-btn"
-               onclick="return confirm('Are you sure you want to delete this job?');">
-               Delete
-            </a>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <%
+            java.sql.Date expiry2 = rs2.getDate("expiry_date");
+            java.sql.Date today2 = new java.sql.Date(System.currentTimeMillis());
+            String status2 = (expiry2 != null && expiry2.before(today2)) ? "EXPIRED" : "ACTIVE";
+            String statusBg = "ACTIVE".equals(status2) ? "#dcfce7" : "#fee2e2";
+            String statusColor = "ACTIVE".equals(status2) ? "#166534" : "#991b1b";
+            %>
+            <span style="background:<%= statusBg %>; color:<%= statusColor %>;
+                         padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700;">
+                <%= status2 %>
+            </span>
+            <div style="display:flex; gap:8px;">
+                <a href="EditJobServlet?job_id=<%= rs2.getInt("job_id") %>"
+                   style="background:#4f6d84; color:#fff; padding:6px 16px;
+                          border-radius:7px; text-decoration:none; font-size:13px; font-weight:600;">
+                    Edit
+                </a>
+                <a href="DeleteJobServlet?job_id=<%= rs2.getInt("job_id") %>"
+                   onclick="return confirm('Are you sure you want to delete this job?');"
+                   style="background:#fee2e2; color:#991b1b; padding:6px 16px;
+                          border-radius:7px; text-decoration:none; font-size:13px; font-weight:600;
+                          border:1px solid #fca5a5;">
+                    Delete
+                </a>
+            </div>
         </div>
     </div>
+
+    <!-- DIVIDER -->
+    <hr style="border:none; border-top:1px solid #f0f2f5; margin-bottom:16px;">
+
+    <!-- INFO GRID -->
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px;">
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Salary</div>
+            <div style="font-size:14px; font-weight:700; color:#166534;">
+                ₹<%= rs2.getString("salary") %>
+                <span style="color:#9ca3af; font-weight:400; font-size:12px;">Maximum Salary
+                    — ₹<%= rs2.getString("min_salary") %> max
+                </span>
+            </div>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Experience</div>
+            <div style="font-size:14px; font-weight:700; color:#1a2a3a;">
+                <%= rs2.getString("experience_required") != null ? rs2.getString("experience_required") : "Not specified" %>
+            </div>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Workers Required</div>
+            <div style="font-size:14px; font-weight:700; color:#1a2a3a;">
+                <%= rs2.getInt("workers_required") %>
+            </div>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Gender Preference</div>
+            <div style="font-size:14px; font-weight:700; color:#1a2a3a;">
+                <%= rs2.getString("gender_preference") != null ? rs2.getString("gender_preference") : "Any" %>
+            </div>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Languages</div>
+            <div style="font-size:14px; font-weight:700; color:#1a2a3a;">
+                <%= rs2.getString("languages_preferred") != null ? rs2.getString("languages_preferred") : "Any" %>
+            </div>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; border:1px solid #e8edf2;">
+            <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                        letter-spacing:0.05em; margin-bottom:4px;">Expiry Date</div>
+            <div style="font-size:14px; font-weight:700; color:<%= "EXPIRED".equals(status2) ? "#991b1b" : "#1a2a3a" %>;">
+                <%= expiry2 != null ? expiry2.toString() : "Not set" %>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SUBSKILLS -->
+    <%
+    String subs2 = rs2.getString("subskills");
+    if(subs2 != null && !subs2.trim().isEmpty()){
+    %>
+    <div style="margin-bottom:14px;">
+        <div style="font-size:11px; color:#9ca3af; font-weight:600; text-transform:uppercase;
+                    letter-spacing:0.05em; margin-bottom:8px;">Required Subskills</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        <%
+        for(String sub : subs2.split(",")){
+        %>
+            <span style="background:#eff6ff; color:#1d4ed8; font-size:12px;
+                         padding:3px 12px; border-radius:20px; font-weight:500;">
+                <%= sub.trim() %>
+            </span>
+        <%
+        }
+        %>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- DESCRIPTION -->
+    <div style="font-size:13px; color:#6b7280; border-top:1px solid #f0f2f5; padding-top:12px;">
+        <span style="font-weight:600; color:#374151;">Description: </span>
+        <%= rs2.getString("description") %>
+    </div>
+
+</div>
 
 <%
         }
@@ -574,302 +953,279 @@ if("ACTIVE".equals(status)){
 <!-- Review Applications SECTION -->
 <div id="reviewApplicationsSection" style="display:none; width:100%; max-width:900px; margin:auto;">
 
-<div class="manage-header">
-<div>
-<h2>Review Applications</h2>
-<p>Review applications only</p>
-</div>
+<div class="manage-header" style="margin-bottom:6px;">
+    <div>
+        <h2 style="font-size:20px; font-weight:600; color:#1a2a3a; margin:0;">Review Applications</h2>
+        <p style="font-size:13px; color:#6b7280; margin:4px 0 0;">Approve or reject candidates for your open positions</p>
+    </div>
 </div>
 
 <%
 Integer employerId2 = (Integer) currentSession.getAttribute("eid");
-
 if(employerId2 != null){
-
 try{
-
-
-
-Connection con3 =DBConnection.getConnection();
-
-PreparedStatement ps3 = con3.prepareStatement(
-"SELECT j.job_id, j.title, " +
+    Connection con3 = DBConnection.getConnection();
+    PreparedStatement ps3 = con3.prepareStatement(
+        "SELECT j.job_id, j.title, " +
 "a.application_id, a.applied_at, " +
-"js.jfirstname, js.jlastname, js.jemail, js.jdistrict, js.jeducation " +
-"FROM jobs j " +
-"INNER JOIN applications a ON j.job_id = a.job_id " +
-"INNER JOIN jobseeker js ON a.jobseeker_id = js.jid " +
-"WHERE j.eid = ? AND a.status='Pending' AND a.is_bid=0 " +
-"ORDER BY j.title ASC, a.applied_at DESC"
-);
+"js.jid AS jobseeker_id, js.jfirstname, js.jlastname, js.jemail, js.jdistrict, js.jeducation " +
+        "FROM jobs j " +
+        "INNER JOIN applications a ON j.job_id = a.job_id " +
+        "INNER JOIN jobseeker js ON a.jobseeker_id = js.jid " +
+        "WHERE j.eid = ? AND a.status='Pending' AND a.is_bid=0 " +
+        "ORDER BY j.title ASC, a.applied_at DESC"
+    );
+    ps3.setInt(1, employerId2);
+    ResultSet rs3 = ps3.executeQuery();
+    String currentJobTitle = "";
+    boolean hasApps = false;
 
-ps3.setInt(1, employerId2);
-
-ResultSet rs3 = ps3.executeQuery();
-
-/* grouping variable */
-
-String currentJobTitle = "";
-boolean hasApps = false;
-
-while(rs3.next()){
-
-String jobTitle = rs3.getString("title");
-
-if(!jobTitle.equals(currentJobTitle)){
-
-if(!currentJobTitle.equals("")){
+    while(rs3.next()){
+        String jobTitle = rs3.getString("title");
+        if(!jobTitle.equals(currentJobTitle)){
+            if(!currentJobTitle.equals("")){
 %>
-</div>
-</div>
+        </div><!-- close applications-list -->
+    </div><!-- close job-group -->
 <%
-}
+            }
+            currentJobTitle = jobTitle;
+%>
+    <!-- Job Group -->
+    <div style="margin-top:24px;">
+        <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase;
+                    letter-spacing:0.05em; margin-bottom:10px; padding:0 2px;">
+            <%= jobTitle %>
+        </div>
+        <div class="applications-list" style="display:flex; flex-direction:column; gap:10px;">
+<%
+        }
+        if(rs3.getObject("application_id") != null){
+            hasApps = true;
+            String initials = rs3.getString("jfirstname").substring(0,1) + rs3.getString("jlastname").substring(0,1);
+%>
+        <!-- Application Card -->
+        <div style="display:flex; justify-content:space-between; align-items:center;
+                    background:#fff; border:0.5px solid #e5e7eb; border-radius:12px;
+                    padding:14px 18px; transition:border-color 0.15s;">
 
-currentJobTitle = jobTitle;
+            <div style="display:flex; align-items:center; gap:14px;">
+                <!-- Avatar -->
+                <div style="width:40px; height:40px; border-radius:50%;
+                            background:#dbeafe; color:#1d4ed8;
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:14px; font-weight:600; flex-shrink:0;">
+                    <%= initials %>
+                </div>
+                <div>
+                    <div style="font-size:15px; font-weight:600; color:#1a2a3a; margin-bottom:2px;">
+                        <%= rs3.getString("jfirstname") %> <%= rs3.getString("jlastname") %>
+                    </div>
+                    <div style="font-size:13px; color:#6b7280; line-height:1.5;">
+                        <%= rs3.getString("jemail") %><br>
+                        <%= rs3.getString("jdistrict") %> &nbsp;·&nbsp; <%= rs3.getString("jeducation") %>
+                    </div>
+                    <span style="display:inline-block; margin-top:5px; font-size:11px; font-weight:500;
+                                 padding:2px 10px; border-radius:20px;
+                                 background:#eff6ff; color:#1d4ed8; border:0.5px solid #bfdbfe;">
+                        Application
+                    </span>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-shrink:0;">
+
+                <a href="view_jobseeker_profile.jsp?jid=<%= rs3.getInt("jobseeker_id") %>"
+                   target="_blank"
+                   style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                          background:#f9fafb; color:#374151; border:0.5px solid #d1d5db;
+                          text-decoration:none;">
+                    View Profile
+                </a>
+
+                <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Accepted"
+                   style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                          background:#ecfdf5; color:#166634; border:0.5px solid #bbf7d0;
+                          text-decoration:none;">
+                    Accept
+                </a>
+
+                <a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Rejected"
+                   style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                          background:#fef2f2; color:#991b1b; border:0.5px solid #fca5a5;
+                          text-decoration:none;">
+                    Reject
+                </a>
+
+            </div>
+        </div>
+<%
+        }
+    }
+    if(!currentJobTitle.equals("")){
+%>
+        </div><!-- close applications-list -->
+    </div><!-- close job-group -->
+<%
+    }
+    if(!hasApps){
+%>
+    <div style="font-size:14px; color:#9ca3af; padding:16px 18px; margin-top:16px;
+                background:#f9fafb; border-radius:10px; border:0.5px solid #e5e7eb;">
+        No pending applications at this time.
+    </div>
+<%
+    }
+    con3.close();
+}catch(Exception e){ e.printStackTrace(); }
+}
 %>
 
-<div class="job-group" style="margin-top:30px;border:1px solid #e6e6e6;padding:20px;border-radius:10px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+<hr style="margin:40px 0; border:none; border-top:0.5px solid #e5e7eb;">
 
-<h3 style="margin-bottom:15px;font-weight:600;color:#333;">
-<%= jobTitle %>
-</h3>
 
-<div class="applications-list" style="display:flex;flex-direction:column;gap:15px;">
-<%
-}
-
-if(rs3.getObject("application_id") != null){
-
-hasApps = true;
-%>
-
-<div class="review-card" style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:15px;border-radius:8px;background:#fafafa;">
-
-<div class="worker-details">
-
-<h4 style="margin:0;">
-<%= rs3.getString("jfirstname") %>
-<%= rs3.getString("jlastname") %>
-</h4>
-
-<p style="margin:3px 0;color:#666;">
-<%= rs3.getString("jemail") %>
-</p>
-
-<div style="font-size:13px;color:#777;">
-<%= rs3.getString("jdistrict") %> |
-<%= rs3.getString("jeducation") %>
-</div>
-
-</div>
-
-<div class="actions" style="display:flex;gap:10px;">
-
-<a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Accepted"
-style="background:#22c55e;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
-Accept
-</a>
-
-<a href="UpdateApplicationStatusServlet?application_id=<%= rs3.getInt("application_id") %>&status=Rejected"
-style="background:#ef4444;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
-Reject
-</a>
-
-</div>
-
+<div class="manage-header" style="margin-bottom:6px;">
+    <div>
+        <h2 style="font-size:20px; font-weight:600; color:#1a2a3a; margin:0;">Review Bids</h2>
+        <p style="font-size:13px; color:#6b7280; margin:4px 0 0;">Workers who placed bids on your jobs</p>
+    </div>
 </div>
 
 <%
-}
-
-}
-
-if(!currentJobTitle.equals("")){
-%>
-</div>
-</div>
-<%
-}
-
-if(!hasApps){
-%>
-<p style="color:#777;">No pending applications.</p>
-<%
-}
-
-con3.close();
-
-}catch(Exception e){
-e.printStackTrace();
-}
-
-}
-%>
-
-
-<!-- ================= REVIEW BIDS SECTION ================= -->
-
-<hr style="margin:50px 0;">
-
-
-<div class="manage-header">
-<div>
-<h2>Review Bids</h2>
-<p>Workers who placed bids on your jobs</p>
-</div>
-</div>
-
-<%
-
 Integer employerBidId = (Integer) currentSession.getAttribute("eid");
-
 if(employerBidId != null){
-
 try{
+    Connection conBid = DBConnection.getConnection();
+    PreparedStatement psBid = conBid.prepareStatement(
+        "SELECT j.job_id, j.title, " +
+        "b.bid_id, b.bid_amount, b.bid_status, b.created_at, b.counter_bid, " +
+        "b.job_seeker_id, " +
+        "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
+        "FROM jobs j " +
+        "INNER JOIN bids b ON j.job_id = b.job_id " +
+        "INNER JOIN jobseeker js ON b.job_seeker_id = js.jid " +
+        "WHERE j.eid = ? AND (b.bid_status='Pending' OR b.bid_status='Countered' OR b.bid_status='Rejected') " +
+        "ORDER BY j.title ASC, b.bid_amount ASC"
+    );
+    psBid.setInt(1, employerBidId);
+    ResultSet rsBid = psBid.executeQuery();
+    String currentBidJobTitle = "";
+    boolean hasBidsOverall = false;
 
-
-
-Connection conBid = DBConnection.getConnection();
-
-PreparedStatement psBid = conBid.prepareStatement(
-
-"SELECT j.job_id, j.title, " +
-"b.bid_id, b.bid_amount, b.bid_status, b.created_at, b.counter_bid, " +
-"js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
-
-"FROM jobs j " +
-
-"INNER JOIN bids b ON j.job_id = b.job_id " +
-
-"INNER JOIN jobseeker js ON b.job_seeker_id = js.jid " +
-
-"WHERE j.eid = ? AND (b.bid_status='Pending' OR b.bid_status='Countered' OR b.bid_status='Rejected') " +
-
-"ORDER BY j.title ASC, b.bid_amount ASC"
-
-);
-
-psBid.setInt(1, employerBidId);
-
-ResultSet rsBid = psBid.executeQuery();
-
-String currentBidJobTitle = "";
-boolean hasBidsOverall = false;
-
-while(rsBid.next()){
-
-String jobTitle = rsBid.getString("title");
-
-if(!jobTitle.equals(currentBidJobTitle)){
-
-if(!currentBidJobTitle.equals("")){
+    while(rsBid.next()){
+        String jobTitle = rsBid.getString("title");
+        if(!jobTitle.equals(currentBidJobTitle)){
+            if(!currentBidJobTitle.equals("")){
 %>
-</div>
-</div>
+        </div><!-- close applications-list -->
+    </div><!-- close job-group -->
 <%
-}
-
-currentBidJobTitle = jobTitle;
-hasBidsOverall = true;
+            }
+            currentBidJobTitle = jobTitle;
+            hasBidsOverall = true;
 %>
-
-<div class="job-group" style="margin-top:30px;border:1px solid #e6e6e6;padding:20px;border-radius:10px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-
-<h3 style="margin-bottom:15px;font-weight:600;color:#333;">
-<%= jobTitle %>
-</h3>
-
-<div class="applications-list" style="display:flex;flex-direction:column;gap:15px;">
-
+    <div style="margin-top:24px;">
+        <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase;
+                    letter-spacing:0.05em; margin-bottom:10px; padding:0 2px;">
+            <%= jobTitle %>
+        </div>
+        <div class="applications-list" style="display:flex; flex-direction:column; gap:10px;">
 <%
-}
-
-if(rsBid.getInt("bid_id") != 0){
+        }
+        if(rsBid.getInt("bid_id") != 0){
+            String bidInitials = rsBid.getString("jfirstname").substring(0,1) + rsBid.getString("jlastname").substring(0,1);
 %>
+        <!-- Bid Card -->
+        <div style="display:flex; justify-content:space-between; align-items:center;
+                    background:#fff; border:0.5px solid #e5e7eb; border-radius:12px;
+                    padding:14px 18px;">
 
-<div class="review-card" style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:15px;border-radius:8px;background:#fafafa;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <!-- Avatar -->
+                <div style="width:40px; height:40px; border-radius:50%;
+                            background:#fef3c7; color:#92400e;
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:14px; font-weight:600; flex-shrink:0;">
+                    <%= bidInitials %>
+                </div>
+                <div>
+                    <div style="font-size:15px; font-weight:600; color:#1a2a3a; margin-bottom:2px;">
+                        <%= rsBid.getString("jfirstname") %> <%= rsBid.getString("jlastname") %>
+                    </div>
+                    <div style="font-size:13px; color:#6b7280; line-height:1.5;">
+                        <%= rsBid.getString("jemail") %><br>
+                        Bid: ₹<%= rsBid.getInt("bid_amount") %>
+                        <% if(rsBid.getInt("counter_bid") > 0){ %>
+                            &nbsp;·&nbsp; Countered: ₹<%= rsBid.getInt("counter_bid") %>
+                        <% } %>
+                        &nbsp;·&nbsp; <%= rsBid.getString("jdistrict") %>
+                    </div>
+                    <span style="display:inline-block; margin-top:5px; font-size:11px; font-weight:500;
+                                 padding:2px 10px; border-radius:20px;
+                                 background:#fffbeb; color:#92400e; border:0.5px solid #fcd34d;">
+                        Bid
+                    </span>
+                </div>
+            </div>
 
-<div>
-
-<h4>
-<%= rsBid.getString("jfirstname") %>
-<%= rsBid.getString("jlastname") %>
-</h4>
-
-<p style="margin:3px 0;color:#666;">
-<%= rsBid.getString("jemail") %>
-</p>
-
-<div style="font-size:13px;color:#777;">
-Bid: ₹<%= rsBid.getInt("bid_amount") %>
-
-<% if(rsBid.getInt("counter_bid") > 0){ %>
- | Countered: ₹<%= rsBid.getInt("counter_bid") %>
-<% } %>
-
- | <%= rsBid.getString("jdistrict") %>
-</div>
-
-</div>
-
-
-<div>
-
-<a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
-style="background:#22c55e;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
-Accept
-</a>
-
-<a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
-style="background:#ef4444;color:white;padding:7px 14px;border-radius:6px;text-decoration:none;">
-Reject
-</a>
-
-
-<form action="CounterBidServlet" method="post" style="margin-top:10px;display:flex;gap:8px;">
-
-<input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
-
-<input type="number" name="counter_amount" placeholder="Counter bid" required style="padding:6px;width:140px;">
-
-<button type="submit" style="background:#ff9800;color:white;border:none;padding:6px 10px;border-radius:5px;">
-Counter
-</button>
-
-</form>
-
-</div>
-
-</div>
-
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                <div style="display:flex; gap:8px;">
+                    <a href="view_jobseeker_profile.jsp?jid=<%= rsBid.getInt("job_seeker_id") %>"
+                       target="_blank"
+                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                              background:#f9fafb; color:#374151; border:0.5px solid #d1d5db;
+                              text-decoration:none;">
+                        View Profile
+                    </a>
+                    <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
+                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                              background:#ecfdf5; color:#166534; border:0.5px solid #bbf7d0;
+                              text-decoration:none;">
+                        Accept
+                    </a>
+                    <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
+                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
+                              background:#fef2f2; color:#991b1b; border:0.5px solid #fca5a5;
+                              text-decoration:none;">
+                        Reject
+                    </a>
+                </div>
+                <form action="CounterBidServlet" method="post" style="display:flex; gap:6px; align-items:center;">
+                    <input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
+                    <input type="number" name="counter_amount" placeholder="Counter amount (₹)" required
+                           style="font-size:13px; padding:6px 10px; border-radius:8px; width:160px;
+                                  border:0.5px solid #e5e7eb; background:#f9fafb; color:#374151;">
+                    <button type="submit"
+                            style="font-size:12px; font-weight:500; padding:6px 14px; border-radius:8px;
+                                   background:#fffbeb; color:#92400e; border:0.5px solid #fcd34d; cursor:pointer;">
+                        Counter
+                    </button>
+                </form>
+            </div>
+        </div>
 <%
-}
-
-}
-
-if(!currentBidJobTitle.equals("")){
+        }
+    }
+    if(!currentBidJobTitle.equals("")){
 %>
-</div>
-</div>
+        </div><!-- close applications-list -->
+    </div><!-- close job-group -->
 <%
-}
-
-if(!hasBidsOverall){
+    }
+    if(!hasBidsOverall){
 %>
-<p>No bids received yet.</p>
+    <div style="font-size:14px; color:#9ca3af; padding:16px 18px; margin-top:16px;
+                background:#f9fafb; border-radius:10px; border:0.5px solid #e5e7eb;">
+        No bids received yet.
+    </div>
 <%
-}
-
-conBid.close();
-
-}catch(Exception e){
-e.printStackTrace();
-}
-
+    }
+    conBid.close();
+}catch(Exception e){ e.printStackTrace(); }
 }
 %>
 
-</div><!-- ✅ IMPORTANT: closes reviewApplicationsSection -->
+</div><!-- closes reviewApplicationsSection -->
 
 <!-- ACCEPTED APPLICATIONS SECTION -->
 <div id="acceptedApplicationsSection"
@@ -1547,6 +1903,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     else if(section === "reviews"){
     document.getElementById("reviewsSection").style.display = "block";
+}
 });
 </script>
 
@@ -1568,7 +1925,11 @@ setTimeout(() => {
 
 
 function showSection(section, event) {
-
+    // Show Post New Job button only on dashboard
+    const postJobBtn = document.getElementById("postJobBtn");
+    if (postJobBtn) {
+        postJobBtn.style.display = (section === "dashboard") ? "inline" : "none";
+    }
     const sections = [
         "dashboardSection",
         "manageJobsSection",
@@ -1621,7 +1982,20 @@ function showSection(section, event) {
     }
 }
 
+// ================= HAMBURGER TOGGLE =================
+const hamburger = document.getElementById("hamburger");
+const sidebar   = document.getElementById("sidebar");
 
+// jobseeker uses .main, employer uses .content
+const mainContent = document.querySelector(".main") || document.querySelector(".content");
+const navbar      = document.querySelector(".navbar") || document.querySelector("header");
+
+hamburger.addEventListener("click", function(){
+    sidebar.classList.toggle("collapsed");
+    hamburger.classList.toggle("collapsed");
+    if(mainContent) mainContent.classList.toggle("collapsed");
+    if(navbar)      navbar.classList.toggle("collapsed");
+});
 </script>
 
 <script>

@@ -76,22 +76,42 @@ if (currentSession.getAttribute("jfirstname") == null) {
 <meta charset="UTF-8">
 <title>Job Seeker Dashboard | SkillMitra</title>
 <link rel="stylesheet" href="jobseeker_dash.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
 <h2>JobSeeker Dashboard</h2>
-<a class="active" onclick="showSection('dashboard', this)">Dashboard</a>
-<a onclick="showSection('applied', this)">Applied Jobs</a>
-<a onclick="showSection('assigned', this)">Assigned Job</a>
-<a onclick="showSection('payments', this)">Payment History</a>
-<a onclick="showSection('reviews', this)">Ratings & Reviews</a>
+<a class="active" onclick="showSection('dashboard', this)">
+    <i class="fa-solid fa-house nav-icon"></i>
+    <span class="nav-label"> Dashboard</span>
+</a>
+<a onclick="showSection('applied', this)">
+    <i class="fa-solid fa-file-lines nav-icon"></i>
+    <span class="nav-label"> Applied Jobs</span>
+</a>
+<a onclick="showSection('assigned', this)">
+    <i class="fa-solid fa-briefcase nav-icon"></i>
+    <span class="nav-label"> Assigned Job</span>
+</a>
+<a onclick="showSection('payments', this)">
+    <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+    <span class="nav-label"> Payment History</span>
+</a>
+<a onclick="showSection('reviews', this)">
+    <i class="fa-solid fa-star nav-icon"></i>
+    <span class="nav-label"> Ratings & Reviews</span>
+</a>
 </div>
 
 <div class="main">
 
 <div class="navbar">
-<div class="nav-left">SkillMitra</div>
+<div style="display:flex; align-items:center; gap:12px;">
+    <button class="hamburger" id="hamburger">&#9776;</button>
+    <img src="skillmitralogo.jpg" alt="Logo" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+    <div class="nav-left">SkillMitra</div>
+</div>
 <div class="nav-right">
 <div class="profile-dropdown">
 <img src="images/default-user.png" class="profile-icon" id="profileIcon">
@@ -110,10 +130,86 @@ if (currentSession.getAttribute("jfirstname") == null) {
 <div class="topbar">
 Welcome, <b><%= currentSession.getAttribute("jfirstname") %></b>
 </div>
+<%-- ── PROFILE COMPLETION BAR ── --%>
+<%
+Connection conProf = null;
+try {
+    conProf = DBConnection.getConnection();
+    PreparedStatement psProf = conProf.prepareStatement(
+        "SELECT jfirstname, jlastname, jphone, jdistrict, jzip, jeducation, jphoto " +
+        "FROM jobseeker WHERE jid=?"
+    );
+    psProf.setInt(1, jobseekerId);
+    ResultSet rsProf = psProf.executeQuery();
 
+    int profScore = 0;
+    int profTotal = 7;
+    String profTip = "";
+
+    if(rsProf.next()){
+        if(rsProf.getString("jfirstname") != null && !rsProf.getString("jfirstname").isEmpty()) profScore++;
+        if(rsProf.getString("jphone")     != null && !rsProf.getString("jphone").isEmpty())     profScore++;
+        else profTip = "Add your phone number. ";
+        if(rsProf.getString("jdistrict")  != null && !rsProf.getString("jdistrict").isEmpty())  profScore++;
+        if(rsProf.getString("jzip")       != null && !rsProf.getString("jzip").isEmpty())       profScore++;
+        else profTip += "Add your ZIP code. ";
+        if(rsProf.getString("jeducation") != null && !rsProf.getString("jeducation").isEmpty()) profScore++;
+        else profTip += "Add your education. ";
+        if(rsProf.getString("jphoto")     != null && !rsProf.getString("jphoto").isEmpty())     profScore++;
+        else profTip += "Upload a profile photo. ";
+    }
+    rsProf.close(); psProf.close();
+
+    // check skills
+    PreparedStatement psProfSkill = conProf.prepareStatement(
+        "SELECT COUNT(*) FROM jobseeker_skills WHERE jid=?"
+    );
+    psProfSkill.setInt(1, jobseekerId);
+    ResultSet rsProfSkill = psProfSkill.executeQuery();
+    if(rsProfSkill.next() && rsProfSkill.getInt(1) > 0) profScore++;
+    else profTip += "Add your skills.";
+    rsProfSkill.close(); psProfSkill.close();
+
+    int profPct = (profScore * 100) / profTotal;
+    String barColor = profPct < 40 ? "#ef4444" : profPct < 70 ? "#f59e0b" : "#22c55e";
+    String profLabel = profPct < 40 ? "Just started" : profPct < 70 ? "Getting there!" : profPct < 100 ? "Almost complete!" : "Complete!";
+%>
+
+<div style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
+            padding:16px 20px; margin:16px 0; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:14px; font-weight:600; color:#1a2a3a;">
+            Profile Completion
+        </span>
+        <span style="font-size:13px; font-weight:700; color:<%= barColor %>;">
+            <%= profPct %>% — <%= profLabel %>
+        </span>
+    </div>
+
+    <div style="background:#f0f2f5; border-radius:20px; height:8px; overflow:hidden;">
+        <div style="height:8px; border-radius:20px; width:<%= profPct %>%;
+                    background:<%= barColor %>; transition:width 0.5s ease;">
+        </div>
+    </div>
+
+    <% if(profPct < 100 && !profTip.isEmpty()){ %>
+    <p style="font-size:12px; color:#6b7280; margin:8px 0 0;">
+        💡 <%= profTip %>
+        <a href="jobseeker_profile.jsp"
+           style="color:#3b5bdb; font-weight:600; text-decoration:none;">
+            Complete Profile →
+        </a>
+    </p>
+    <% } %>
+</div>
+
+<%
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conProf != null) try{ conProf.close(); }catch(Exception ignored){} }
+%>
 <form class="search-box" method="get" action="search_results.jsp">
     <input type="hidden" name="jid" value="<%= session.getAttribute("jobseekerId") %>">
-<input type="text" id="searchInput" name="q" placeholder="Search jobs...">
+<input type="text" id="searchInput" name="q" placeholder="Search by skill or area...">
 
 <button type="button" id="filterBtn">Filters ▼</button>
 
@@ -414,6 +510,116 @@ conBids.close();
     </div>
 
 </div>
+<%-- ── RECENT ACTIVITY FEED ── --%>
+<div style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
+            padding:20px; margin-top:20px; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+    <h4 style="margin:0 0 16px; font-size:16px; color:#1a2a3a;">Recent Activity</h4>
+
+<%
+Connection conAct = null;
+try {
+    conAct = DBConnection.getConnection();
+    PreparedStatement psAct = conAct.prepareStatement(
+        "SELECT * FROM ( " +
+
+        "SELECT 'applied'  AS type, j.title, a.applied_at AS event_time, NULL AS extra " +
+        "FROM applications a JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE a.jobseeker_id=? " +
+
+        "UNION ALL " +
+
+        "SELECT CASE WHEN a.status='Accepted' THEN 'accepted' ELSE 'rejected' END AS type, " +
+        "j.title, a.applied_at AS event_time, NULL AS extra " +
+        "FROM applications a JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE a.jobseeker_id=? AND a.status IN ('Accepted','Rejected') " +
+
+        "UNION ALL " +
+
+        "SELECT 'bid' AS type, j.title, b.created_at AS event_time, " +
+        "CAST(b.bid_amount AS CHAR) AS extra " +
+        "FROM bids b JOIN jobs j ON b.job_id=j.job_id " +
+        "WHERE b.job_seeker_id=? " +
+
+        "UNION ALL " +
+
+        "SELECT 'countered' AS type, j.title, b.created_at AS event_time, " +
+        "CAST(b.counter_bid AS CHAR) AS extra " +
+        "FROM bids b JOIN jobs j ON b.job_id=j.job_id " +
+        "WHERE b.job_seeker_id=? AND b.counter_bid > 0 " +
+
+        "UNION ALL " +
+
+        "SELECT 'payment' AS type, j.title, p.updated_at AS event_time, NULL AS extra " +
+        "FROM payments p " +
+        "JOIN applications a ON p.application_id=a.application_id " +
+        "JOIN jobs j ON a.job_id=j.job_id " +
+        "WHERE a.jobseeker_id=? AND p.status='Confirmed' " +
+
+        ") AS activity ORDER BY event_time DESC LIMIT 6"
+    );
+    psAct.setInt(1, jobseekerId);
+    psAct.setInt(2, jobseekerId);
+    psAct.setInt(3, jobseekerId);
+    psAct.setInt(4, jobseekerId);
+    psAct.setInt(5, jobseekerId);
+    ResultSet rsAct = psAct.executeQuery();
+
+    boolean anyAct = false;
+    while(rsAct.next()){
+        anyAct = true;
+        String actType  = rsAct.getString("type");
+        String actTitle = rsAct.getString("title");
+        String actExtra = rsAct.getString("extra");
+        String actDate  = new java.text.SimpleDateFormat("dd MMM yyyy")
+                            .format(rsAct.getTimestamp("event_time"));
+        String icon, msg, dotColor;
+        if("applied".equals(actType)){
+            icon="📝"; dotColor="#eef2ff"; msg="Applied to <b>"+actTitle+"</b>";
+        } else if("accepted".equals(actType)){
+            icon="✅"; dotColor="#dcfce7"; msg="Accepted for <b>"+actTitle+"</b>";
+        } else if("rejected".equals(actType)){
+            icon="❌"; dotColor="#fee2e2"; msg="Not selected for <b>"+actTitle+"</b>";
+        } else if("bid".equals(actType)){
+            icon="💰"; dotColor="#fff7ed"; msg="Placed a bid of ₹"+actExtra+" on <b>"+actTitle+"</b>";
+        } else if("countered".equals(actType)){
+            icon="🔄"; dotColor="#fff7ed"; msg="Employer countered with ₹"+actExtra+" on <b>"+actTitle+"</b>";
+        } else if("payment".equals(actType)){
+            icon="💸"; dotColor="#dcfce7"; msg="Payment confirmed for <b>"+actTitle+"</b>";
+        } else {
+            icon="📌"; dotColor="#f3f4f6"; msg=actTitle;
+        }
+        %>
+    <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:14px;">
+
+        <div style="font-size:20px; width:36px; height:36px; border-radius:50%;
+                    background:<%= dotColor %>; display:flex; align-items:center;
+                    justify-content:center; flex-shrink:0;">
+            <%= icon %>
+        </div>
+
+        <div style="flex:1;">
+            <p style="margin:0; font-size:14px; color:#374151; line-height:1.5;">
+                <%= msg %>
+            </p>
+            <span style="font-size:12px; color:#9ca3af;"><%= actDate %></span>
+        </div>
+
+    </div>
+<%
+    }
+    if(!anyAct){
+%>
+    <div style="text-align:center; padding:24px; color:#9ca3af;">
+        <div style="font-size:28px; margin-bottom:8px;">📋</div>
+        <p style="margin:0; font-size:14px;">No activity yet. Start by applying to a job!</p>
+    </div>
+<%
+    }
+    rsAct.close(); psAct.close();
+} catch(Exception e){ e.printStackTrace(); }
+finally { if(conAct != null) try{ conAct.close(); }catch(Exception ignored){} }
+%>
+</div>      
 </div> <%-- closes dashboardSection --%>
 
 
@@ -1392,6 +1598,22 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+});
+
+//sidebar
+// ================= HAMBURGER TOGGLE =================
+const hamburger = document.getElementById("hamburger");
+const sidebar   = document.getElementById("sidebar");
+
+// jobseeker uses .main, employer uses .content
+const mainContent = document.querySelector(".main") || document.querySelector(".content");
+const navbar      = document.querySelector(".navbar") || document.querySelector("header");
+
+hamburger.addEventListener("click", function(){
+    sidebar.classList.toggle("collapsed");
+    hamburger.classList.toggle("collapsed");
+    if(mainContent) mainContent.classList.toggle("collapsed");
+    if(navbar)      navbar.classList.toggle("collapsed");
 });
 </script>
 </div>

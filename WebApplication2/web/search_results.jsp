@@ -143,7 +143,7 @@ job.put("salary",rs.getString("salary"));
 job.put("min_salary",rs.getString("min_salary"));
 job.put("percent",percent);
 
-if(bestMatchJobs.size() < 3){
+if(percent >= 50){
     bestMatchJobs.add(job);
 } else {
     otherJobs.add(job);
@@ -171,12 +171,89 @@ int totalResults = bestMatchJobs.size() + otherJobs.size();
 
 <!-- 🔵 NAVBAR -->
 <div class="navbar">
-  <div class="nav-left">SkillMitra</div>
-  <a href="jobseeker_dash.jsp" class="back-btn">← Back</a>
+  <div style="display:flex; align-items:center; gap:16px;">
+      <a href="jobseeker_dash.jsp" class="back-btn">← Back to Dashboard</a>
+    <img src="skillmitralogo.jpg" alt="Logo" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+      <div class="nav-left">SkillMitra</div>
+    
+  </div>
+  <div class="profile-dropdown">
+    <%
+    HttpSession sr = request.getSession(false);
+    String srPhoto = (String) sr.getAttribute("jphoto");
+    String srImg = (srPhoto != null && !srPhoto.trim().isEmpty()) 
+                   ? "uploads/" + srPhoto 
+                   : "images/default-user.png";
+    %>
+    <img src="<%= srImg %>" class="profile-icon" id="profileIcon"
+         style="width:38px; height:38px; border-radius:50%; 
+                border:2px solid white; cursor:pointer;">
+    <div class="profile-menu" id="profileMenu"
+         style="display:none; position:absolute; right:0; top:55px;
+                background:#fff; width:200px; border-radius:10px;
+                box-shadow:0 8px 25px rgba(0,0,0,0.15); z-index:999;">
+      <div style="padding:12px 14px; font-weight:600; border-bottom:1px solid #eee;">
+        <%= sr.getAttribute("jfirstname") %> <%= sr.getAttribute("jlastname") %>
+      </div>
+      <a href="jobseeker_profile.jsp" 
+         style="display:block; padding:10px 14px; color:#333; text-decoration:none;">
+         View Profile
+      </a>
+      <a href="LogoutServlet" 
+         style="display:block; padding:10px 14px; color:#333; text-decoration:none;">
+         Logout
+      </a>
+    </div>
+  </div>
 </div>
+
+<script>
+document.getElementById("profileIcon").addEventListener("click", function(e){
+    e.stopPropagation();
+    var menu = document.getElementById("profileMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+});
+document.addEventListener("click", function(){
+    document.getElementById("profileMenu").style.display = "none";
+});
+</script>
 
 <!-- 🔵 MAIN CONTAINER (IMPORTANT CHANGE) -->
 <div class="results-container">
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+    <div class="side-card">
+        <h4>Search Tips</h4>
+        <div class="side-tip">
+            <span>Results are matched based on your registered skills</span>
+        </div>
+        <div class="side-tip">
+            <span>Use area and salary filters for more relevant results</span>
+        </div>
+        <div class="side-tip">
+            <span>Keep your profile updated for better job matches</span>
+        </div>
+    </div>
+    <div class="side-card">
+        <h4>Match Guide</h4>
+        <div class="side-tip">
+            <span style="color:#166534; font-weight:700;">75–100%</span>
+            <span>Excellent match</span>
+        </div>
+        <div class="side-tip">
+            <span style="color:#1d4ed8; font-weight:700;">50–74%</span>
+            <span>Good match</span>
+        </div>
+        <div class="side-tip">
+            <span style="color:#9ca3af; font-weight:700;">Below 50%</span>
+            <span>Partial match</span>
+        </div>
+    </div>
+</div>
+
+<!-- CENTER COLUMN -->
+<div class="center-col">
 
 <p class="total-results">
     <b>Total Results:</b> <%= totalResults %>
@@ -212,7 +289,7 @@ if(totalResults == 0){
 } else {
 %>
 
-<h2 class="section-title">🔥 Best Skill Match</h2>
+<h2 class="section-title">Best Skill Match</h2>
 
 <%
 if(bestMatchJobs.isEmpty()){
@@ -233,9 +310,32 @@ Map<String,Object> job = bestMatchJobs.get(i);
 
 <p>📍 <%= job.get("locality") %>, <%= job.get("city") %></p>
 
-<p>Salary: ₹<%= job.get("salary") %></p>
+<div class="salary-row">
+    <span class="salary-badge">₹<%= job.get("salary") %> Min</span>
+    <span class="min-salary-badge">₹<%= job.get("min_salary") %> Max</span>
+</div>
 
-<p>Min Salary: ₹<%= job.get("min_salary") %></p>
+<p>
+<%
+Connection conSub1 = DBConnection.getConnection();
+PreparedStatement psSub1 = conSub1.prepareStatement(
+    "SELECT ss.subskill_name FROM subskill ss " +
+    "JOIN job_skills jsk ON jsk.subskill_id = ss.subskill_id " +
+    "WHERE jsk.job_id = ?"
+);
+psSub1.setInt(1, (Integer) job.get("job_id"));
+ResultSet rsSub1 = psSub1.executeQuery();
+while(rsSub1.next()){
+%>
+<span style="display:inline-block; background:#f0f4ff; color:#3b5bdb;
+             font-size:11px; padding:2px 10px; border-radius:20px; margin:2px;">
+    <%= rsSub1.getString("subskill_name") %>
+</span>
+<%
+}
+rsSub1.close(); psSub1.close(); conSub1.close();
+%>
+</p>
 
 <p>
 Match: <span class="match">
@@ -274,9 +374,32 @@ Map<String,Object> job = otherJobs.get(i);
 
 <p>📍 <%= job.get("locality") %>, <%= job.get("city") %></p>
 
-<p>Salary: ₹<%= job.get("salary") %></p>
+<div class="salary-row">
+    <span class="salary-badge">₹<%= job.get("salary") %> Min</span>
+    <span class="min-salary-badge">₹<%= job.get("min_salary") %> Max</span>
+</div>
 
-<p>Min Salary: ₹<%= job.get("min_salary") %></p>
+<p>
+<%
+Connection conSub2 = DBConnection.getConnection();
+PreparedStatement psSub2 = conSub2.prepareStatement(
+    "SELECT ss.subskill_name FROM subskill ss " +
+    "JOIN job_skills jsk ON jsk.subskill_id = ss.subskill_id " +
+    "WHERE jsk.job_id = ?"
+);
+psSub2.setInt(1, (Integer) job.get("job_id"));
+ResultSet rsSub2 = psSub2.executeQuery();
+while(rsSub2.next()){
+%>
+<span style="display:inline-block; background:#f0f4ff; color:#3b5bdb;
+             font-size:11px; padding:2px 10px; border-radius:20px; margin:2px;">
+    <%= rsSub2.getString("subskill_name") %>
+</span>
+<%
+}
+rsSub2.close(); psSub2.close(); conSub2.close();
+%>
+</p>
 
 <p>
 Match: <span class="match">
@@ -295,6 +418,39 @@ Match: <span class="match">
 }
 %>
 
+</div> <%-- closes center-col --%>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+    <div class="side-card">
+        <h4>Quick Actions</h4>
+        <div class="side-tip-plain">
+            <a href="jobseeker_profile.jsp" style="color:#3b5bdb; text-decoration:none; font-weight:500;">Update your profile</a>
+        </div>
+        <div class="side-tip-plain">
+            <a href="jobseeker_dash.jsp?section=applied" style="color:#3b5bdb; text-decoration:none; font-weight:500;">View applied jobs</a>
+        </div>
+        <div class="side-tip-plain">
+            <a href="jobseeker_dash.jsp?section=payments" style="color:#3b5bdb; text-decoration:none; font-weight:500;">Payment history</a>
+        </div>
+    </div>
+    <div class="side-card">
+        <h4>How Bidding Works</h4>
+        <div class="side-tip-plain">
+            <span style="font-weight:700; color:#4f6d84; margin-right:8px;">1.</span>
+            <span>View a job and place your expected salary</span>
+        </div>
+        <div class="side-tip-plain">
+            <span style="font-weight:700; color:#4f6d84; margin-right:8px;">2.</span>
+            <span>Employer reviews and accepts or counters</span>
+        </div>
+        <div class="side-tip-plain">
+            <span style="font-weight:700; color:#4f6d84; margin-right:8px;">3.</span>
+            <span>Accept the counter offer to get hired</span>
+        </div>
+    </div>
 </div>
+
+</div> <%-- closes results-container --%>
 
 </body>
