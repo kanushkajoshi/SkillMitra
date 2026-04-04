@@ -1088,144 +1088,325 @@ try{
     <div>
         <h2 style="font-size:20px; font-weight:600; color:#1a2a3a; margin:0;">Review Bids</h2>
         <p style="font-size:13px; color:#6b7280; margin:4px 0 0;">Workers who placed bids on your jobs</p>
-    </div>
-</div>
+        
+<style>
+/* ── Negotiation thread ── */
+<%--
+  In emp_dash.jsp, find the <style> block inside reviewApplicationsSection
+  that contains .neg-dot.js and .neg-dot.emp and replace the two dot rules:
+
+  OLD:
+    .neg-dot.js  { background: #dbeafe; color: #1d4ed8; }
+    .neg-dot.emp { background: #dcfce7; color: #166534; }
+
+  NEW (below) — matches the class names used in the corrected bubble code:
+--%>
+
+
+/* ── Negotiation thread ── */
+.neg-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0 14px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 0.5px solid #e2e8f0;
+    max-height: 260px;
+    overflow-y: auto;
+}
+.neg-bubble {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+.neg-bubble.employer { flex-direction: row-reverse; }
+.neg-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+/* Jobseeker moves → blue dot */
+.neg-dot.js-dot  { background: #dbeafe; color: #1d4ed8; }
+/* Employer moves → green dot */
+.neg-dot.emp-dot { background: #dcfce7; color: #166534; }
+.neg-content {
+    background: #fff;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 12px;
+    max-width: 72%;
+    font-size: 13px;
+    line-height: 1.5;
+}
+/* employer bubble (right side) gets a green tint */
+.neg-bubble.employer .neg-content { background: #f0fdf4; border-color: #bbf7d0; }
+.neg-amount { font-size: 15px; font-weight: 700; color: #1a2a3a; }
+.neg-action { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+.neg-note   { font-size: 12px; color: #6b7280; font-style: italic; margin-top: 3px; }
+.neg-date   { font-size: 10px; color: #c0c7d1; margin-top: 4px; }
+
+/* status pill */
+.bid-pill {
+    display: inline-block;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    margin-top: 5px;
+}
+.pill-pending    { background: #fef9c3; color: #854d0e; }
+.pill-countered  { background: #fff7ed; color: #9a3412; }
+.pill-jscountered { background: #ede9fe; color: #6d28d9; }
+.pill-jsAccepted { background: #dbeafe; color: #1e40af; }
+.pill-accepted   { background: #dcfce7; color: #166534; }
+.pill-rejected   { background: #fee2e2; color: #991b1b; }
+</style>
 
 <%
-Integer employerBidId = (Integer) currentSession.getAttribute("eid");
-if(employerBidId != null){
-try{
-    Connection conBid = DBConnection.getConnection();
-    PreparedStatement psBid = conBid.prepareStatement(
+Integer empBidReviewId = (Integer) currentSession.getAttribute("eid");
+if (empBidReviewId != null) {
+try {
+    Connection conBid2 = DBConnection.getConnection();
+
+    // Load all open bids grouped by job
+    PreparedStatement psBid2 = conBid2.prepareStatement(
         "SELECT j.job_id, j.title, " +
-        "b.bid_id, b.bid_amount, b.bid_status, b.created_at, b.counter_bid, " +
+        "b.bid_id, b.bid_amount, b.bid_status, b.current_amount, " +
+        "b.counter_bid, b.round_number, b.created_at AS bid_created, " +
         "b.job_seeker_id, " +
         "js.jfirstname, js.jlastname, js.jemail, js.jdistrict " +
         "FROM jobs j " +
         "INNER JOIN bids b ON j.job_id = b.job_id " +
         "INNER JOIN jobseeker js ON b.job_seeker_id = js.jid " +
-        "WHERE j.eid = ? AND (b.bid_status='Pending' OR b.bid_status='Countered' OR b.bid_status='Rejected') " +
-        "ORDER BY j.title ASC, b.bid_amount ASC"
+        "WHERE j.eid = ? " +
+        "  AND b.bid_status NOT IN ('Accepted','Rejected','RejectedByJobseeker') " +
+        "ORDER BY j.title ASC, b.bid_id ASC"
     );
-    psBid.setInt(1, employerBidId);
-    ResultSet rsBid = psBid.executeQuery();
-    String currentBidJobTitle = "";
-    boolean hasBidsOverall = false;
+    psBid2.setInt(1, empBidReviewId);
+    ResultSet rsBid2 = psBid2.executeQuery();
 
-    while(rsBid.next()){
-        String jobTitle = rsBid.getString("title");
-        if(!jobTitle.equals(currentBidJobTitle)){
-            if(!currentBidJobTitle.equals("")){
+    String curJobTitle2 = "";
+    boolean hasBids2    = false;
+
+    while (rsBid2.next()) {
+        String jobTitle2  = rsBid2.getString("title");
+        String bidStatus2 = rsBid2.getString("bid_status");
+        int bidId2        = rsBid2.getInt("bid_id");
+        int jobId2        = rsBid2.getInt("job_id");
+        int currentAmt2   = rsBid2.getInt("current_amount");
+        int roundNum2     = rsBid2.getInt("round_number");
+        if (currentAmt2 == 0) currentAmt2 = rsBid2.getInt("bid_amount");
+
+        if (!jobTitle2.equals(curJobTitle2)) {
+            if (!curJobTitle2.isEmpty()) { %>
+        </div><!-- close prev job group -->
+    </div>
+<%          }
+            curJobTitle2 = jobTitle2;
 %>
-        </div><!-- close applications-list -->
-    </div><!-- close job-group -->
-<%
-            }
-            currentBidJobTitle = jobTitle;
-            hasBidsOverall = true;
-%>
-    <div style="margin-top:24px;">
-        <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase;
-                    letter-spacing:0.05em; margin-bottom:10px; padding:0 2px;">
-            <%= jobTitle %>
+    <div style="margin-top: 24px;">
+        <div style="font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;
+                    letter-spacing:0.05em;margin-bottom:10px;">
+            <%= jobTitle2 %>
         </div>
-        <div class="applications-list" style="display:flex; flex-direction:column; gap:10px;">
-<%
-        }
-        if(rsBid.getInt("bid_id") != 0){
-            String bidInitials = rsBid.getString("jfirstname").substring(0,1) + rsBid.getString("jlastname").substring(0,1);
-%>
-        <!-- Bid Card -->
-        <div style="display:flex; justify-content:space-between; align-items:center;
-                    background:#fff; border:0.5px solid #e5e7eb; border-radius:12px;
-                    padding:14px 18px;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+<%      }
+        hasBids2 = true;
 
-            <div style="display:flex; align-items:center; gap:14px;">
-                <!-- Avatar -->
-                <div style="width:40px; height:40px; border-radius:50%;
-                            background:#fef3c7; color:#92400e;
-                            display:flex; align-items:center; justify-content:center;
-                            font-size:14px; font-weight:600; flex-shrink:0;">
-                    <%= bidInitials %>
+        // ── Pill color & label ───────────────────────────────────────────
+        String pillClass, pillLabel, actionHint;
+       if ("JobseekerCountered".equals(bidStatus2)) {
+    pillClass  = "pill-jscountered";
+    pillLabel  = "Worker Counter #" + roundNum2;
+    actionHint = "Worker countered back – accept, reject, or counter again";
+}
+else if ("JobseekerAccepted".equals(bidStatus2)) {
+    pillClass  = "pill-jsAccepted";
+    pillLabel  = "Worker Accepted Counter";
+    actionHint = "Worker agreed to your counter – confirm to assign the job";
+}
+else {
+    pillClass  = "pill-pending";
+    pillLabel  = "Initial Bid";
+    actionHint = "New bid received – accept, reject, or counter";
+}
+
+        // ── Load negotiation history for this bid ───────────────────────
+        PreparedStatement psHist = conBid2.prepareStatement(
+            "SELECT actor, action, amount, note, created_at " +
+            "FROM   bid_negotiations " +
+            "WHERE  bid_id = ? " +
+            "ORDER  BY neg_id ASC"
+        );
+        psHist.setInt(1, bidId2);
+        ResultSet rsHist = psHist.executeQuery();
+
+        String initials2 = rsBid2.getString("jfirstname").substring(0,1)
+                         + rsBid2.getString("jlastname").substring(0,1);
+%>
+        <!-- ── BID CARD ──────────────────────────────────────────────── -->
+        <div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:18px 20px;">
+
+            <!-- Header row -->
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#fef3c7;
+                            color:#92400e;display:flex;align-items:center;justify-content:center;
+                            font-size:14px;font-weight:700;flex-shrink:0;">
+                    <%= initials2 %>
                 </div>
-                <div>
-                    <div style="font-size:15px; font-weight:600; color:#1a2a3a; margin-bottom:2px;">
-                        <%= rsBid.getString("jfirstname") %> <%= rsBid.getString("jlastname") %>
+                <div style="flex:1;">
+                    <div style="font-size:15px;font-weight:600;color:#1a2a3a;">
+                        <%= rsBid2.getString("jfirstname") %> <%= rsBid2.getString("jlastname") %>
                     </div>
-                    <div style="font-size:13px; color:#6b7280; line-height:1.5;">
-                        <%= rsBid.getString("jemail") %><br>
-                        Bid: ₹<%= rsBid.getInt("bid_amount") %>
-                        <% if(rsBid.getInt("counter_bid") > 0){ %>
-                            &nbsp;·&nbsp; Countered: ₹<%= rsBid.getInt("counter_bid") %>
-                        <% } %>
-                        &nbsp;·&nbsp; <%= rsBid.getString("jdistrict") %>
+                    <div style="font-size:13px;color:#6b7280;">
+                        <%= rsBid2.getString("jemail") %> &nbsp;·&nbsp; <%= rsBid2.getString("jdistrict") %>
                     </div>
-                    <span style="display:inline-block; margin-top:5px; font-size:11px; font-weight:500;
-                                 padding:2px 10px; border-radius:20px;
-                                 background:#fffbeb; color:#92400e; border:0.5px solid #fcd34d;">
-                        Bid
-                    </span>
+                    <span class="bid-pill <%= pillClass %>"><%= pillLabel %></span>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:20px;font-weight:800;color:#1a2a3a;">₹<%= currentAmt2 %></div>
+                    <div style="font-size:11px;color:#9ca3af;">Current offer</div>
                 </div>
             </div>
+<% String viewerRole = "Employer"; %>
+   <!-- Negotiation thread -->
+            <div class="neg-thread" id="thread-<%= bidId2 %>">
+<%
+boolean anyHist = false;
+while (rsHist.next()) {
+    anyHist = true;
+    String hActor  = rsHist.getString("actor");   // "Employer" or "Jobseeker"
+    String hAction = rsHist.getString("action");
+    int    hAmt    = rsHist.getInt("amount");
+    boolean amtNull = rsHist.wasNull();            // ← MUST be read right after getInt
+    String hNote   = rsHist.getString("note");
+    String hDate   = new java.text.SimpleDateFormat("dd MMM, HH:mm")
+                        .format(rsHist.getTimestamp("created_at"));
 
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-                <div style="display:flex; gap:8px;">
-                    <a href="view_jobseeker_profile.jsp?jid=<%= rsBid.getInt("job_seeker_id") %>"
-                       target="_blank"
-                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
-                              background:#f9fafb; color:#374151; border:0.5px solid #d1d5db;
-                              text-decoration:none;">
-                        View Profile
-                    </a>
-                    <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=accept"
-                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
-                              background:#ecfdf5; color:#166534; border:0.5px solid #bbf7d0;
-                              text-decoration:none;">
-                        Accept
-                    </a>
-                    <a href="RespondBidByEmployerServlet?bid_id=<%= rsBid.getInt("bid_id") %>&action=reject"
-                       style="font-size:13px; font-weight:500; padding:7px 18px; border-radius:8px;
-                              background:#fef2f2; color:#991b1b; border:0.5px solid #fca5a5;
-                              text-decoration:none;">
-                        Reject
-                    </a>
-                </div>
-                <form action="CounterBidServlet" method="post" style="display:flex; gap:6px; align-items:center;">
-                    <input type="hidden" name="bid_id" value="<%= rsBid.getInt("bid_id") %>">
-                    <input type="number" name="counter_amount" placeholder="Counter amount (₹)" required
-                           style="font-size:13px; padding:6px 10px; border-radius:8px; width:160px;
-                                  border:0.5px solid #e5e7eb; background:#f9fafb; color:#374151;">
-                    <button type="submit"
-                            style="font-size:12px; font-weight:500; padding:6px 14px; border-radius:8px;
-                                   background:#fffbeb; color:#92400e; border:0.5px solid #fcd34d; cursor:pointer;">
-                        Counter
-                    </button>
-                </form>
-            </div>
+    // In the employer view: MY moves are Employer rows → right side
+    boolean isMine   = "Employer".equals(hActor);
+    String bubbleCls = isMine ? "employer" : "";    // "employer" = right-aligned in CSS
+    String dotCls    = isMine ? "emp-dot" : "js-dot"; // green or blue
+    String dotLbl    = isMine ? "You" : initials2;  // "You" or worker's initials
+
+    String actionLabel;
+    if      ("Bid".equals(hAction))     actionLabel = "Initial bid";
+    else if ("Counter".equals(hAction)) actionLabel = "Counter offer";
+    else if ("Accept".equals(hAction))  actionLabel = "Accepted ✓";
+    else if ("Reject".equals(hAction))  actionLabel = "Rejected ✗";
+    else                                actionLabel = hAction;
+%>
+    <div class="neg-bubble <%= bubbleCls %>">
+        <div class="neg-dot <%= dotCls %>"><%= dotLbl %></div>
+        <div class="neg-content">
+            <div class="neg-action"><%= actionLabel %></div>
+            <% if (!amtNull && hAmt > 0) { %>
+            <div class="neg-amount">₹<%= hAmt %></div>
+            <% } %>
+            <% if (hNote != null && !hNote.isEmpty()) { %>
+            <div class="neg-note">"<%= hNote %>"</div>
+            <% } %>
+            <div class="neg-date"><%= hDate %></div>
         </div>
-<%
-        }
-    }
-    if(!currentBidJobTitle.equals("")){
-%>
-        </div><!-- close applications-list -->
-    </div><!-- close job-group -->
-<%
-    }
-    if(!hasBidsOverall){
-%>
-    <div style="font-size:14px; color:#9ca3af; padding:16px 18px; margin-top:16px;
-                background:#f9fafb; border-radius:10px; border:0.5px solid #e5e7eb;">
-        No bids received yet.
     </div>
 <%
-    }
-    conBid.close();
-}catch(Exception e){ e.printStackTrace(); }
 }
+if (!anyHist) {
 %>
+    <div style="font-size:13px; color:#9ca3af; text-align:center;">No history yet</div>
+<%
+}
+rsHist.close(); psHist.close();
+%>
+            </div><%-- end neg-thread --%>
 
-</div><!-- closes reviewApplicationsSection -->
+
+            <!-- Action hint -->
+            <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">
+                💡 <%= actionHint %>
+            </div>
+
+            <!-- Action row -->
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+
+                <%-- Accept (FINAL) --%>
+                <a href="RespondBidByEmployerServlet?bid_id=<%= bidId2 %>&action=accept"
+                   style="text-decoration:none;">
+                    <button style="background:#ecfdf5;color:#166534;border:0.5px solid #bbf7d0;
+                                   border-radius:8px;padding:8px 20px;font-size:13px;
+                                   font-weight:600;cursor:pointer;">
+                        ✅ Accept &amp; Assign
+                    </button>
+                </a>
+
+                <%-- Reject (FINAL) --%>
+                <a href="RespondBidByEmployerServlet?bid_id=<%= bidId2 %>&action=reject"
+                   onclick="return confirm('Reject this bid permanently?');"
+                   style="text-decoration:none;">
+                    <button style="background:#fef2f2;color:#991b1b;border:0.5px solid #fca5a5;
+                                   border-radius:8px;padding:8px 20px;font-size:13px;
+                                   font-weight:600;cursor:pointer;">
+                        ❌ Reject
+                    </button>
+                </a>
+
+                <%-- Counter form --%>
+                <form action="CounterBidServlet" method="post"
+                      style="display:flex;gap:6px;align-items:center;flex:1;min-width:260px;">
+                    <input type="hidden" name="bid_id" value="<%= bidId2 %>">
+                     <input type="hidden" name="submitted_by" value="employer">
+                    <input type="number" name="counter_amount"
+                           placeholder="Your counter amount (₹)" required min="1"
+                           style="font-size:13px;padding:8px 12px;border-radius:8px;flex:1;
+                                  border:0.5px solid #e5e7eb;background:#f9fafb;color:#374151;">
+                    <input type="text" name="note" placeholder="Optional note"
+                           style="font-size:13px;padding:8px 10px;border-radius:8px;
+                                  border:0.5px solid #e5e7eb;background:#f9fafb;
+                                  color:#374151;width:120px;">
+                    <button type="submit"
+                            style="background:#fffbeb;color:#92400e;border:0.5px solid #fcd34d;
+                                   border-radius:8px;padding:8px 16px;font-size:13px;
+                                   font-weight:600;cursor:pointer;white-space:nowrap;">
+                        🔁 Counter
+                    </button>
+                </form>
+
+            </div><!-- end action row -->
+
+            <!-- View Profile link -->
+            <div style="margin-top:10px;">
+                <a href="view_jobseeker_profile.jsp?jid=<%= rsBid2.getInt("job_seeker_id") %>"
+                   target="_blank"
+                   style="font-size:12px;color:#3b5bdb;text-decoration:none;">
+                    View Full Profile →
+                </a>
+            </div>
+
+        </div><!-- end bid card -->
+<%
+    } // end while
+
+    if (!curJobTitle2.isEmpty()) { %>
+        </div><!-- close last job group applications-list -->
+    </div>
+<%  }
+
+    if (!hasBids2) { %>
+    <div style="font-size:14px;color:#9ca3af;padding:16px 18px;margin-top:16px;
+                background:#f9fafb;border-radius:10px;border:0.5px solid #e5e7eb;">
+        No pending bids at this time.
+    </div>
+<%  }
+
+    conBid2.close();
+} catch (Exception e) { e.printStackTrace(); }
+} %>
+
+    </div>
+</div>
+</div>
+
+<!-- closes reviewApplicationsSection -->
 
 <!-- ACCEPTED APPLICATIONS SECTION -->
 <div id="acceptedApplicationsSection"
@@ -1366,7 +1547,7 @@ String query2 =
 "FROM bids b " +
 "JOIN jobs j ON b.job_id=j.job_id " +
 "JOIN jobseeker js ON b.job_seeker_id=js.jid " +
-"WHERE j.eid=? AND LOWER(b.bid_status)='rejected' " +
+"WHERE j.eid=? AND (LOWER(b.bid_status)='rejected' OR b.bid_status='RejectedByJobseeker') "  +
 
 "ORDER BY applied_at DESC";
 

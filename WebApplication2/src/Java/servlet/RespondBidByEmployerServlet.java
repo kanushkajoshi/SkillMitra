@@ -7,94 +7,147 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+/**
+ * RespondBidByEmployerServlet
+ *
+ * Employer responds to a bid or counter-bid.
+ * action = "accept"  → FINAL – job is assigned
+ * action = "reject"  → FINAL – bid is closed
+ *
+ * Only the EMPLOYER can make a FINAL decision.
+ */
 @WebServlet("/RespondBidByEmployerServlet")
 public class RespondBidByEmployerServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
-        int bidId = Integer.parseInt(request.getParameter("bid_id"));
-        String action = request.getParameter("action"); // accept or reject
+        HttpSession session = request.getSession(false);
+        if (session == null) { response.sendRedirect("login.jsp"); return; }
 
-        String newStatus = null;
-        if("accept".equalsIgnoreCase(action)){
-            newStatus = "Accepted";   // ✅ FIXED HERE
-        } else if("reject".equalsIgnoreCase(action)){
-            newStatus = "Rejected";
-        } else {
+        Integer eid = (Integer) session.getAttribute("eid");
+        if (eid == null) { response.sendRedirect("login.jsp"); return; }
+
+        int    bidId;
+        String action;
+        try {
+            bidId  = Integer.parseInt(request.getParameter("bid_id"));
+            action = request.getParameter("action");   // "accept" | "reject"
+        } catch (Exception e) {
+            response.sendRedirect("emp_dash.jsp?section=reviewApplications");
+            return;
+        }
+
+        if (!"accept".equalsIgnoreCase(action) && !"reject".equalsIgnoreCase(action)) {
             response.sendRedirect("emp_dash.jsp?section=reviewApplications");
             return;
         }
 
         Connection con = null;
-
-        try{
+        try {
             con = DBConnection.getConnection();
 
-            // 🔹 1. Get job_id and jobseeker_id
-            int jobId = 0;
-            int jobSeekerId = 0;
+            // ── 1. Load bid data ────────────────────────────────────────────
             PreparedStatement psGet = con.prepareStatement(
-                "SELECT job_id, job_seeker_id FROM bids WHERE bid_id=?"
+                "SELECT b.bid_id, b.job_id, b.job_seeker_id, " +
+                "       b.bid_amount, b.counter_bid, b.bid_status, b.current_amount, " +
+                "       j.eid AS employer_id, j.workers_required " +
+                "FROM   bids b " +
+                "JOIN   jobs j ON j.job_id = b.job_id " +
+                "WHERE  b.bid_id = ?"
             );
             psGet.setInt(1, bidId);
             ResultSet rs = psGet.executeQuery();
-            if(rs.next()){
-                jobId = rs.getInt("job_id");
-                jobSeekerId = rs.getInt("job_seeker_id");
-            }
-            rs.close();
-            psGet.close();
 
-            // 🔹 2. Update bids table with employer decision
+            if (!rs.next()) { rs.close(); psGet.close();
+                response.sendRedirect("emp_dash.jsp?section=reviewApplications"); return; }
+
+            int jobId        = rs.getInt("job_id");
+            int jobSeekerId  = rs.getInt("job_seeker_id");
+            int employerId   = rs.getInt("employer_id");
+            int workersReq   = rs.getInt("workers_required");
+            int currentAmt   = rs.getInt("current_amount");
+            if (currentAmt == 0) currentAmt = rs.getInt("bid_amount");  // fallback
+            String bidStatus = rs.getString("bid_status");
+            rs.close(); psGet.close();
+
+            // Security check
+            if (employerId != eid) {
+                response.sendRedirect("emp_dash.jsp?section=reviewApplications"); return; }
+
+            // Guard – can't respond to already-closed bids
+            if ("Accepted".equalsIgnoreCase(bidStatus) ||
+                "Rejected".equalsIgnoreCase(bidStatus)) {
+                response.sendRedirect("emp_dash.jsp?section=reviewApplications"); return; }
+
+            // ── 2. Determine final status strings ───────────────────────────
+            String finalBidStatus;
+            String finalAppStatus;
+            String historyAction;
+            String notifMsg;
+            String jobTitle = getJobTitle(con, jobId);
+
+            if ("accept".equalsIgnoreCase(action)) {
+                finalBidStatus = "Accepted";
+                finalAppStatus = "Accepted";
+                historyAction  = "Accept";
+                notifMsg = "🎉 Your bid of ₹" + currentAmt + " on \"" + jobTitle +
+                           "\" has been ACCEPTED! Report to work.";
+            } else {
+                finalBidStatus = "Rejected";
+                finalAppStatus = "Rejected";
+                historyAction  = "Reject";
+                notifMsg = "Your bid on \"" + jobTitle + "\" was not accepted this time.";
+            }
+
+            // ── 3. Update bids table ────────────────────────────────────────
             PreparedStatement psUpdateBid = con.prepareStatement(
-                "UPDATE bids SET bid_status=? WHERE bid_id=?"
+                "UPDATE bids " +
+                "SET    bid_status     = ?, " +
+                "       last_actor     = 'Employer' " +
+                "WHERE  bid_id = ?"
             );
-            psUpdateBid.setString(1, newStatus);
+            psUpdateBid.setString(1, finalBidStatus);
             psUpdateBid.setInt(2, bidId);
             psUpdateBid.executeUpdate();
             psUpdateBid.close();
 
-            // 🔹 3. Update applications table accordingly
-            String appStatus = null;
-            if("Accepted".equals(newStatus)){   // ✅ FIXED HERE
-                appStatus = "Accepted";
-            } else if("RejectedByEmployer".equals(newStatus)){
-                appStatus = "Rejected";
-            }
-
-            PreparedStatement psUpdateApp = con.prepareStatement(
-                "UPDATE applications SET status=? WHERE job_id=? AND jobseeker_id=?"
+            // ── 4. Update applications table ────────────────────────────────
+            PreparedStatement psApp = con.prepareStatement(
+                "UPDATE applications SET status = ? " +
+                "WHERE  job_id = ? AND jobseeker_id = ?"
             );
-            psUpdateApp.setString(1, appStatus);
-            psUpdateApp.setInt(2, jobId);
-            psUpdateApp.setInt(3, jobSeekerId);
-            psUpdateApp.executeUpdate();
-            psUpdateApp.close();
+            psApp.setString(1, finalAppStatus);
+            psApp.setInt(2, jobId);
+            psApp.setInt(3, jobSeekerId);
+            psApp.executeUpdate();
+            psApp.close();
 
-            // 🔹 4. If accepted → check workers_required and close job if limit reached
-            if("Accepted".equals(newStatus)){   // ✅ FIXED HERE
+            // ── 5. Write history ────────────────────────────────────────────
+            insertHistory(con, bidId, jobId, "Employer", eid, historyAction, null, null);
+
+            // ── 6. Notify jobseeker ─────────────────────────────────────────
+            insertNotification(con, null, jobSeekerId, notifMsg);
+
+            // ── 7. If accepted → check workers_required, close job if full ─
+            if ("Accepted".equalsIgnoreCase(finalBidStatus)) {
+
                 PreparedStatement psCount = con.prepareStatement(
-                    "SELECT COUNT(*) FROM applications WHERE job_id=? AND status='Accepted'"
+                    "SELECT (SELECT COUNT(*) FROM applications a " +
+                    "        WHERE a.job_id=? AND a.status='Accepted') + " +
+                    "       (SELECT COUNT(*) FROM bids b " +
+                    "        WHERE b.job_id=? AND b.bid_status='Accepted') AS total"
                 );
                 psCount.setInt(1, jobId);
-                ResultSet rsCount = psCount.executeQuery();
-                int acceptedCount = 0;
-                if(rsCount.next()) acceptedCount = rsCount.getInt(1);
-                rsCount.close();
-                psCount.close();
+                psCount.setInt(2, jobId);
+                ResultSet rsCnt = psCount.executeQuery();
+                int accepted = 0;
+                if (rsCnt.next()) accepted = rsCnt.getInt("total");
+                rsCnt.close(); psCount.close();
 
-                PreparedStatement psReq = con.prepareStatement(
-                    "SELECT workers_required FROM jobs WHERE job_id=?"
-                );
-                psReq.setInt(1, jobId);
-                ResultSet rsReq = psReq.executeQuery();
-                int required = 0;
-                if(rsReq.next()) required = rsReq.getInt("workers_required");
-                rsReq.close();
-                psReq.close();
-
-                if(acceptedCount >= required){
+                if (accepted >= workersReq) {
                     PreparedStatement psClose = con.prepareStatement(
                         "UPDATE jobs SET status='Closed' WHERE job_id=?"
                     );
@@ -102,22 +155,65 @@ public class RespondBidByEmployerServlet extends HttpServlet {
                     psClose.executeUpdate();
                     psClose.close();
                 }
-            }
 
-            // Redirect to correct section after accept/reject
-            if("Accepted".equalsIgnoreCase(newStatus)){   // ✅ FIXED HERE
                 response.sendRedirect("emp_dash.jsp?section=acceptedApplications");
-            } else if("RejectedByEmployer".equalsIgnoreCase(newStatus)){
-                response.sendRedirect("emp_dash.jsp?section=rejectedApplications");
             } else {
-                response.sendRedirect("emp_dash.jsp?section=reviewApplications");
+                response.sendRedirect("emp_dash.jsp?section=rejectedApplications");
             }
 
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("emp_dash.jsp?section=reviewApplications");
         } finally {
-            try{ if(con!=null) con.close(); } catch(Exception e){}
+            if (con != null) try { con.close(); } catch (Exception ignored) {}
         }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private void insertHistory(Connection con, int bidId, int jobId,
+                               String actor, int actorId,
+                               String action, Integer amount, String note)
+            throws SQLException {
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO bid_negotiations " +
+            "(bid_id, job_id, actor, actor_id, action, amount, note) " +
+            "VALUES (?,?,?,?,?,?,?)"
+        );
+        ps.setInt(1, bidId);
+        ps.setInt(2, jobId);
+        ps.setString(3, actor);
+        ps.setInt(4, actorId);
+        ps.setString(5, action);
+        if (amount == null) ps.setNull(6, java.sql.Types.INTEGER);
+        else                ps.setInt(6, amount);
+        if (note == null)   ps.setNull(7, java.sql.Types.VARCHAR);
+        else                ps.setString(7, note);
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    private void insertNotification(Connection con, Integer empId, Integer jsId,
+                                    String message) throws SQLException {
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO notifications (employer_id, jobseeker_id, message) VALUES (?,?,?)"
+        );
+        if (empId == null) ps.setNull(1, java.sql.Types.INTEGER);
+        else               ps.setInt(1, empId);
+        if (jsId  == null) ps.setNull(2, java.sql.Types.INTEGER);
+        else               ps.setInt(2, jsId);
+        ps.setString(3, message);
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    private String getJobTitle(Connection con, int jobId) throws SQLException {
+        PreparedStatement ps = con.prepareStatement("SELECT title FROM jobs WHERE job_id=?");
+        ps.setInt(1, jobId);
+        ResultSet rs = ps.executeQuery();
+        String t = "this job";
+        if (rs.next()) t = rs.getString("title");
+        rs.close(); ps.close();
+        return t;
     }
 }
