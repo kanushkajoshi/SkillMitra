@@ -32,20 +32,30 @@ int jid = (Integer) session.getAttribute("jobseekerId");
 
 Part part = request.getPart("photo");
 
+// Guard 1: no part or empty file
 if(part == null || part.getSize() == 0){
-response.sendRedirect("jobseeker_profile.jsp");
-return;
+    response.sendRedirect("jobseeker_profile.jsp");
+    return;
+}
+
+// Guard 2: null or blank filename (fixes NullPointerException)
+String submittedName = part.getSubmittedFileName();
+if(submittedName == null || submittedName.trim().isEmpty()){
+    response.sendRedirect("jobseeker_profile.jsp");
+    return;
+}
+
+// Guard 3: file has no extension
+int dotIndex = submittedName.lastIndexOf(".");
+if(dotIndex == -1){
+    response.sendRedirect("jobseeker_profile.jsp");
+    return;
 }
 
 /* ORIGINAL FILE NAME */
-
-String original =
-Paths.get(part.getSubmittedFileName())
-.getFileName()
-.toString();
+String original = Paths.get(submittedName).getFileName().toString();
 
 /* FILE EXTENSION */
-
 String ext = original.substring(original.lastIndexOf("."));
 
 /* NEW FILE NAME */
@@ -54,16 +64,27 @@ String fileName = jid + "_" + System.currentTimeMillis() + ext;
 
 /* GET DEPLOYED UPLOAD FOLDER */
 
+/* GET DEPLOYED UPLOAD FOLDER */
 String uploadPath = request.getServletContext().getRealPath("/uploads");
 
+// Guard 4: getRealPath() returned null (common in GlassFish 4)
+if(uploadPath == null){
+    // Fallback: use a fixed folder inside your home directory
+    uploadPath = System.getProperty("user.home") + File.separator + "skillmitra_uploads";
+}
+System.out.println("DEBUG uploadPath = " + uploadPath);
 File uploadDir = new File(uploadPath);
-
 if(!uploadDir.exists()){
-uploadDir.mkdirs();
+    uploadDir.mkdirs();
+}
+
+// Guard 5: folder could not be created
+if(!uploadDir.exists()){
+    response.getWriter().println("ERROR: Upload folder could not be created at: " + uploadPath);
+    return;
 }
 
 /* FULL FILE PATH */
-
 File file = new File(uploadDir, fileName);
 
 /* SAVE FILE MANUALLY */

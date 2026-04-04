@@ -102,6 +102,46 @@ if (currentSession.getAttribute("jfirstname") == null) {
     <i class="fa-solid fa-star nav-icon"></i>
     <span class="nav-label"> Ratings & Reviews</span>
 </a>
+<%
+String sidePhoto = (String) currentSession.getAttribute("jphoto");
+String sideName  = currentSession.getAttribute("jfirstname") + " " + currentSession.getAttribute("jlastname");
+String sideInitials = "";
+String fn = (String) currentSession.getAttribute("jfirstname");
+String ln = (String) currentSession.getAttribute("jlastname");
+if(fn != null && fn.length() > 0) sideInitials += fn.charAt(0);
+if(ln != null && ln.length() > 0) sideInitials += ln.charAt(0);
+sideInitials = sideInitials.toUpperCase();
+%>
+
+<div style="margin-top:auto; padding:16px 12px;
+            border-top:0.5px solid rgba(255,255,255,0.15);
+            display:flex; align-items:center; gap:10px;">
+    <%
+    if(sidePhoto != null && !sidePhoto.trim().isEmpty()){
+    %>
+    <img src="uploads/<%= sidePhoto %>"
+         style="width:38px; height:38px; border-radius:50%; object-fit:cover;
+                border:2px solid rgba(255,255,255,0.3);"
+         onerror="this.style.display='none'">
+    <%
+    } else {
+    %>
+    <div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.15);
+                display:flex; align-items:center; justify-content:center;
+                font-size:13px; font-weight:500; color:white; flex-shrink:0;">
+        <%= sideInitials %>
+    </div>
+    <%
+    }
+    %>
+    <div style="overflow:hidden;">
+        <p style="font-size:13px; font-weight:500; color:white;
+                  margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <%= sideName %>
+        </p>
+        <p style="font-size:11px; color:rgba(255,255,255,0.6); margin:0;">Job Seeker</p>
+    </div>
+</div>
 </div>
 
 <div class="main">
@@ -114,7 +154,15 @@ if (currentSession.getAttribute("jfirstname") == null) {
 </div>
 <div class="nav-right">
 <div class="profile-dropdown">
-<img src="images/default-user.png" class="profile-icon" id="profileIcon">
+<%
+String dashPhoto = (String) currentSession.getAttribute("jphoto");
+String dashPhotoSrc = "images/default-user.png";
+if(dashPhoto != null && !dashPhoto.trim().isEmpty()){
+    dashPhotoSrc = "uploads/" + dashPhoto;
+}
+%>
+<img src="<%= dashPhotoSrc %>" class="profile-icon" id="profileIcon"
+     onerror="this.src='images/default-user.png'">
 <div class="profile-menu" id="profileMenu">
 <div class="profile-name">
 <%= currentSession.getAttribute("jfirstname") %>
@@ -175,7 +223,8 @@ try {
     String profLabel = profPct < 40 ? "Just started" : profPct < 70 ? "Getting there!" : profPct < 100 ? "Almost complete!" : "Complete!";
 %>
 
-<div style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
+<% if(profPct < 100){ %>
+<div id="profileCompletionBar" style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
             padding:16px 20px; margin:16px 0; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <span style="font-size:14px; font-weight:600; color:#1a2a3a;">
@@ -185,14 +234,12 @@ try {
             <%= profPct %>% — <%= profLabel %>
         </span>
     </div>
-
     <div style="background:#f0f2f5; border-radius:20px; height:8px; overflow:hidden;">
         <div style="height:8px; border-radius:20px; width:<%= profPct %>%;
                     background:<%= barColor %>; transition:width 0.5s ease;">
         </div>
     </div>
-
-    <% if(profPct < 100 && !profTip.isEmpty()){ %>
+    <% if(!profTip.isEmpty()){ %>
     <p style="font-size:12px; color:#6b7280; margin:8px 0 0;">
         💡 <%= profTip %>
         <a href="jobseeker_profile.jsp"
@@ -202,6 +249,35 @@ try {
     </p>
     <% } %>
 </div>
+<% } else { %>
+<div id="profileCompletionBar" style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
+            padding:16px 20px; margin:16px 0; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:14px; font-weight:600; color:#1a2a3a;">
+            Profile Completion
+        </span>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:13px; font-weight:700; color:<%= barColor %>;">
+                100% — Complete!
+            </span>
+            <button onclick="dismissProfileBar()"
+                    title="Dismiss"
+                    style="background:none; border:none; cursor:pointer;
+                           font-size:16px; color:#9ca3af; line-height:1;
+                           padding:0 2px; border-radius:4px;"
+                    onmouseover="this.style.color='#374151'"
+                    onmouseout="this.style.color='#9ca3af'">
+                ✕
+            </button>
+        </div>
+    </div>
+    <div style="background:#f0f2f5; border-radius:20px; height:8px; overflow:hidden;">
+        <div style="height:8px; border-radius:20px; width:100%;
+                    background:#22c55e; transition:width 0.5s ease;">
+        </div>
+    </div>
+</div>
+<% } %>
 
 <%
 } catch(Exception e){ e.printStackTrace(); }
@@ -379,23 +455,30 @@ conBids.close();
 %>
 
 <%-- ── STATS ── --%>
+<%
+int successRate = (appliedJobs > 0) ? (acceptedJobs * 100 / appliedJobs) : 0;
+%>
 <div class="stats-grid">
     <div class="stat stat-blue">
         <div class="stat-label">Jobs Available</div>
         <div class="stat-value"><%= totalJobs %></div>
+        <div style="font-size:11px; color:var(--color-text-tertiary); margin-top:4px;">in your area</div>
     </div>
     <div class="stat stat-amber">
         <div class="stat-label">Applied</div>
         <div class="stat-value"><%= appliedJobs %></div>
+        <div style="font-size:11px; color:var(--color-text-tertiary); margin-top:4px;">total sent</div>
     </div>
     <div class="stat stat-green">
         <div class="stat-label">Accepted</div>
         <div class="stat-value"><%= acceptedJobs %></div>
+        <div style="font-size:11px; color:#3B6D11; margin-top:4px;"><%= successRate %>% success rate</div>
     </div>
     <div class="stat stat-purple">
-    <div class="stat-label">Bids Placed</div>
-    <div class="stat-value"><%= bidsPlaced %></div>
-</div>
+        <div class="stat-label">Bids Placed</div>
+        <div class="stat-value"><%= bidsPlaced %></div>
+        <div style="font-size:11px; color:var(--color-text-tertiary); margin-top:4px;">active bids</div>
+    </div>
 </div>
 
 <%-- ── STATUS + RECOMMENDED ROW ── --%>
@@ -403,7 +486,13 @@ conBids.close();
 
     <%-- Application Status --%>
     <div class="status-card">
-        <h4>Application Status</h4>
+        <p style="font-size:11px; font-weight:500; letter-spacing:0.08em;
+          text-transform:uppercase; color:var(--color-text-tertiary); margin:0 0 6px;">
+            Overview
+        </p>
+        <h4 style="font-size:16px; font-weight:500; color:var(--color-text-primary); margin:0 0 14px;">
+            Application status
+        </h4>
         <%
         Connection conStatus = DBConnection.getConnection();
         PreparedStatement psStatus = conStatus.prepareStatement(
@@ -438,7 +527,13 @@ conBids.close();
 
     <%-- Recommended Jobs --%>
     <div class="rec-section">
-        <h4>Recommended for You</h4>
+        <p style="font-size:11px; font-weight:500; letter-spacing:0.08em;
+          text-transform:uppercase; color:var(--color-text-tertiary); margin:0 0 6px;">
+            For you
+        </p>
+        <h4 style="font-size:16px; font-weight:500; color:var(--color-text-primary); margin:0 0 14px;">
+            Recommended jobs
+        </h4>
         <div class="rec-cards">
         <%
         Connection conRec = DBConnection.getConnection();
@@ -461,46 +556,68 @@ conBids.close();
             int total   = rsRec.getInt("total");
             int pct     = (total > 0) ? (matched * 100) / total : 0;
         %>
-        <div class="rec-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <div style="background:#ffffff;
+            border:1px solid #e8edf2;
+            border-radius:12px;
+            padding:14px 18px;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.06);">
 
-    <div class="job-title">
-        <%= rsRec.getString("title") %>
-    </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <span style="font-size:15px; font-weight:500; color:#1a2a3a;">
+                    <%= rsRec.getString("title") %>
+                </span>
+                <span style="font-size:11px; font-weight:500; color:#3B6D11;
+                             background:#EAF3DE; padding:3px 10px; border-radius:20px; white-space:nowrap;">
+                    <%= pct %>% match
+                </span>
+            </div>
 
-    <span style="font-size:12px; color:#16a34a; font-weight:600;">
-        <%= pct %>% match
-    </span>
+            <div style="font-size:13px; color:#7a8fa6;">
+                📍 <%= rsRec.getString("locality") %>, <%= rsRec.getString("city") %>
+            </div>
 
-</div>
-            <div class="job-loc">📍 <%= rsRec.getString("locality") %>, <%= rsRec.getString("city") %></div>
-     
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-    <div class="job-salary">₹<%= rsRec.getString("salary") %></div>
-    <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end;">
-    <%
-    Connection conSub = DBConnection.getConnection();
-    PreparedStatement psSub = conSub.prepareStatement(
-        "SELECT ss.subskill_name FROM subskill ss " +
-        "JOIN job_skills jsk ON jsk.subskill_id = ss.subskill_id " +
-        "WHERE jsk.job_id = ?"
-    );
-    psSub.setInt(1, rsRec.getInt("job_id"));
-    ResultSet rsSub = psSub.executeQuery();
-    while(rsSub.next()){
-    %>
-        <span style="background:#f0f4ff; color:#3b5bdb; font-size:10px; padding:2px 8px; border-radius:20px; white-space:nowrap;">
-            <%= rsSub.getString("subskill_name") %>
-        </span>
-       
-    <%
-    }
-    rsSub.close(); psSub.close(); conSub.close();
-    %>
-    </div>
-</div>
-            <span class="job-type"><%= rsRec.getString("job_type") %></span>
-            <a href="job_details.jsp?jobId=<%= rsRec.getInt("job_id") %>" class="rec-view-btn">View Job</a>
+            <div style="font-size:18px; font-weight:500; color:#1a2a3a;">
+                ₹<%= rsRec.getString("salary") %>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                <%
+                Connection conSub = DBConnection.getConnection();
+                PreparedStatement psSub = conSub.prepareStatement(
+                    "SELECT ss.subskill_name FROM subskill ss " +
+                    "JOIN job_skills jsk ON jsk.subskill_id = ss.subskill_id " +
+                    "WHERE jsk.job_id = ?"
+                );
+                psSub.setInt(1, rsRec.getInt("job_id"));
+                ResultSet rsSub = psSub.executeQuery();
+                while(rsSub.next()){
+                %>
+                <span style="font-size:11px; color:#185FA5; background:#E6F1FB;
+                             padding:3px 8px; border-radius:20px; white-space:nowrap;">
+                    <%= rsSub.getString("subskill_name") %>
+                </span>
+                <%
+                }
+                rsSub.close(); psSub.close(); conSub.close();
+                %>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <span style="font-size:11px; color:#633806; background:#FAEEDA;
+                             padding:3px 10px; border-radius:20px;">
+                    <%= rsRec.getString("job_type") %>
+                </span>
+                <a href="job_details.jsp?jobId=<%= rsRec.getInt("job_id") %>"
+   style="flex:1; text-align:center; background:#2563eb; color:#fff;
+          border-radius:8px; padding:8px 0;
+          font-size:13px; font-weight:500; text-decoration:none; display:block;">
+                    View job
+                </a>
+            </div>
+
         </div>
         <%
         }
@@ -513,8 +630,13 @@ conBids.close();
 <%-- ── RECENT ACTIVITY FEED ── --%>
 <div style="background:#fff; border:1px solid #e8edf2; border-radius:12px;
             padding:20px; margin-top:20px; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-    <h4 style="margin:0 0 16px; font-size:16px; color:#1a2a3a;">Recent Activity</h4>
-
+    <p style="font-size:11px; font-weight:500; letter-spacing:0.08em;
+          text-transform:uppercase; color:var(--color-text-tertiary); margin:0 0 6px;">
+        Timeline
+    </p>
+    <h4 style="font-size:16px; font-weight:500; color:var(--color-text-primary); margin:0 0 14px;">
+        Recent activity
+    </h4>
 <%
 Connection conAct = null;
 try {
@@ -572,38 +694,37 @@ try {
         String actExtra = rsAct.getString("extra");
         String actDate  = new java.text.SimpleDateFormat("dd MMM yyyy")
                             .format(rsAct.getTimestamp("event_time"));
-        String icon, msg, dotColor;
+        String dotColor, msg, statusColor;
         if("applied".equals(actType)){
-            icon="📝"; dotColor="#eef2ff"; msg="Applied to <b>"+actTitle+"</b>";
+            dotColor="#378ADD"; statusColor="#E6F1FB"; msg="Applied to <b>"+actTitle+"</b>";
         } else if("accepted".equals(actType)){
-            icon="✅"; dotColor="#dcfce7"; msg="Accepted for <b>"+actTitle+"</b>";
+            dotColor="#1D9E75"; statusColor="#EAF3DE"; msg="Accepted for <b>"+actTitle+"</b>";
         } else if("rejected".equals(actType)){
-            icon="❌"; dotColor="#fee2e2"; msg="Not selected for <b>"+actTitle+"</b>";
+            dotColor="#E24B4A"; statusColor="#FCEBEB"; msg="Not selected for <b>"+actTitle+"</b>";
         } else if("bid".equals(actType)){
-            icon="💰"; dotColor="#fff7ed"; msg="Placed a bid of ₹"+actExtra+" on <b>"+actTitle+"</b>";
+            dotColor="#BA7517"; statusColor="#FAEEDA"; msg="Placed a bid of ₹"+actExtra+" on <b>"+actTitle+"</b>";
         } else if("countered".equals(actType)){
-            icon="🔄"; dotColor="#fff7ed"; msg="Employer countered with ₹"+actExtra+" on <b>"+actTitle+"</b>";
+            dotColor="#854F0B"; statusColor="#FAEEDA"; msg="Employer countered with ₹"+actExtra+" on <b>"+actTitle+"</b>";
         } else if("payment".equals(actType)){
-            icon="💸"; dotColor="#dcfce7"; msg="Payment confirmed for <b>"+actTitle+"</b>";
+            dotColor="#1D9E75"; statusColor="#EAF3DE"; msg="Payment confirmed for <b>"+actTitle+"</b>";
         } else {
-            icon="📌"; dotColor="#f3f4f6"; msg=actTitle;
+            dotColor="#888780"; statusColor="#F1EFE8"; msg=actTitle;
         }
         %>
-    <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:14px;">
-
-        <div style="font-size:20px; width:36px; height:36px; border-radius:50%;
-                    background:<%= dotColor %>; display:flex; align-items:center;
-                    justify-content:center; flex-shrink:0;">
-            <%= icon %>
-        </div>
-
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;
+        padding:10px 14px; border-radius:8px;
+        background:#ffffff;
+        border:1px solid #e8edf2;">
+        <div style="width:9px; height:9px; border-radius:50%;
+                    background:<%= dotColor %>; flex-shrink:0;"></div>
         <div style="flex:1;">
-            <p style="margin:0; font-size:14px; color:#374151; line-height:1.5;">
+            <p style="margin:0; font-size:13px; color:var(--color-text-primary); line-height:1.5;">
                 <%= msg %>
             </p>
-            <span style="font-size:12px; color:#9ca3af;"><%= actDate %></span>
         </div>
-
+        <span style="font-size:12px; color:var(--color-text-tertiary); white-space:nowrap;">
+            <%= actDate %>
+        </span>
     </div>
 <%
     }
@@ -1608,7 +1729,17 @@ function updateSubskillText(){
 
     document.getElementById("subskillText").innerText = names.join(", ");
 }
-
+//prifle completion removal
+function dismissProfileBar(){
+    const bar = document.getElementById("profileCompletionBar");
+    if(bar){
+        bar.style.transition = "opacity 0.3s ease";
+        bar.style.opacity = "0";
+        setTimeout(function(){
+            bar.style.display = "none";
+        }, 300);
+    }
+}
 
 // ===== AREA UI (SAME STYLE) =====
 function toggleArea(){
