@@ -33,7 +33,7 @@ try {
    Integer employerId = (Integer) currentSession.getAttribute("eid");
 
 PreparedStatement ps = con.prepareStatement(
-    "SELECT efirstname, elastname, ecompanyname FROM employer WHERE eid = ?");
+    "SELECT efirstname, elastname, ecompanyname, ephoto FROM employer WHERE eid = ?");
 ps.setInt(1, employerId);
 
 
@@ -42,6 +42,7 @@ ps.setInt(1, employerId);
         currentSession.setAttribute("efirstname", rs.getString("efirstname"));
         currentSession.setAttribute("elastname", rs.getString("elastname"));
         currentSession.setAttribute("ecompanyname", rs.getString("ecompanyname"));
+        currentSession.setAttribute("ephoto",      rs.getString("ephoto"));
     }
     con.close();
 } catch (Exception e) {
@@ -221,7 +222,7 @@ margin-top:10px;
                 🔔 Notifications
                 <% if (unreadCount > 0) { %>
                 <a href="javascript:void(0)" onclick="markAllRead()">
-                   style="float:right; font-size:12px; color:#1976d2;
+                   <style="float:right; font-size:12px; color:#1976d2;
                           font-weight:400; text-decoration:none;">
                     Mark all read
                 </a>
@@ -338,6 +339,49 @@ margin-top:10px;
     <i class="fa-solid fa-star nav-icon"></i>
     <span class="nav-label"> Rate & Review</span>
 </a>
+
+<%
+String empSidePhoto = (String) currentSession.getAttribute("ephoto");
+String empFn = (String) currentSession.getAttribute("efirstname");
+String empLn = (String) currentSession.getAttribute("elastname");
+String empSideName = (empFn != null ? empFn : "") + " " + (empLn != null ? empLn : "");
+String empInitials = "";
+if(empFn != null && empFn.length() > 0) empInitials += empFn.charAt(0);
+if(empLn != null && empLn.length() > 0) empInitials += empLn.charAt(0);
+empInitials = empInitials.toUpperCase();
+%>
+
+<div style="margin-top:auto; padding:16px 12px;
+            border-top:0.5px solid rgba(255,255,255,0.15);
+            display:flex; align-items:center; gap:10px;">
+    <%
+    if(empSidePhoto != null && !empSidePhoto.trim().isEmpty()){
+    %>
+    <img src="uploads/<%= empSidePhoto %>"
+         style="width:38px; height:38px; border-radius:50%; object-fit:cover;
+                border:2px solid rgba(255,255,255,0.3); flex-shrink:0;"
+         onerror="this.style.display='none'">
+    <%
+    } else {
+    %>
+    <div style="width:38px; height:38px; border-radius:50%;
+                background:rgba(255,255,255,0.15);
+                display:flex; align-items:center; justify-content:center;
+                font-size:13px; font-weight:500; color:white; flex-shrink:0;">
+        <%= empInitials %>
+    </div>
+    <%
+    }
+    %>
+    <div style="overflow:hidden;">
+        <p style="font-size:13px; font-weight:500; color:white;
+                  margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <%= empSideName.trim() %>
+        </p>
+        <p style="font-size:11px; color:rgba(255,255,255,0.6); margin:0;">Employer</p>
+    </div>
+</div>
+
 </aside>
 
     <main class="content">
