@@ -161,12 +161,16 @@
                 </div>
             </div>
         </section>
-        <footer class="site-footer">
-            <p>© 2025 SkillMitra. All Rights Reserved.</p>
-            <div class="footer-links">
-                <a href="privacy.html">Privacy Policy</a>
-                <span>|</span>
-                <a href="#contact">Contact Us</a>
+        <footer class="site-footer" style="text-align: unset;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; width:100%;">
+                <p style="margin:0; color:#aaa;">© 2025 SkillMitra. All Rights Reserved.</p>
+                <div class="footer-links" style="display:flex; align-items:center; gap:8px;">
+                    <a href="privacy.html">Privacy Policy</a>
+                    <span>|</span>
+                    <a href="#contact">Contact Us</a>
+                    <span style="color:#aaa;">|</span>
+                    <a href="admin_login.jsp" style="font-size:10px; color:#666; text-decoration:none;">Admin</a>
+                </div>
             </div>
         </footer>
 
@@ -196,7 +200,7 @@
         const status = document.getElementById("formStatus");
         const formData = new FormData(form);
 
-        fetch("https://formsubmit.co/ajax/9c36c951b94826caf8bf7f93bd1ab129", {
+        fetch("https://formsubmit.co/ajax/7cfb6d109b539f46fdc22c48bd157012", {
             method: "POST",
             body: formData
         })
