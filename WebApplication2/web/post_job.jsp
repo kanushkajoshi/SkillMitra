@@ -61,67 +61,43 @@ data-name="<%= s.get("name") %>">
 
 <!-- hidden title -->
 <input type="hidden" name="job_title" id="jobTitle">
-
-
 <label>Job Description *</label>
-
 <textarea name="job_description"
 rows="4"
 maxlength="500"
 required
 oninput="updateCounter(this)"></textarea>
-
 <div id="descCounter" style="font-size:12px;color:#777;">
 0 / 500 characters
 </div>
-
-
 <!-- ZIPCODE FIRST -->
-
 <label>Zipcode *</label>
-
 <input type="text"
 id="zipcode"
 name="zip"
 maxlength="6"
 required>
-
-
 <div class="row">
-
 <div>
-
 <label>Country *</label>
-
 <input type="text"
 id="country"
 name="job_country"
 readonly
 required>
-
 </div>
-
 <div>
-
 <label>State *</label>
-
 <input type="text"
 id="state"
 name="job_state"
 readonly
 required>
-
 </div>
-
 </div>
-
-
 <div class="row">
-
 <div>
-
 <label>District / City *</label>
-
 <input type="text"
 id="district"
 name="job_city"

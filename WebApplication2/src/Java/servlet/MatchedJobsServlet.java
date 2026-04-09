@@ -1,22 +1,18 @@
 package servlet;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-
 import db.DBConnection;
-
 @WebServlet("/MatchedJobsServlet")
 public class MatchedJobsServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+       HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("jobseekerId") == null) {
             response.sendRedirect("login.jsp");
@@ -29,7 +25,6 @@ public class MatchedJobsServlet extends HttpServlet {
 
         try {
             Connection con = DBConnection.getConnection();
-
 String sql =
     "SELECT DISTINCT " +
     "j.job_id, j.title, j.description, j.city, j.salary, j.job_type, j.expiry_date " +

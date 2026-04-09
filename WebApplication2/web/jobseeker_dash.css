@@ -645,3 +645,440 @@ header {
     color: #1a2a3a;   /* dark bluish black (zyada classy) */
 }
 
+.skill-group {
+    background: var(--sj-surface, #fff);
+    border: 0.5px solid #e5e7eb;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.skill-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    gap: 12px;
+    transition: background 0.18s;
+}
+
+.skill-group-header:hover {
+    background: #f8fafc;
+}
+
+.skill-group-header .sg-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.skill-group-header .sg-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.skill-group-header .sg-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a2a3a;
+    letter-spacing: -0.01em;
+}
+
+.skill-group-header .sg-meta {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.skill-group-header .sg-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.count-pill {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+}
+
+.chevron {
+    width: 18px;
+    height: 18px;
+    border-right: 2px solid #9ca3af;
+    border-bottom: 2px solid #9ca3af;
+    transform: rotate(45deg);
+    transition: transform 0.22s ease;
+    margin-top: -4px;
+    flex-shrink: 0;
+}
+
+.skill-group.open .chevron {
+    transform: rotate(-135deg);
+    margin-top: 4px;
+}
+
+.skill-group-body {
+    display: none;
+    padding: 0 14px 14px;
+    border-top: 0.5px solid #f1f3f6;
+}
+
+.skill-group.open .skill-group-body {
+    display: block;
+}
+
+/* ── STATUS ACCORDION (nested) ── */
+.status-group {
+    border: 0.5px solid #f1f3f6;
+    border-radius: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.status-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    background: #fafbfc;
+    transition: background 0.15s;
+}
+
+.status-group-header:hover {
+    background: #f3f4f6;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-group-header .sg-status-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    flex: 1;
+}
+
+.status-group-header .sg-status-count {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.chevron-sm {
+    width: 13px;
+    height: 13px;
+    border-right: 1.5px solid #9ca3af;
+    border-bottom: 1.5px solid #9ca3af;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    margin-top: -3px;
+    flex-shrink: 0;
+}
+
+.status-group.open .chevron-sm {
+    transform: rotate(-135deg);
+    margin-top: 3px;
+}
+
+.status-group-body {
+    display: none;
+    padding: 10px 12px;
+    background: #fff;
+    border-top: 0.5px solid #f1f3f6;
+}
+
+.status-group.open .status-group-body {
+    display: block;
+}
+
+/* ── JOB CARD (in accordion) ── */
+.sj-card {
+    background: #fff;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 11px;
+    padding: 15px 16px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.sj-card:last-child { margin-bottom: 0; }
+
+.sj-card:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 10px rgba(99,102,241,0.07);
+}
+
+.sj-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.sj-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2a3a;
+    margin-bottom: 4px;
+    line-height: 1.35;
+}
+
+.sj-card-loc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+
+.sj-card-desc {
+    font-size: 12.5px;
+    color: #4b5563;
+    line-height: 1.55;
+    margin-top: 6px;
+}
+
+.status-badge {
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.badge-pending  { background: #fef3c7; color: #92400e; }
+.badge-accepted { background: #dcfce7; color: #166534; }
+.badge-rejected { background: #fee2e2; color: #991b1b; }
+.badge-bidding  { background: #ede9fe; color: #5b21b6; }
+.badge-countered { background: #fef3c7; color: #b45309; }
+.badge-jsaccepted { background: #dbeafe; color: #1e40af; }
+.badge-jscountered { background: #e0f2fe; color: #075985; }
+
+/* ── BID CARD ADAPTATION ── */
+.bid-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 5px;
+    letter-spacing: 0.02em;
+}
+
+.pill-pending    { background: #f1f5f9; color: #475569; }
+.pill-countered  { background: #fef9c3; color: #854d0e; }
+.pill-jscounter  { background: #dbeafe; color: #1e40af; }
+.pill-jsAccepted { background: #dcfce7; color: #15803d; }
+.pill-accepted   { background: #bbf7d0; color: #14532d; }
+.pill-rejected   { background: #fee2e2; color: #991b1b; }
+
+/* ── NEGOTIATION THREAD ── */
+.neg-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 9px;
+    border: 0.5px solid #e5e7eb;
+}
+
+.neg-bubble {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.neg-bubble.you {
+    flex-direction: row-reverse;
+}
+
+.neg-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: 0.03em;
+}
+
+.js-dot  { background: #dbeafe; color: #1d4ed8; }
+.emp-dot { background: #dcfce7; color: #15803d; }
+
+.neg-content {
+    background: #fff;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 9px;
+    padding: 8px 12px;
+    max-width: 75%;
+    min-width: 100px;
+}
+
+.neg-bubble.you .neg-content {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.neg-action  { font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.neg-amount  { font-size: 16px; font-weight: 800; color: #1a2a3a; line-height: 1.2; }
+.neg-note    { font-size: 11.5px; color: #6b7280; font-style: italic; margin-top: 2px; }
+.neg-date    { font-size: 10.5px; color: #9ca3af; margin-top: 4px; }
+
+/* ── SALARY CHIP ── */
+.salary-chip {
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* ── CURRENT OFFER BOX ── */
+.offer-box {
+    text-align: right;
+}
+
+.offer-amount {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a2a3a;
+    line-height: 1;
+}
+
+.offer-label {
+    font-size: 10.5px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* ── ACTION STRIP ── */
+.action-strip {
+    border-radius: 9px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.action-strip.warn   { background: #fffbeb; border: 0.5px solid #fcd34d; color: #92400e; }
+.action-strip.info   { background: #eff6ff; border: 0.5px solid #bfdbfe; color: #1d4ed8; }
+.action-strip.success{ background: #f0fdf4; border: 0.5px solid #86efac; color: #166534; font-weight: 700; }
+.action-strip.danger { background: #fef2f2; border: 0.5px solid #fca5a5; color: #991b1b; }
+.action-strip.muted  { background: #f9fafb; border: 0.5px solid #e5e7eb; color: #6b7280; }
+
+/* ── ACTION BUTTONS ── */
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-end;
+    margin-top: 10px;
+}
+
+.btn-accept {
+    background: #ecfdf5; color: #166534;
+    border: 0.5px solid #bbf7d0;
+    border-radius: 8px; padding: 7px 16px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer;
+    text-decoration: none; display: inline-block;
+    transition: background 0.15s;
+}
+.btn-accept:hover { background: #dcfce7; }
+
+.btn-reject {
+    background: #fef2f2; color: #991b1b;
+    border: 0.5px solid #fca5a5;
+    border-radius: 8px; padding: 7px 16px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer;
+    text-decoration: none; display: inline-block;
+    transition: background 0.15s;
+}
+.btn-reject:hover { background: #fee2e2; }
+
+.btn-counter {
+    background: #ede9fe; color: #6d28d9;
+    border: 0.5px solid #c4b5fd;
+    border-radius: 8px; padding: 7px 14px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer;
+    transition: background 0.15s;
+}
+.btn-counter:hover { background: #ddd6fe; }
+
+.counter-form {
+    display: flex; gap: 6px; align-items: center; flex: 1; min-width: 200px;
+}
+
+.counter-input {
+    font-size: 12.5px; padding: 7px 10px;
+    border-radius: 8px; flex: 1;
+    border: 0.5px solid #e5e7eb; background: #f9fafb; color: #374151;
+}
+
+.counter-note {
+    font-size: 12.5px; padding: 7px 10px; border-radius: 8px;
+    border: 0.5px solid #e5e7eb; background: #f9fafb; color: #374151; width: 100px;
+}
+
+/* ── ASSIGNED SECTION ── */
+#assignedSection .sj-card {
+    position: relative;
+}
+
+.assigned-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #dcfce7;
+    color: #14532d;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+}
+
+.assigned-salary {
+    font-size: 17px;
+    font-weight: 800;
+    color: #15803d;
+    margin-top: 6px;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #9ca3af;
+}
+
+.empty-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}

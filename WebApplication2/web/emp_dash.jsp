@@ -337,7 +337,7 @@ margin-top:10px;
 </a>
 <a href="#" onclick="showSection('reviews', event)">
     <i class="fa-solid fa-star nav-icon"></i>
-    <span class="nav-label"> Rate & Review</span>
+    <span class="nav-label"> Rate & Reviews</span>
 </a>
 
 <%
