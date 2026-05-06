@@ -9,7 +9,7 @@ public class DBConnection {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/skillmitra",
+           "jdbc:mysql://localhost:3306/skillmitra",
                 "root",
                 ""
             );

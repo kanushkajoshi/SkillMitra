@@ -433,6 +433,7 @@ try {
         "SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.job_id WHERE j.eid=?"
     );
     psDash2.setInt(1, empDashId);
+    
     ResultSet rsDash2 = psDash2.executeQuery();
     if (rsDash2.next()) empTotalApps = rsDash2.getInt(1);
     rsDash2.close(); psDash2.close();
